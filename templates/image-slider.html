@@ -1,0 +1,7 @@
+<div class="modal image-modal transparent" ng-click="closeModal()">
+    <ion-slide-box on-slide-changed="slideChanged(index)" show-pager="false">
+        <ion-slide ng-repeat="image in categoryproductdata.images">
+            <img ng-src="file:///storage/sdcard0/toykraft/{{image.image}}" class="fullscreen-image" />
+        </ion-slide>
+    </ion-slide-box>
+</div>

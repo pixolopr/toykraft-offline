@@ -1,0 +1,36 @@
+<ion-modal-view>
+    <ion-header-bar class="bar-assertive">
+        <h1 class="title">Edit Retailer Details</h1>
+    </ion-header-bar>
+    <ion-content>
+        <div class="list">
+            <label class="item item-input">
+                <span class="input-label">Owner Name</span>
+                <input type="text" name="contact" ng-model="editretailer.ownername">
+            </label>
+
+            <label class="item item-input">
+                <span class="input-label">Owner Number</span>
+                <input type="tel" name="contactperson" ng-model="editretailer.ownernumber">
+            </label>
+            <label class="item item-input">
+                <span class="input-label">Company Email</span>
+                <input type="email" name="email" ng-model="editretailer.email">
+            </label>
+            <label class="item item-input">
+                <span class="input-label">Sales Person Name</span>
+                <input type="text" name="contact" ng-model="editretailer.contactname">
+            </label>
+
+            <label class="item item-input">
+                <span class="input-label">Sales Person Number</span>
+                <input type="tel" name="contactperson" ng-model="editretailer.contactnumber">
+            </label>
+        </div>
+        <div class="padding">
+            <button class="button button-block button-assertive" ng-click="editRetailerFunction();">
+                EDIT SHOP
+            </button>
+        </div>
+    </ion-content>
+</ion-modal-view>

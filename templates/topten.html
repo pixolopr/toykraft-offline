@@ -1,0 +1,32 @@
+<ion-modal-view>
+    <ion-header-bar class="bar-assertive">
+        <h1 class="title">Top Ten Products</h1>
+    </ion-header-bar>
+    <ion-content>
+        <div ng-controller="loaderCtrl"></div>
+        <div class="padding">
+            
+            <table class="table2">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Product Code</th>
+                        <th>Product Name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="topten in toptendata">
+                        <td>{{$index + 1}}</td>
+                        <td>{{topten.productcode}}</td>
+                        <td>{{topten.name}}</td>    
+                    </tr>
+                </tbody>
+            </table>
+        <div class="row">
+                
+            </div>
+        </div>
+    </ion-content>
+</ion-modal-view>
+
+

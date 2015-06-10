@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!-- config.xml reference: https://build.phonegap.com/docs/config-xml -->
+<widget xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0" id="com.toykraft.dealer" versionCode="1" version="1.0.0">
+
+    <name>Toykraft Dealer</name>
+
+    <description>
+        Dealer's App
+    </description>
+
+    <author href="toy-kraft.in" email="anujmehta@toy-kraft.com">
+        Toykraft
+    </author>
+    
+    <preference name="phonegap-version" value="3.6.3" />
+    <preference name="fullscreen" value="false" />
+    <preference name="orientation" value="landscape" />
+    <preference name="splash-screen-duration" value="5000" />
+    <preference name="android-minSdkVersion" value="10" />
+    <preference name="LoadUrlTimeoutValue" value="100000" />
+    <preference name="target-device" value="universal" />
+    <preference name="webviewbounce" value="true" />
+    <preference name="prerendered-icon" value="true" />
+    <preference name="stay-in-webview" value="true" />
+    <preference name="ios-statusbarstyle" value="black-opaque" />
+    <preference name="detect-data-types" value="true" />
+    <preference name="exit-on-suspend" value="false" />
+    <preference name="show-splash-screen-spinner" value="true" />
+    <preference name="auto-hide-splash-screen" value="true" />
+    <preference name="disable-cursor" value="false" />
+    <preference name="android-installLocation" value="auto" />
+    
+    <feature name="http://api.phonegap.com/1.0/geolocation"/>
+    
+    
+    <gap:plugin name="org.apache.cordova.device" />
+    <gap:plugin name="org.apache.cordova.camera" />
+    <gap:plugin name="org.apache.cordova.splashscreen" />
+    <gap:plugin name="org.apache.cordova.core.geolocation" />
+    <gap:plugin name="org.apache.cordova.file" />
+    <gap:plugin name="org.apache.cordova.file-transfer" />
+    <gap:plugin name="com.ionic.keyboard" />
+    <gap:plugin name="org.apache.cordova.network-information" />
+    <gap:plugin name="nl.x-services.plugins.toast" />
+   
+
+
+    <icon src="img/logo1.png" />
+    <gap:splash src="img/splash.png" />
+    
+    <access origin="*" />
+    <!-- allow all pages, use for development -->
+    <!-- allow pushwoosh service -->
+
+</widget>

@@ -1,0 +1,33 @@
+<ion-view title="Your Orders">
+    <ion-content class="has-header">
+       <ion-nav-buttons side="right">
+        <a class="button icon ion-home" href="#/app/home">
+
+        </a>
+    </ion-nav-buttons>
+
+        <div class="padding">
+
+            <table class="table2" ng-show="noorder">
+                <tr>
+                    <th>Order Id</th>
+                    <th>Retailer</th>
+                    
+                    <th>Total</th>
+                    <th>Time</th>
+                    <th></th>
+                </tr>
+                
+                <tr ng-repeat="userorder in userordersdata" ng-show="noorder">
+                    <td>{{userorder.id}}</td>
+                    <td>{{userorder.retail}}</td>
+                    <td>{{userorder.amount|decimal2|currency}}</td>
+                    <td>{{userorder.timestamp}}</td>
+                    <td><a class="button button-assertive button-small" href="#/app/orderdetails/{{userorder.id}}">Details</a></td>
+                </tr>
+            </table>
+            <p class="assertive text-center" ng-hide="noorder" style="padding:20%;">No order found</p>
+            
+        </div>
+    </ion-content>
+</ion-view>

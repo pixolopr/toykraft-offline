@@ -1,0 +1,69 @@
+<ion-view title="Toykraft Dealer">
+    <ion-content class="has-header">
+        <ion-nav-buttons side="right">
+            <a class="button icon ion-home" href="#/app/home">
+
+            </a>
+        </ion-nav-buttons>
+        <div ng-controller="loaderCtrl"></div>
+        <div class="padding">
+            <h2>{{retailerdata.name}}</h2>
+            <h4>{{retailerdata.contactname}}</h4>
+            <h4>{{retailerdata.address}}</h4>
+            <h4>{{retailerdata.contactnumber}}</h4>
+            <h4>{{retailerdata.email}}</h4>
+    
+            <table class="table2">
+                <thead>
+                    <tr>
+                        <th>Product Code</th>
+                        <th>Product name</th>
+                        <th>MRP</th>
+                        <th>Quantity</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="orderdetails in orderdetailsdata|filter:cartnotschemenew">
+                        <td>{{orderdetails.productcode}}</td>
+                        <td>{{orderdetails.name}}</td>
+                        <td>{{orderdetails.amount / orderdetails.quantity|decimal2|currency}}</td>
+                        <td>{{orderdetails.quantity}}</td>
+                        <td>{{orderdetails.amount |decimal2|currency}}</td>
+                    </tr>
+                    <tr class="list list-royal" ng-repeat="orderdetails in orderdetailsdata|filter:{category:'scheme'}">
+                        <td>{{orderdetails.productcode}}</td>
+                        <td>{{orderdetails.name}}</td>
+                        <td>{{orderdetails.amount / orderdetails.quantity|decimal2|currency}}</td>
+                        <td>{{orderdetails.quantity}}</td>
+                        <td>{{orderdetails.amount |decimal2|currency}}</td>
+                    </tr>
+                    <tr class="list list-energized" ng-repeat="orderdetails in orderdetailsdata|filter:{category:'new'}">
+                        <td>{{orderdetails.productcode}}</td>
+                        <td>{{orderdetails.name}}</td>
+                        <td>{{orderdetails.amount / orderdetails.quantity|decimal2|currency}}</td>
+                        <td>{{orderdetails.quantity}}</td>
+                        <td>{{orderdetails.amount |decimal2|currency}}</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td><strong>Total:</strong>
+                        </td>
+                        <td><strong>{{quantitytotal}}</strong> 
+                        </td>
+                        <td><strong>{{total|decimal2|currency}}</strong>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+            <div class="clearfix"></div>
+            <div>
+                <span class="list list-royal pull-right marker"> SCHEME </span><span class="list list-energized pull-right marker"> NEW PRODUCTS </span>
+            </div>
+            <!--            <button class="button button-assertive button-block" ng-click="sendOrder(retailerdata2);">Confirm Order</button>-->
+        </div>
+    </ion-content>
+</ion-view>

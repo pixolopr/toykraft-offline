@@ -1,0 +1,30 @@
+<ion-modal-view>
+    <ion-header-bar class="bar-assertive">
+        <h1 class="title">Recent Orders</h1>
+        <button class="button icon ion-close-round" ng-click="closerecent();"></button>
+    </ion-header-bar>
+    <ion-content>
+        <div class="padding">
+            <table class="table2">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Quantity</th>
+                        <th>Amount</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="retailerrecent in retailerrecentdata">
+                        <!--<td>{{retailerrecent.sales}}</td>-->
+                        <td>{{retailerrecent.timestamp}}</td>
+                        <td>{{retailerrecent.quantity}}</td>
+                        <td>{{retailerrecent.amount|decimal2|currency}}</td>
+                        <td><a class="button button-assertive button-small" ng-click="closerecent();" href="#/app/orderdetails/{{retailerrecent.id}}">Details</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </ion-content>
+</ion-modal-view>

@@ -1,0 +1,142 @@
+<ion-view title="TOYKRAFT DEALER">
+    <ion-nav-buttons>
+        <input class="search navbox" type="text" ng-model="searchtext" placeholder="Search">
+        <a class="button button-icon icon ion-ios7-search" ng-click="searchproduct(searchtext);"></a>
+    </ion-nav-buttons>
+
+    <ion-nav-buttons side="right">
+        <button class="button button-assertive" ng-click="gettopten();">
+            Top Ten Products
+        </button>
+        <button class="button button-assertive" ng-click="openrecent();">
+            Recent Orders
+        </button>
+        <button class="button button-assertive" ng-click="gettopen();">
+            Edit Retailer
+        </button>
+        <a class="button icon ion-home" href="#/app/home">
+
+        </a>
+    </ion-nav-buttons>
+
+
+    <ion-content class="has-header">
+       <div ng-controller="loaderCtrl"></div>
+        <div class="row">
+            <div class="col col-67">
+                <button class="button button-assertive  icon ion-chevron-left" ng-click="getnextproduct(0);"></button>
+                <div class="pull-right">
+                    <button class="button button-assertive  icon ion-chevron-right" ng-click="getnextproduct(1);"></button>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <h2>{{categoryproductdata.name}}</h2>
+                    </div>
+                    <div class="col">
+                        <h3>MRP: {{categoryproductdata.mrp|decimal2|currency}} </h3>                       
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <h4>Code: {{categoryproductdata.productcode}}</h4>
+                        <h4>Age: {{categoryproductdata.age}} years</h4>
+                        <h4>USPs: </h4>
+                        <ion-scroll zooming="false" direction="y" class="description" ng-click="openusp();">
+                            <p>{{categoryproductdata.description}}</p>
+                        </ion-scroll>
+                    </div>
+                    <div class="col">
+                        <div class="row">
+                            <div class="col col-25">
+                                <h4>Quantity</h4>
+                                <h4>Amount</h4>
+                            </div>
+                            <div class="col">
+                                <input class="navbox inputborder" type="number" ng-model="productquantity">
+                                <input class="navbox inputborder" type="text" value="{{categoryproductdata.mrp * productquantity|decimal2|currency}}" disabled>
+                            </div>
+                        </div>
+                        <h3 class="royal">{{categoryname}}</h3>
+                        <button class="button button-block button-assertive" ng-click="addToCart(categoryproductdata.id, categoryproductdata.productcode,categoryproductdata.name,productquantity,categoryproductdata.mrp);">
+                            Add to cart
+                        </button>
+                    </div>
+                </div>
+
+                <h4>Photos:</h4>
+                <div class="row image-scroll" ng-controller="PhotoSliderCtrl">
+
+                    <div class="col col-10" ng-repeat="image in categoryproductdata.images" ng-click="openModal($index);"><!--
+                        <img src="http://www.mywebsite-demo.com/toy-kraft/media/catalog/product{{image.image}}" class="full-image">-->
+                        <img src="file:///storage/sdcard0/toykraft/{{image.image}}" class="full-image">
+                    </div>
+
+                </div>
+
+                <div class="row" style="padding:20px">
+                    <div class="col col-33">
+                        <button class="button button-block button-royal" ng-click="getscheme('scheme')">Scheme <span ng-show="categoryid=='scheme'" class="checkedgreen ion-checkmark-round"></span> 
+                        </button>
+                    </div>
+                    <div class="col col-33">
+                        <button class="button button-block button-energized" ng-click="getscheme('new')">New Products <span ng-show="categoryid=='new'" class="checkedgreen ion-checkmark-round"></span> 
+                        </button>
+                    </div>
+                    <div class="col col-33">
+                        <button class="button button-block button-assertive" ng-click="getscheme(6)">Regular <span ng-hide="categoryid=='scheme' || categoryid=='new'" class="checkedgreen ion-checkmark-round"></span> 
+                        </button>
+                    </div>
+                    
+                </div>
+
+
+            </div>
+            <div class="col border-left">
+                <h3>{{retailerdata2.name}}</h3>
+                <h3>{{retailerdata2.contactname}}</h3>
+                <h4>Shopping Cart</h4>
+                <a href="#/app/confirm-order/{{retailerid}}" class="button button-block button-assertive">Order Now</a>
+                <table class="table2">
+                    <thead>
+                        <tr>
+                            <td><strong>Total:</strong></td>
+                            <td><strong>{{gettotalquantity()}}</strong></td>
+                            <td>
+                            </td>
+                            <td><strong>{{gettotal()|decimal2}}</strong>
+                            </td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <th>Name</th>
+                            <th>Quantity</th>
+                            <th>MRP(₹)</th>
+                            <th>Amt.(₹)</th>
+                            <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                        <tr ng-repeat="singlecart in mycart|reverse" ng-class="giveclass(singlecart.category);">
+                            <td>{{singlecart.name}}</td>
+                            <td>
+                                <input class="text-center" type="text" ng-model="singlecart.quantity" ng-change="changequantity(singlecart.quantity,singlecart.productcode,singlecart.category)" style="width: 35px;">
+                            </td>
+                            <td>{{singlecart.mrp|decimal2}}</td>
+                            <td>{{(singlecart.totalprice)|decimal2}}</td>
+                            <td>
+                                <button class="button button-icon icon ion-android-close" ng-click="remove(singlecart.id,singlecart.category);"></button>
+                            </td>
+                        </tr>
+                        
+                       
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+
+
+
+    </ion-content>
+</ion-view>

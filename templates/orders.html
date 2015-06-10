@@ -1,0 +1,46 @@
+<ion-view title="Your Orders">
+    <ion-content class="has-header">
+        <ion-nav-buttons side="right">
+            <a class="button icon ion-home" href="#/app/home">
+
+            </a>
+        </ion-nav-buttons>
+        <div ng-controller="loaderCtrl"></div>
+        <div class="item item-divider">Sort by:</div>
+        
+            
+ <div class="row">
+    <div class="col"><button class="button button-assertive button-block" ng-click="openDate();">date</button></div>
+     <div class="col"><button class="button button-assertive button-block" ng-click="openRetailer();">Retailer</button></div>
+</div>
+           
+            <p class="assertive text-center" ng-show="ordersdata=='false'" style="padding:20%;">No order found</p>
+            <div class="padding" ng-controller="DealerCtrl">
+                <table class="table2" ng-show="ordersdata!='false'">
+                    <thead><tr>
+                            <th>Order Id</th>
+                            <th>Retailer</th>
+                            <th>Total</th>
+                            <th>Time</th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                   <tbody>
+                         <tr ng-repeat="userorder in ordersdata">
+                            <td>{{userorder.id}}</td>
+                            <td>{{userorder.retail}}</td>
+                             <td>{{userorder.amount|decimal2|currency}}</td>
+                            <td>{{userorder.timestamp}}</td>
+                            <td><a class="button button-assertive button-small" href="#/app/orderdetails/{{userorder.id}}">Details</a>
+                            </td>
+                             <td><a class="button button-assertive button-small" ng-click="resendemail(userorder.id);">Resend</a></td>
+                             <td><a class="button button-assertive button-small" ng-click="resendorder(userorder.id);">Reorder</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        
+    </ion-content>
+</ion-view>

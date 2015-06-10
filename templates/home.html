@@ -1,0 +1,132 @@
+<ion-view title="Toykraft - Welcome {{user.name}}">
+    <div class="bar bar-header">
+        <button class="button icon ion-navicon"></button>
+        <ion-nav-buttons side="right">
+
+
+            <button class="button button-assertive icon ion-log-out" ng-click="logout()">
+                Logout
+            </button>
+
+        </ion-nav-buttons>
+    </div>
+    <ion-content class="has-header">
+
+        <div class="home">
+            <!--
+            <div class="row">
+                <div class="col">
+                    <a href="">
+                        <span class="sync box"><i class="icon ion-ios7-loop-strong"></i></span>
+                        <br>Sync Data
+                    </a>
+                </div>
+                <div class="col">
+                    <a href="" ng-click="">
+                        <span class="sync box"><i class="icon ion-ios7-loop-strong"></i></span>
+                        <br>Sync Order
+                    </a>
+                </div>
+            </div>
+            
+--> 
+            <div class="row" ng-hide="lastretailer!=0">
+                <div class="col col-50">
+                    <a href="#/app/state/{{userzone}}" class="aligncenter">
+                        <span class="field box"><i class="icon ion-ios7-briefcase"></i></span>
+                        <br>Field Mode
+                    </a>
+                </div>
+                <div class="col col-50">
+                    <a href="#/app/orders" class="aligncenter">
+                        <span class="field box"><i class="icon ion-cash"></i></span>
+                        <br>My Orders
+                    </a>
+                </div>
+            </div>
+
+            <div class="row" ng-show="lastretailer!=0">
+                <div class="col col-33">
+                    <a href="#/app/state/{{userzone}}" class="aligncenter">
+                        <span class="field box"><i class="icon ion-ios7-briefcase"></i></span>
+                        <br>Field Mode
+                    </a>
+                </div>
+                <div class="col col-33">
+                    <a href="#/app/orders" class="aligncenter">
+                        <span class="field box"><i class="icon ion-cash"></i></span>
+                        <br>My Orders
+                    </a>
+                </div>
+                <div class="col col-33" >
+                    <a ng-click="gotolastretailer();" class="aligncenter">
+                        <span class="field box"><i class="icon ion-person-stalker"></i></span>
+                        <br>Last Retailer
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col col-50">
+                <h4 class="tableheader">Today's Tally</h4>
+                <table class="table">
+                    <tr>
+                        <td>No. of Calls: <span class="tallyreport">{{todtallydata.calls}}</span>
+                        </td>
+                        <td>No. of Order: <span class="tallyreport">{{todtallydata.orders}}</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Total Quantity: <span class="tallyreport">{{todtallydata.quantity}}</span>
+                        </td>
+                        <td>Total Amount: <span class="tallyreport">{{todtallydata.amount|decimal2}}</span> 
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col col-50">
+                <h4 class="tableheader">Month's Tally</h4>
+                <table class="table">
+                    <tr>
+                        <td>No. of Calls: <span class="tallyreport">{{monthtallydata.calls}}</span>
+                        </td>
+                        <td>No. of Order: <span class="tallyreport">{{monthtallydata.orders}}</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Total Quantity: <span class="tallyreport">{{monthtallydata.quantity}}</span>
+                        </td>
+                        <td>Total Amount: <span class="tallyreport">{{monthtallydata.amount|decimal2}}</span> 
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+        </div>
+
+
+        <!--
+            <table class="table" border="1" style="padding:20%; margin: 5%">
+                    <tr>
+                        <th>Number of calls</th>
+                        <th>Number of ordersS</th>
+                        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+                        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+                        <th>Number of calls</th>
+                        <th>Number of orders</th>
+                        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+                    </tr>
+                    <tr align=center style="align: center">
+                        <td>NAME</th>
+                        <td>QUANTITY</td>
+                        <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                        <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                        <td>MRP</td>
+                        <td>AMT</td>
+                    </tr>
+            </table>
+-->
+        </div>
+    </ion-content>
+</ion-view>

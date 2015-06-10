@@ -1,0 +1,310 @@
+/* Empty. Add your own CSS if you like */
+
+@font-face {
+    font-family: 'Source Sans Pro';
+    src: url('fonts/SourceSansPro-Light.ttf');
+    font-weight: 300;
+}
+@font-face {
+    font-family: 'Source Sans Pro';
+    src: url('fonts/SourceSansPro-Regular.ttf');
+    font-weight: 400;
+}
+@font-face {
+    font-family: 'Source Sans Pro';
+    src: url('fonts/SourceSansPro-Bold.ttf');
+    font-weight: 700;
+}
+body,
+p,
+a,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+input,
+button,
+select,
+textarea {
+    font-family: 'Source Sans Pro';
+    color: #444;
+    text-transform: capitalize;
+}
+a {
+    text-decoration: none;
+}
+.responsive {
+    width: 100%;
+}
+.xlargefont {
+    font-size: x-large;
+}
+.home {
+    text-align: center;
+}
+.home a {
+    color: #777;
+}
+.box i.icon {
+    font-size: 88px;
+    width: 100%;
+}
+.table tr td {
+    text-align: left;
+    padding: 11px;
+    border-bottom: 1px solid #b22222;
+}
+.table {
+    width: 100%;
+    padding: 10px;
+    border-left: 1px solid #b22222;
+    border-right: 1px solid #b22222;
+}
+input.navbox {
+    padding: 10px;
+    width: 100%;
+    background: white;
+    margin-left: 10px;
+}
+input.inputborder {
+    width: 120px;
+    margin-left: 0px;
+    text-align: center;
+    font-size: 17px;
+    background: #b22222;
+    margin-top: 2px;
+    border-radius: 5px;
+    color: white;
+}
+.sync {
+    background: -webkit-linear-gradient(top, #86fe65 0%, #06d315 100%);
+    background: -moz-linear-gradient(top, #86fe65 0%, #06d315 100%);
+    background: -ms-linear-gradient(top, #86fe65 0%, #06d315 100%);
+    background: -o-linear-gradient(top, #86fe65 0%, #06d315 100%);
+    background: linear-gradient(top, #86fe65 0%, #06d315 100%);
+    box-shadow: 0 0 0 1px rgba(134, 254, 101, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05) inset;
+    color: white;
+}
+.field {
+    /* box-shadow: 0 0 0 1px rgba(31, 118, 237, 0.3) inset; */
+    background: #b22222;
+    border-radius: 100%;
+    background: -moz-linear-gradient(top, #1f76ed 0%, #70edfe 100%);
+    background: -ms-linear-gradient(top, #1f76ed 0%, #70edfe 100%);
+    background: -o-linear-gradient(top, #1f76ed 0%, #70edfe 100%);
+    background: linear-gradient(top, #1f76ed 0%, #70edfe 100%);
+    color: white;
+}
+.viewall {
+    box-shadow: 0 0 0 1px rgba(72, 195, 248, 0.5) inset;
+    background: -webkit-linear-gradient(top, #50ebc2 0%, #50ebc2 33%, #59c7fd 100%);
+    background: -moz-linear-gradient(top, #50ebc2 0%, #50ebc2 33%, #59c7fd 100%);
+    background: -ms-linear-gradient(top, #50ebc2 0%, #50ebc2 33%, #59c7fd 100%);
+    background: -o-linear-gradient(top, #50ebc2 0%, #50ebc2 33%, #59c7fd 100%);
+    background: linear-gradient(top, #50ebc2 0%, #50ebc2 33%, #59c7fd 100%);
+    color: white;
+}
+.box {
+    position: relative;
+    display: inline-block;
+    width: 300px;
+    height: 300px;
+    margin: 10px;
+    border-radius: 100%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 104px 10px 19px;
+    font-size: 125px;
+}
+.bar.bar-toykraft {
+    border-color: #f8f8f8;
+    background-color: #e7e7e7;
+    background-image: linear-gradient(0deg, #e7e7e7, #e7e7e7 50%, transparent 50%);
+    color: #969a9d;
+}
+.bar-toykraft .title {
+    color: #888;
+    font-size: 22px;
+}
+.bar-toykraft .button {
+    color: #888;
+}
+.button.button-positive {
+    border-color: #6197EC;
+    background-color: #79AAF5;
+    color: #fff;
+}
+.button.button-balanced {
+    border-color: #64BE33;
+    background-color: #8CCE6B;
+    color: #fff;
+}
+.shopimage {
+    height: 78px;
+}
+.images img {
+    width: 100px;
+}
+.images>img+img {
+    margin-left: 5px;
+}
+.pull-right {
+    float: right;
+}
+.border-left {
+    border-left: 1px solid #b22;
+    margin: -5px 0;
+}
+.bar .title {
+    font-weight: 600;
+    font-size: 18px;
+}
+.tableheader {
+    color: white;
+    background: #b22222;
+    padding: 10px;
+    font-weight: bold;
+    margin-bottom: 0px;
+}
+.tallyreport {
+    float: right;
+    font-size: 140%;
+    background: #b22222;
+    padding: 10px;
+    color: white;
+    border-radius: 6px;
+    margin-top: -3px;
+    min-width: 95px;
+    text-align: center;
+    min-height: 40px;
+}
+.bar-assertive .button {
+    border-color: #A21F1F;
+    background-color: #b22222;
+    color: #fff;
+}
+.table2 {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 20px;
+}
+th {
+    text-align: left;
+    font-weight: bold;
+}
+.table2>thead>tr>th,
+.table2>thead>tr>td,
+.table2>tbody>tr>th,
+.table2>tfoot>tr>th,
+.table2>tbody>tr>td,
+.table2>tfoot>tr>td {
+    padding: 5px;
+    vertical-align: middle;
+    border-top: 1px solid #ddd;
+}
+.table2>thead>tr>th,
+.table2>thead>tr>td {
+    border-top: 0
+}
+.image-scroll {
+    background: #F6F4F4;
+    margin-bottom: 5px;
+    border-radius: 5px;
+    overflow-x: scroll;
+}
+.item-divider {
+    padding-top: 8px;
+    padding-bottom: 8px;
+    min-height: 30px;
+    background-color: #FFE6E6;
+    color: #b22;
+    font-weight: bold;
+    border-color: #FCD8D8;
+}
+.checkedgreen {
+    float: right;
+    border-radius: 100%;
+    background: rgb(0, 219, 0);
+    width: 40px;
+    height: 40px;
+}
+.list.list-royal {
+    color: white;
+    background: #8a6de9;
+}
+.list.list-energized {
+    color: white;
+    background: #f0b840;
+}
+.marker {
+    padding: 10px;
+    margin: 10px;
+}
+.transparent {
+    background: transparent !important;
+}
+.modal-backdrop.active {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+.image-modal {
+    width: 100% !important;
+    height: 100%;
+    top: 0 !important;
+    left: 0 !important;
+}
+.fullscreen-image {
+    max-width: 100%;
+    max-height: 100%;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+    overflow: auto;
+    position: fixed;
+    right: 0;
+    top: 0;
+}
+.slider {
+    width: 100%;
+    height: 100%;
+}
+p.info {
+    position: absolute;
+    bottom: 55px;
+    margin: 0 auto;
+    width: 100%;
+    display: block;
+    text-align: center;
+    font-size: 28px;
+    color: #ffffff;
+}
+.description {
+    height: 100px;
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    text-align: justify;
+    overflow: hidden;
+}
+.buttons span+span,
+.button+.button {
+    margin-left: 8px;
+}
+.clearfix:before,
+.clearfix:after {
+    display: table;
+    content: " ";
+}
+.clearfix:after {
+    clear: both;
+}
+.remark {
+    border: 1px solid #ccc;
+    box-shadow: 1px 1px 5px 1px #ccc;
+    padding: 10px;
+    height: 100px;
+}
+input {
+ text-transform: none !important;
+}

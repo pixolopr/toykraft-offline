@@ -1,0 +1,53 @@
+<ion-modal-view>
+    <ion-header-bar class="bar-assertive">
+        <h1 class="title">Sort by Retailer</h1>
+    </ion-header-bar>
+    <ion-content>
+        <div class="padding">
+          
+            <label class=" item-input item-select">
+                <div class="input-label">
+                    Select a State
+                </div>
+                <select ng-model="filter.state" ng-change="statechange(filter.state);">
+                    <option value="{{state.id}}" ng-repeat="state in statedata">{{state.name}}</option>
+                </select>
+            </label>
+            <label class=" item-input item-select">
+                <div class="input-label">
+                    Select a City
+                </div>
+                <select ng-model="filter.city" ng-change="citychange(filter.city);">
+                    <option value="{{city.id}}" ng-repeat="city in citydata">{{city.name}}</option>
+                </select>
+            </label>
+            <label class=" item-input item-select">
+                <div class="input-label">
+                    Select a Area
+                </div>
+                <select ng-model="filter.area" ng-change="areachange(filter.area);">
+                    <option value="{{area.id}}" ng-repeat="area in areadata">{{area.name}}</option>
+                </select>
+            </label>
+            <label class=" item-input item-select">
+                <div class="input-label">
+                    Select a Retailer
+                </div>
+                <select ng-model="filter.retailer" ng-change="retailerchange(filter);">
+                    <option value="{{retailer.id}}" ng-repeat="retailer in retailerdata">{{retailer.name}}</option>
+                </select>
+            </label>
+
+            <div class="row">
+                <div class="col">
+                    <button class="button button-assertive button-block" ng-click="resettoold();">Reset to Old Data</button>
+                </div>
+                <div class="col">
+                    <button class="button button-assertive button-block" ng-click="resettoold2();">Clear</button>
+                </div>
+            </div>
+        </div>
+    </ion-content>
+</ion-modal-view>
+
+

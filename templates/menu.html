@@ -1,0 +1,32 @@
+<ion-side-menus>
+
+    <ion-pane ion-side-menu-content>
+
+        <ion-nav-bar class=" nav-title-slide-ios7 bar bar-assertive ">
+            <!--<ion-nav-back-button class="button-clear"><i class="icon ion-ios7-arrow-back"></i>
+            </ion-nav-back-button>-->
+        </ion-nav-bar>
+        <ion-nav-view name="menuContent" animation="slide-left-right"></ion-nav-view>
+    </ion-pane>
+    <ion-side-menu side="left">
+        <header class="bar bar-header bar-assertive">
+            <h1 class="title">Categories</h1>
+        </header>
+        <ion-content class="has-header">
+            <ion-list class="menu-item"  ng-show="setslide();">
+                    <div nav-clear menu-close href="#" ng-repeat="category in categorynamedata">
+                    <h4 style="padding:10px;color:white;background:#b22222;">{{category.name}}</h4>
+
+                    
+                    <ion-item  ng-click="changecategory(subcategory.id);" ng-repeat="subcategory in category.subcategory" nav-clear  >
+                        <span style="margin-left:20px;">{{subcategory.name}}</span>
+                    </ion-item>
+                    
+                </div>
+
+            </ion-list>
+            <button class="button button-assertive button-block" ng-click="gotosyncpage();" ng-hide="setslide();">Sync</button>
+        </ion-content>
+    </ion-side-menu>
+
+</ion-side-menus>
