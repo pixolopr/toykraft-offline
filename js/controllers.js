@@ -5,7 +5,7 @@ var filenameee = "";
 angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 'ngCordova'])
 
 .controller('AppCtrl', function ($scope, $ionicModal, $timeout, $location, MyServices, MyDatabase, $cordovaKeyboard, $ionicLoading) {
-    
+
     console.log("APP CONTROL");
     $scope.setslide = function () {
         var path = $location.path();
@@ -34,11 +34,9 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
     var categorynamesuccess = function (data, status) {
         $scope.categorynamedata = data;
     };
-    if (offline) {
-        $scope.categorynamedata = MyDatabase.getcategoriesoffline();
-    } else {
-        MyServices.getcategoriesname().success(categorynamesuccess);
-    };
+
+    //GET CATEGORIES FROM ONLINE TABLE
+    MyDatabase.getcategoriesname().success(categorynamesuccess);
 
 
     $scope.rid = MyServices.getretailer();
@@ -53,6 +51,8 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
     $scope.gotosyncpage = function () {
         $location.path("/app/sync");
     };
+
+    //XONE DATA SYNC
     var zonedata = function (data, status) {
         console.log(data);
         MyDatabase.addzonedata(data);
@@ -60,56 +60,15 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
     MyDatabase.findzonebyuser().success(zonedata);
 
 })
-    .controller('syncCtrl', function ($scope, $stateParams, MyServices, MyDatabase, $location, $cordovaNetwork, $cordovaToast) {
-       
-        $scope.userz = {};
-        $scope.userz.zone = ""
-        //OFFLINE MODE BUTTON
-        $scope.offlinemodebutton = false;
-        $scope.offlinemoder = function () {
-            $scope.offlinemodebutton = !($scope.offlinemodebutton);
-            console.log($scope.offlinemodebutton);
-            MyServices.setmode($scope.offlinemodebutton);
-            $cordovaToast.show('Offline Mode if now ' + $scope.offlinemodebutton, 'long', 'bottom');
-        };
-
-        //DUMMY OBJECTS TO STORE RECIEVED DATA
-        var sd, cd, ad, rd = [];
-        var successretailer = function (data, status) {
-            rd = data;
-            MyDatabase.getalldata(sd, cd, ad, rd);
-        };
-        var successarea = function (data, status) {
-            ad = data;
-            MyDatabase.syncinretailerdata().success(successretailer);
-        };
-        var successcity = function (data, status) {
-            cd = data;
-            MyDatabase.syncinretailerareadata().success(successarea);
-        };
-        var successstate = function (data, status) {
-            sd = data;
-            MyDatabase.syncinretailercitydata().success(successcity);
-        };
-        //MyDatabase.syncinretailerstatedata().success(successstate);
-        //MyDatabase.getalldata();
-        MyDatabase.test2();
-        var checkdata = function () {
-
-        };
 
 
 
-        /*var type = $cordovaNetwork.getNetwork();
-        console.log("The type of network is" + type);
-        alert(type);*/
-        //SETS VALUE FOR ZONE
-        //MyDatabase.findzonebyuseroffline();
 
-        $scope.retailerdatao = [];
-        //CREATE TABLES
+.controller('syncCtrl', function ($scope, $stateParams, MyServices, MyDatabase, $location, $cordovaNetwork, $cordovaToast) {
+
+
+        //CREATE ALL TABLES DURING PAGE LOAD
         MyDatabase.createretailertables();
-
 
         //RETRIEVING DATA INTO TABLES (FIRST TIME)
         syncretailerstatedatasuccess = function (data, status) {
@@ -136,15 +95,29 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         synccategorydatasuccess = function (data, status) {
             MyDatabase.synccategorydata(data);
         };
-        $scope.getdatatables = function () {
-            //SYNC IN DATA
-            MyDatabase.syncinretailerstatedata().success(syncretailerstatedatasuccess);
-            MyDatabase.syncinretailercitydata().success(syncretailercitydatasuccess);
-            MyDatabase.syncinretailerareadata().success(syncretailerareadatasuccess);
-            MyDatabase.syncinretailerdata().success(syncretailerdatasuccess);
-            MyDatabase.syncinproductdata().success(syncproductdatasuccess);
-            MyServices.getcategoriesname().success(synccategorydatasuccess);
+        syncproductimagedatasuccess = function (data, status) {
+            MyDatabase.insertproductimagedata(data);
         };
+
+        //GET DATA FROM ONLINE API
+        $scope.getdatatables = function () {
+            //STATE
+            MyDatabase.syncinretailerstatedata().success(syncretailerstatedatasuccess);
+            //CITY
+            MyDatabase.syncinretailercitydata().success(syncretailercitydatasuccess);
+            //AREA
+            MyDatabase.syncinretailerareadata().success(syncretailerareadatasuccess);
+            //RETAILER
+            MyDatabase.syncinretailerdata().success(syncretailerdatasuccess);
+            //PRODUCT
+            MyDatabase.syncinproductdata().success(syncproductdatasuccess);
+            //CATEGORIES
+            MyDatabase.getcategoriesname().success(synccategorydatasuccess);
+            //PRODUCTIMAGE
+            MyDatabase.syncinproductimagedata().success(syncproductimagedatasuccess);
+        };
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         var toptendatasuccess = function (data, status) {
             MyDatabase.inserttopten(data);
@@ -185,62 +158,93 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
 
         $scope.updateretailerdata = function () {
-           /* db.transaction(function (tx) {
-                tx.executeSql('SELECT * FROM RETAILER WHERE sync = "false" AND id != null', [], function (tx, results) {
-                    console.log(results.rows.item(1));
-                }, function (tx, results) {});
-            });*/
+            /* db.transaction(function (tx) {
+                 tx.executeSql('SELECT * FROM RETAILER WHERE sync = "false" AND id != null', [], function (tx, results) {
+                     console.log(results.rows.item(1));
+                 }, function (tx, results) {});
+             });*/
             MyDatabase.sendretailerupdate('SELECT id, contactname, contactnumber, ownername, ownernumber FROM RETAILER WHERE sync = "false" AND id > 0');
             MyDatabase.sendnewretailer('SELECT * FROM RETAILER WHERE sync = "false" AND id = 0');
         };
+
+        /*//DUMMY OBJECTS TO STORE RECIEVED DATA
+           var sd, cd, ad, rd = [];
+           var successretailer = function (data, status) {
+               rd = data;
+               MyDatabase.getalldata(sd, cd, ad, rd);
+           };
+           var successarea = function (data, status) {
+               ad = data;
+               MyDatabase.syncinretailerdata().success(successretailer);
+           };
+           var successcity = function (data, status) {
+               cd = data;
+               MyDatabase.syncinretailerareadata().success(successarea);
+           };
+           var successstate = function (data, status) {
+               sd = data;
+               MyDatabase.syncinretailercitydata().success(successcity);
+           };*/
+        //MyDatabase.syncinretailerstatedata().success(successstate);
+        //MyDatabase.getalldata();
+
+
+
+        /*var type = $cordovaNetwork.getNetwork();
+        console.log("The type of network is" + type);
+        alert(type);*/
+        //SETS VALUE FOR ZONE
+        //MyDatabase.findzonebyuseroffline();
+
+        //$scope.retailerdatao = [];
     })
-/*
-.controller('LoginCtrl', function ($scope, $stateParams, MyServices, $location, MyDatabase) {
-    $scope.login = {};
-    console.log($scope.login)
+    /*
+    .controller('LoginCtrl', function ($scope, $stateParams, MyServices, $location, MyDatabase) {
+        $scope.login = {};
+        console.log($scope.login)
 
 
-    var loginSuccess = function (data, status) {
-        console.log(data);
-        if (data != "false") {
-            $location.path("#/app/home");
-            MyServices.setuser(data);
-        } else {
-            $scope.alert = "Username or password incorrect";
-        }
-    };
-
-    $scope.loginFunction = function (login) {
-        MyServices.loginFunc(login).success(loginSuccess);
-    };
-
-
-})*/
-.controller('LoginCtrl', function ($scope, $stateParams, MyServices, $location, MyDatabase) {
-    $scope.login = {};
-    console.log($scope.login)
-
-    $scope.loginFunction = function (login) {
-        db.transaction(function (tx) {
-            console.log(login.password);
-            var sqls = 'SELECT * FROM USERS WHERE name = "' + login.username + '"';
-            tx.executeSql(sqls, [], function (tx, results) {
-                console.log(results.rows.item(0).password);
-                if (results.rows.item(0).password == login.password) {
-                    $location.path("#/app/home");
-                    MyServices.setuser(results.rows.item(0));
-                };
-            }, function (tx, results) {
+        var loginSuccess = function (data, status) {
+            console.log(data);
+            if (data != "false") {
+                $location.path("#/app/home");
+                MyServices.setuser(data);
+            } else {
                 $scope.alert = "Username or password incorrect";
+            }
+        };
+
+        $scope.loginFunction = function (login) {
+            MyServices.loginFunc(login).success(loginSuccess);
+        };
+
+
+    })*/
+    .controller('LoginCtrl', function ($scope, $stateParams, MyServices, $location, MyDatabase) {
+        $scope.login = {};
+        console.log($scope.login)
+
+        $scope.loginFunction = function (login) {
+            db.transaction(function (tx) {
+                console.log(login.password);
+                var sqls = 'SELECT * FROM USERS WHERE name = "' + login.username + '"';
+                tx.executeSql(sqls, [], function (tx, results) {
+                    console.log(results.rows.item(0).password);
+                    if (results.rows.item(0).password == login.password) {
+                        $location.path("#/app/home");
+                        MyServices.setuser(results.rows.item(0));
+                    };
+                }, function (tx, results) {
+                    $scope.alert = "Username or password incorrect";
+                });
             });
-        });
-    };
+        };
 
 
-})
+    })
 
 .controller('HomeCtrl', function ($scope, $stateParams, $location, MyServices, $ionicLoading) {
-    
+
 
     /*var db = $cordovaSQLite.openDB({ name: "my.db" });
     $scope.execute = function() {
@@ -322,7 +326,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
 
 .controller('ZoneCtrl', function ($scope, $stateParams, $http, MyServices) {
-    
+
 
     $scope.zonedata = [];
     var onzonesuccess = function (data, status) {
@@ -332,166 +336,92 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
 })
 
-.controller('StateCtrl', function ($scope, $stateParams, $http, MyServices, MyDatabase, $ionicLoading /*,$cordovaNetwork*/) {
-    //GET OFFLINE MODE VALUE
-    var offline = true;
-    zoneID = 1;
+.controller('StateCtrl', function ($scope, $stateParams, $http, MyServices, MyDatabase, $ionicLoading) {
+
+    zone = 4;
     var zoneID = $stateParams.id;
     $scope.statedata = [];
 
-    var onsuccess = function (data, status) {
-        $ionicLoading.hide();
-        $scope.statedata = data;
-    };
-
-    //CHECK IF INTERNET IS CONNECTED
-    //$scope.type = $cordovaNetwork.getNetwork();
-    //var isOnline = $cordovaNetwork.isOnline();
-    //offline = !(isOnline);
-    //alert(isOnline);
-    //IF NO INTERNET THEN
-    if (offline) {
-        alert("your in offline mode");
-        db.transaction(function (tx) {
-            var sqls = 'SELECT * FROM STATE WHERE "zone" = "1"';
-            tx.executeSql(sqls, [], function (tx, results) {
-                var length = results.rows.length;
-                for (var i = 0; i < length; i++) {
-                    $scope.statedata.push(results.rows.item(i));
-                }
-                $ionicLoading.hide();
-            }, function (tx, results) {
-
-            });
+    db.transaction(function (tx) {
+        var sqls = 'SELECT * FROM STATE WHERE "zone" = "' + zone + '"';
+        tx.executeSql(sqls, [], function (tx, results) {
+            for (var i = 0; i < results.rows.length; i++) {
+                $scope.statedata.push(results.rows.item(i));
+            }
+            $ionicLoading.hide();
+        }, function (tx, results) {
+            console.log("No States");
         });
-        //IF INTERNET CONNECTION EXISTS
-    } else {
-        MyServices.findstate(zoneID).success(onsuccess);
-    };
+    });
 })
 
-.controller('CityCtrl', function ($scope, $stateParams, $http, MyServices, $ionicLoading/*, $cordovaNetwork*/) {
+.controller('CityCtrl', function ($scope, $stateParams, $http, MyServices, $ionicLoading) {
 
     var stateID = $stateParams.id;
     $scope.citydata = [];
 
-    var citySuccess = function (data, status) {
-        $ionicLoading.hide();
-        $scope.citydata = data;
-    };
+    db.transaction(function (tx) {
+        var sqls = 'SELECT * FROM CITY WHERE "state" = "' + stateID + '"';
+        tx.executeSql(sqls, [], function (tx, results) {
+            var length = results.rows.length;
+            for (var i = 0; i < length; i++) {
+                $scope.citydata.push(results.rows.item(i));
+            };
+            $ionicLoading.hide();
+        }, function (tx, results) {
 
-    //CHECK IF INTERNET IS CONNECTED
-    $scope.type = $cordovaNetwork.getNetwork();
-    var isOnline = $cordovaNetwork.isOnline();
-    offline = !(isOnline);
-    alert(isOnline);
-    //IF NO INTERNET THEN
-    if (offline) {
-        alert("your in offline mode");
-        db.transaction(function (tx) {
-            var sqls = 'SELECT * FROM CITY WHERE "state" = "' + stateID + '"';
-            tx.executeSql(sqls, [], function (tx, results) {
-                var length = results.rows.length;
-                for (var i = 0; i < length; i++) {
-                    $scope.citydata.push(results.rows.item(i));
-                }
-                $ionicLoading.hide();
-            }, function (tx, results) {
-
-            });
         });
-        //IF INTERNET CONNECTION EXISTS
-    } else {
-        MyServices.findcity(stateID).success(citySuccess);
-    };
+    });
 })
 
-.controller('AreaCtrl', function ($scope, $stateParams, $http, MyServices, $ionicLoading, $cordovaNetwork) {
+.controller('AreaCtrl', function ($scope, $stateParams, $http, MyServices, $ionicLoading) {
 
     var cityID = $stateParams.id;
     $scope.areadata = [];
+    db.transaction(function (tx) {
+        var sqls = 'SELECT * FROM AREA WHERE "city" = "' + cityID + '"';
+        tx.executeSql(sqls, [], function (tx, results) {
+            var length = results.rows.length;
+            for (var i = 0; i < length; i++) {
+                $scope.areadata.push(results.rows.item(i));
+            }
+            $ionicLoading.hide();
+        }, function (tx, results) {
 
-    var areaSuccess = function (data, status) {
-        $ionicLoading.hide();
-        $scope.areadata = data;
-    };
-
-    //CHECK IF INTERNET IS CONNECTED
-    $scope.type = $cordovaNetwork.getNetwork();
-    var isOnline = $cordovaNetwork.isOnline();
-    offline = !(isOnline);
-
-    //IF NO INTERNET THEN
-    if (offline) {
-        alert("your in offline mode");
-        db.transaction(function (tx) {
-            var sqls = 'SELECT * FROM AREA WHERE "city" = "' + cityID + '"';
-            tx.executeSql(sqls, [], function (tx, results) {
-                var length = results.rows.length;
-                for (var i = 0; i < length; i++) {
-                    $scope.areadata.push(results.rows.item(i));
-                }
-                $ionicLoading.hide();
-            }, function (tx, results) {
-
-            });
         });
-        //IF INTERNET CONNECTION EXISTS
-    } else {
-        MyServices.findarea(cityID).success(areaSuccess);
-    };
+    });
+
+
 })
 
-.controller('RetailerCtrl', function ($scope, $stateParams, $http, MyServices, $location, $ionicLoading/*, $cordovaNetwork*/) {
-    //GET OFFLINE MODE VALUE
-    var offline = true;
+.controller('RetailerCtrl', function ($scope, $stateParams, $http, MyServices, $location, $ionicLoading) {
 
-   /* var areaID = $stateParams.id;
+
+
+    var areaID = $stateParams.id;
     $scope.areaid = areaID;
 
-    console.log(MyServices.setareaid(areaID));
+    MyServices.setareaid(areaID);
     $scope.retailerdata = [];
 
-    var retailSuccess = function (data, status) {
-        $ionicLoading.hide();
-        $scope.retailerdata = data;
-    };
+    db.transaction(function (tx) {
+        var sqls = 'SELECT * FROM RETAILER WHERE "area" = "' + areaID + '"';
+        tx.executeSql(sqls, [], function (tx, results) {
+            var length = results.rows.length;
+            for (var i = 0; i < length; i++) {
+                $scope.retailerdata.push(results.rows.item(i));
+            }
+            $ionicLoading.hide();
+        }, function (tx, results) {
 
-    //CHECK IF INTERNET IS CONNECTED
-    $scope.type = $cordovaNetwork.getNetwork();
-    var isOnline = $cordovaNetwork.isOnline();
-    offline = !(isOnline);
-    alert(isOnline);*/
-    //IF NO INTERNET THEN
-    if (offline) {
-        alert("your in offline mode");
-        db.transaction(function (tx) {
-            var sqls = 'SELECT * FROM RETAILER WHERE "area" = "' + areaID + '"';
-            tx.executeSql(sqls, [], function (tx, results) {
-                var length = results.rows.length;
-                for (var i = 0; i < length; i++) {
-                    $scope.retailerdata.push(results.rows.item(i));
-                }
-                $ionicLoading.hide();
-            }, function (tx, results) {
-
-            });
         });
-        //IF INTERNET CONNECTION EXISTS
-    } else {
-        MyServices.findretailer(areaID).success(retailSuccess);
-    };
+    });
+
+
 })
 
-.controller('DealerCtrl', function ($scope, $stateParams, $http, MyServices, MyDatabase, $location, $ionicModal, $window, $ionicLoading/*, $cordovaNetwork*/) {
-    //GET OFFLINE MODE VALUE
-    var offline = true;
-    //CHECK IF INTERNET IS CONNECTED
-    /*$scope.type = $cordovaNetwork.getNetwork();
-    var isOnline = $cordovaNetwork.isOnline();
-    offline = !(isOnline);
-    */
-    offline = true;
+.controller('DealerCtrl', function ($scope, $stateParams, $http, MyServices, MyDatabase, $location, $ionicModal, $window, $ionicLoading) {
+
     $scope.firstclick = 1;
     $scope.heightVal = $window.innerHeight - 44;
 
@@ -549,7 +479,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
     //GAINING RETAILER INFORMATION - OFFLINE//
     var getretailerdataoffline = function () {
         db.transaction(function (tx) {
-            console.log("offline retailer");
+
             var sqls = 'SELECT * FROM RETAILER WHERE "id" = "' + $scope.retailerid + '"';
             tx.executeSql(sqls, [], function (tx, results) {
                 var length = results.rows.length;
@@ -572,11 +502,9 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
     };
 
     //GET RETAILER INFORMATION
-    if (offline) {
-        getretailerdataoffline();
-    } else {
-        MyServices.findoneretailer($scope.retailerID).success(retailSuccess2);
-    };
+
+    getretailerdataoffline();
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -781,23 +709,11 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
     };
 
     //INITITAL FUNCTION CALL ON PAGE LOAD FOR PRODUCT
-    var initialproductcall = function () {
-        if (offline) {
-            nextproductoffline(0, 1);
-        } else {
-            MyServices.findnext(0, 1).success(oncategoryproductsuccess);
-        };
-    };
-    initialproductcall();
+    nextproductoffline(0, 1);
 
     //NEXT BUTTON AN PREVIOUS BUTTON (1 FOR NEXT, 0 FOR PREVIOUS)
     $scope.getnextproduct = function (next) {
-        if (offline) {
-            nextproductoffline($scope.categoryproductdata.id, next);
-        } else {
-            MyServices.findnext($scope.categoryproductdata.id, next).success(oncategoryproductsuccess);
-        };
-
+        nextproductoffline($scope.categoryproductdata.id, next);
     };
 
     //SCHEME AND NEW PRODUCTS
@@ -1605,146 +1521,146 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 })
 
 .controller('AddshopCtrl', function ($scope, $stateParams, $cordovaCamera, $cordovaFile, $http, MyServices, MyDatabase, $location, $ionicLoading, $cordovaGeolocation, $cordovaNetwork) {
-    
-    offline = true;
-    console.log("OFFLINE MODE IS " + offline);
-    //CHECK IF INTERNET IS CONNECTED
-    /* $scope.type = $cordovaNetwork.getNetwork();
-    var isOnline = $cordovaNetwork.isOnline();
-    offline = !(isOnline);*/
 
-    $ionicLoading.hide();
+        offline = true;
+        console.log("OFFLINE MODE IS " + offline);
+        //CHECK IF INTERNET IS CONNECTED
+        /* $scope.type = $cordovaNetwork.getNetwork();
+        var isOnline = $cordovaNetwork.isOnline();
+        offline = !(isOnline);*/
 
-    var aid = $stateParams.areaid;
-    $scope.firstclick = 0;
+        $ionicLoading.hide();
 
-
-    var areasuccess = function (data, status) {
-        $scope.areaname = data.name;
-    };
-    MyServices.areaone(aid).success(areasuccess);
-
-    $scope.filename2 = "";
-    //GEO-LOCATION
-    /*var onSuccess = function (position) {
-        alert('Latitude: ' + position.coords.latitude + '\n' +
-            'Longitude: ' + position.coords.longitude);
-         //$scope.lat = position.coords.latitude;
-        //$scope.long = position.coords.longitude;
-        $scope.addretailer.lat = '' + position.coords.latitude + '';
-        $scope.addretailer.long = '' + position.coords.longitude + '';
-    };
-
-    function onError(error) {
-        alert('code: ' + error.code + '\n' +
-            'message: ' + error.message + '\n');
-
-        $scope.addretailer.lat = 'not found';
-        $scope.addretailer.long = 'not found';
-    }
-    window.navigator.geolocation.getCurrentPosition(onSuccess, onError, {
-        enableHighAccuracy: true
-    });*/
-    $cordovaGeolocation.getCurrentPosition().then(function (position) {
-        $scope.addretailer.lat = '' + position.coords.latitude + '';
-        $scope.addretailer.long = '' + position.coords.longitude + '';
-    }, function (err) {
-        // error
-        alert("GPS is off");
-    });
-
-    $scope.addretailer = {};
-    $scope.addretailer.area = aid;
-    $scope.addretailer.name = '';
-    $scope.addretailer.number = '';
-    $scope.addretailer.address = '';
-    $scope.addretailer.code = '';
-    $scope.addretailer.contactname = '';
-    $scope.addretailer.contactnumber = '';
-    $scope.addretailer.ownername = '';
-    $scope.addretailer.ownernumber = '';
-    $scope.addretailer.dob = '';
-    $scope.addretailer.type_of_area = '';
-    $scope.addretailer.sq_feet = '';
-    $scope.addretailer.store_image = '';
-    $scope.addretailer.lat = '';
-    $scope.addretailer.long = '';
+        var aid = $stateParams.areaid;
+        $scope.firstclick = 0;
 
 
-    $scope.addRetailerFunction = function () {
-        if ($scope.firstclick == 0) {
-            $scope.firstclick = 1;
-            console.log("retailer name is " + $scope.addretailer.name);
-            console.log($scope.addretailer);
+        var areasuccess = function (data, status) {
+            $scope.areaname = data.name;
+        };
+        MyServices.areaone(aid).success(areasuccess);
 
-            function addRetailerSuccess(data, status) {
-                //SUCCESS
-                console.log(data);
+        $scope.filename2 = "";
+        //GEO-LOCATION
+        /*var onSuccess = function (position) {
+            alert('Latitude: ' + position.coords.latitude + '\n' +
+                'Longitude: ' + position.coords.longitude);
+             //$scope.lat = position.coords.latitude;
+            //$scope.long = position.coords.longitude;
+            $scope.addretailer.lat = '' + position.coords.latitude + '';
+            $scope.addretailer.long = '' + position.coords.longitude + '';
+        };
 
-                //REDIRECT
-                var pathToGo = "/app/retailer/" + aid;
-                console.log($location.path());
-                $location.path(pathToGo);
+        function onError(error) {
+            alert('code: ' + error.code + '\n' +
+                'message: ' + error.message + '\n');
 
+            $scope.addretailer.lat = 'not found';
+            $scope.addretailer.long = 'not found';
+        }
+        window.navigator.geolocation.getCurrentPosition(onSuccess, onError, {
+            enableHighAccuracy: true
+        });*/
+        $cordovaGeolocation.getCurrentPosition().then(function (position) {
+            $scope.addretailer.lat = '' + position.coords.latitude + '';
+            $scope.addretailer.long = '' + position.coords.longitude + '';
+        }, function (err) {
+            // error
+            alert("GPS is off");
+        });
+
+        $scope.addretailer = {};
+        $scope.addretailer.area = aid;
+        $scope.addretailer.name = '';
+        $scope.addretailer.number = '';
+        $scope.addretailer.address = '';
+        $scope.addretailer.code = '';
+        $scope.addretailer.contactname = '';
+        $scope.addretailer.contactnumber = '';
+        $scope.addretailer.ownername = '';
+        $scope.addretailer.ownernumber = '';
+        $scope.addretailer.dob = '';
+        $scope.addretailer.type_of_area = '';
+        $scope.addretailer.sq_feet = '';
+        $scope.addretailer.store_image = '';
+        $scope.addretailer.lat = '';
+        $scope.addretailer.long = '';
+
+
+        $scope.addRetailerFunction = function () {
+            if ($scope.firstclick == 0) {
+                $scope.firstclick = 1;
+                console.log("retailer name is " + $scope.addretailer.name);
+                console.log($scope.addretailer);
+
+                function addRetailerSuccess(data, status) {
+                    //SUCCESS
+                    console.log(data);
+
+                    //REDIRECT
+                    var pathToGo = "/app/retailer/" + aid;
+                    console.log($location.path());
+                    $location.path(pathToGo);
+
+                };
+                if (offline) {
+                    console.log("ADD TO OFFLINE DB");
+                    MyDatabase.addnewretailer($scope.addretailer);
+                } else {
+                    MyServices.addNewRetailer($scope.addretailer).success(addRetailerSuccess);
+                };
+
+            }
+
+            //sqfeet type dob area latitude longitude contactperson address contactnumber email compony code name
+        };
+
+
+        //Capture Image
+        $scope.takePicture = function () {
+            var options = {
+                quality: 20,
+                destinationType: Camera.DestinationType.FILE_URI,
+                sourceType: Camera.PictureSourceType.CAMERA,
+                allowEdit: true,
+                encodingType: Camera.EncodingType.JPEG,
+                saveToPhotoAlbum: true
             };
-            if (offline) {
-                console.log("ADD TO OFFLINE DB");
-                MyDatabase.addnewretailer($scope.addretailer);
-            } else {
-                MyServices.addNewRetailer($scope.addretailer).success(addRetailerSuccess);
+
+            $cordovaCamera.getPicture(options).then(function (imageData) {
+                // Success! Image data is here
+                $scope.cameraimage = imageData;
+                $scope.uploadPhoto();
+            }, function (err) {
+                // An error occured. Show a message to the user
+            });
+
+            //Upload photo
+            var server = 'http://wohlig.biz/Toykraftbackend/index.php/json/uploadfile';
+
+            //File Upload parameters: source, filePath, options
+            $scope.uploadPhoto = function () {
+                console.log("function called");
+                $cordovaFile.uploadFile(server, $scope.cameraimage, options)
+                    .then(function (result) {
+                        console.log(result);
+                        result = JSON.parse(result.response);
+                        filenameee = result;
+                        $scope.filename2 = result.file_name;
+                        $scope.addretailer.store_image = $scope.filename2;
+
+                    }, function (err) {
+                        // Error
+                        console.log(err);
+                        console.log("Error");
+                    }, function (progress) {
+                        // constant progress updates
+                    });
+
             };
 
         }
-
-        //sqfeet type dob area latitude longitude contactperson address contactnumber email compony code name
-    };
-
-
-    //Capture Image
-    $scope.takePicture = function () {
-        var options = {
-            quality: 20,
-            destinationType: Camera.DestinationType.FILE_URI,
-            sourceType: Camera.PictureSourceType.CAMERA,
-            allowEdit: true,
-            encodingType: Camera.EncodingType.JPEG,
-            saveToPhotoAlbum: true
-        };
-
-        $cordovaCamera.getPicture(options).then(function (imageData) {
-            // Success! Image data is here
-            $scope.cameraimage = imageData;
-            $scope.uploadPhoto();
-        }, function (err) {
-            // An error occured. Show a message to the user
-        });
-
-        //Upload photo
-        var server = 'http://wohlig.biz/Toykraftbackend/index.php/json/uploadfile';
-
-        //File Upload parameters: source, filePath, options
-        $scope.uploadPhoto = function () {
-            console.log("function called");
-            $cordovaFile.uploadFile(server, $scope.cameraimage, options)
-                .then(function (result) {
-                    console.log(result);
-                    result = JSON.parse(result.response);
-                    filenameee = result;
-                    $scope.filename2 = result.file_name;
-                    $scope.addretailer.store_image = $scope.filename2;
-
-                }, function (err) {
-                    // Error
-                    console.log(err);
-                    console.log("Error");
-                }, function (progress) {
-                    // constant progress updates
-                });
-
-        };
-
-    }
-})
+    })
     .controller('PhotoSliderCtrl', function ($scope, $stateParams, MyServices, $ionicModal, $ionicSlideBoxDelegate, $ionicLoading) {
         $ionicLoading.hide();
         $ionicModal.fromTemplateUrl('templates/image-slider.html', {

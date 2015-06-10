@@ -286,18 +286,7 @@ var myservices = angular.module('myservices', [])
             });
         },
 
-        //GETTING NAMES OF CATEGORIES TO LIST
-        getcategoriesname: function () {
-            return $http.get(adminurl + "catelog/getcatelog");
-        },
-        //CALLED DURING CHANGE OF CATEGORY
-        findproductbycategory: function (id) {
-            $http.get(adminurl + "", {
-                params: {
-                    id: id
-                }
-            })
-        },
+        
         //SETTING GLOBAL CATEGORY DATA
         setproductCatdata: function (data) {
             productCatdata = data;
