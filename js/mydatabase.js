@@ -12,7 +12,9 @@ db.transaction(function (tx) {
     tx.executeSql('CREATE TABLE IF NOT EXISTS USERS (id Integer PRIMARY KEY, name varchar, password varchar, username varchar, email varchar, mobile varchar, accesslevel Integer, zone Integer, lastlogin TIMESTAMP)');
     //tx.executeSql('DROP TABLE USERS');
 });
-
+db.transaction(function(tx){
+tx.executeSql('INSERT INTO `USERS` VALUES(1,"abc","toykraft","toykraft","","","","","")')
+})
 var mydatabase = angular.module('mydatabase', [])
     .factory('MyDatabase', function ($http, $location, MyServices) {
 
@@ -50,43 +52,43 @@ var mydatabase = angular.module('mydatabase', [])
             //CREATING ALL TABLES ON SYNC PAGE LOAD
             createretailertables: function () {
                 db.transaction(function (tx) {
-                    tx.executeSql('CREATE TABLE IF NOT EXISTS STATE (id Integer PRIMARY KEY, zone Varchar, name Varchar)');
-                    //tx.executeSql('DROP TABLE STATE');
+                   tx.executeSql('CREATE TABLE IF NOT EXISTS STATE (id Integer PRIMARY KEY, zone Varchar, name Varchar)');
+                 //   tx.executeSql('DROP TABLE STATE');
 
                 });
                 db.transaction(function (tx) {
-                    tx.executeSql('CREATE TABLE IF NOT EXISTS CITY (id Integer PRIMARY KEY, state Integer, name Varchar)');
-                    //tx.executeSql('DROP TABLE CITY');
+                   tx.executeSql('CREATE TABLE IF NOT EXISTS CITY (id Integer PRIMARY KEY, state Integer, name Varchar)');
+                 //   tx.executeSql('DROP TABLE CITY');
 
                 });
                 db.transaction(function (tx) {
                     tx.executeSql('CREATE TABLE IF NOT EXISTS AREA (id Integer PRIMARY KEY, city Integer, name Varchar, distributor Integer)');
-                    //tx.executeSql('DROP TABLE AREA');
+                  //  tx.executeSql('DROP TABLE AREA');
 
                 });
                 db.transaction(function (tx) {
                     tx.executeSql('CREATE TABLE IF NOT EXISTS RETAILER (id INTEGER PRIMARY KEY ,lat Integer,long Integer,area int,dob Date ,type_of_area Integer,sq_feet Float,store_image Varchar,name Varchar,number Varchar,email Varchar,address Varchar,ownername Varchar,ownernumber Varchar,contactname Varchar,contactnumber Varchar,timestamp TIMESTAMP, issync Integer)');
-                    //tx.executeSql('DROP TABLE RETAILER');
+                   // tx.executeSql('DROP TABLE RETAILER');
                 });
                 db.transaction(function (tx) {
-                    tx.executeSql('CREATE TABLE IF NOT EXISTS PRODUCT (id INTEGER PRIMARY KEY AUTOINCREMENT, name Varchar, product Varchar, encode Varchar, name2 Varchar, productcode Varchar, category Integer,video Varchar,mrp,description VARCHAR2(5000),age Integer,scheme Varchar,isnew Integer,timestamp Timestamp)');
-                    //tx.executeSql('DROP TABLE PRODUCT');
+                   tx.executeSql('CREATE TABLE IF NOT EXISTS PRODUCT (id INTEGER PRIMARY KEY AUTOINCREMENT, name Varchar, product Varchar, encode Varchar, name2 Varchar, productcode Varchar, category Integer,video Varchar,mrp,description VARCHAR2(5000),age Integer,scheme Varchar,isnew Integer,timestamp Timestamp)');
+                   // tx.executeSql('DROP TABLE PRODUCT');
                 });
                 db.transaction(function (tx) {
                     tx.executeSql('CREATE TABLE IF NOT EXISTS ORDERS (id INTEGER AUTO_INCREMENT, retail Integer,sales Varchar,timestamp Timestamp,amount Integer,signature Varchar,salesid Integer,quantity Integer,remark Varchar,issync Integer)');
-                    //tx.executeSql('DROP TABLE ORDERS');
+                  //  tx.executeSql('DROP TABLE ORDERS');
                 });
                 db.transaction(function (tx) {
                     tx.executeSql('CREATE TABLE IF NOT EXISTS TOPTEN (product INTEGER, productcode, name, totalquantity)');
-                    //tx.executeSql('DROP TABLE TOPTEN');
+                 //   tx.executeSql('DROP TABLE TOPTEN');
                 });
                 db.transaction(function (tx) {
                     tx.executeSql('CREATE TABLE IF NOT EXISTS ORDERPRODUCT (id Integer PRIMARY KEY, orders Integer, product Integer, quantity Integer, amount Integer, scheme_id Integer, status Integer, category varchar, productcode varchar)');
-                    //tx.executeSql('DROP TABLE ORDERPRODUCT ');
+               // tx.executeSql('DROP TABLE ORDERPRODUCT ');
                 });
                 db.transaction(function (tx) {
                     tx.executeSql('CREATE TABLE IF NOT EXISTS PRODUCTIMAGE (id Integer PRIMARY KEY, product Integer, image varchar)');
-                    //tx.executeSql('DROP TABLE PRODUCTIMAGE');
+                  //  tx.executeSql('DROP TABLE PRODUCTIMAGE');
                 });
 
             },

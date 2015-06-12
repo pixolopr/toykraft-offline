@@ -1,7 +1,6 @@
 var adminurl = "http://mafiawarloots.com/clientunderworkcode/index.php/";
 
 var filenameee = "";
-
 angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 'ngCordova'])
 
 .controller('AppCtrl', function ($scope, $ionicModal, $timeout, $location, MyServices, MyDatabase, $cordovaKeyboard, $ionicLoading) {
@@ -29,14 +28,12 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
         var isVisible = $cordovaKeyboard.isVisible();
     };
-    var offline = true;
+
     //GET CATEGORY NAMES
-    var categorynamesuccess = function (data, status) {
-        $scope.categorynamedata = data;
+    if ($.jStorage.get("categories")) {
+        $scope.categorynamedata = $.jStorage.get("categories");
     };
 
-    //GET CATEGORIES FROM ONLINE TABLE
-    MyDatabase.getcategoriesname().success(categorynamesuccess);
 
 
     $scope.rid = MyServices.getretailer();
@@ -93,7 +90,9 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
             MyDatabase.insertproductdata(data);
         };
         synccategorydatasuccess = function (data, status) {
-            MyDatabase.synccategorydata(data);
+            //INSERTING DATA IN JSTORAGE
+            $.jStorage.set("categories", data);
+            $scope.categorynamedata = $.jStorage.get("categories");
         };
         syncproductimagedatasuccess = function (data, status) {
             MyDatabase.insertproductimagedata(data);
@@ -115,6 +114,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
             MyDatabase.getcategoriesname().success(synccategorydatasuccess);
             //PRODUCTIMAGE
             MyDatabase.syncinproductimagedata().success(syncproductimagedatasuccess);
+
         };
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -421,6 +421,13 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 })
 
 .controller('DealerCtrl', function ($scope, $stateParams, $http, MyServices, MyDatabase, $location, $ionicModal, $window, $ionicLoading) {
+    //RETRIEVING DATA FROM JSTORAGE
+    $scope.categoryproductdata = {};
+
+
+
+    console.log($scope.categoryproductdata);
+    //console.log($.jStorage.get("categories"));
 
     $scope.firstclick = 1;
     $scope.heightVal = $window.innerHeight - 44;
@@ -502,10 +509,125 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
     };
 
     //GET RETAILER INFORMATION
-
     getretailerdataoffline();
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    //CAEGORY AND PRODUCTS
+    $scope.categoryid = $stateParams.cid;
+    MyServices.setcategory($stateParams.cid);
+
+    //DEFINING THE ARRAY VARIABLE TO STORE PRODUCTS
+    $scope.categoryproductdata = {};
+
+    //GIVING VALUES IN VARIABLE - OFFLINE
+    var oncategoryproductofflinesuccess = function (data) {
+        $ionicLoading.hide();
+        console.log(data);
+        $scope.categoryproductdata = data;
+        /*if ($scope.categoryproductdata.scheme2) {
+            if ($scope.categoryproductdata.scheme2.name) {
+                $scope.categoryname = "Scheme : " + $scope.categoryproductdata.scheme2.name + " (" + $scope.categoryproductdata.scheme2.discount_percent + "%)";
+            } else {
+                $scope.categoryname = ""
+            };
+        };*/
+    };
+
+    //OFFLINE PRODUCT CALL FUNCTION
+    $scope.getnextproduct = function (productid, next) {
+        //SHOW LOADER
+        $ionicLoading.show();
+        //ARRAY TO STORE TEMP PRODUCTS
+        var tempproducts = [];
+        //VARIABLE TO sTORE SQL QUERY
+        var sqls2;
+        if (parseInt($scope.categoryid) > 0) {
+            sqls2 = 'SELECT * FROM PRODUCT WHERE "category" = "' + $scope.categoryid + '" ORDER BY `id` ASC';
+        } else {
+            if ($scope.categoryid == "new") {
+                sqls2 = 'SELECT * FROM PRODUCT WHERE "isnew" = "1"  ORDER BY `id` ASC';
+            } else {
+                if ($scope.categoryid == "scheme") {
+                    sqls2 = 'SELECT * FROM PRODUCT WHERE "scheme" > 3  ORDER BY `id` ASC';
+                } else {
+                    var findindicator = $scope.categoryid.charAt(0);
+                    if (findindicator == "f") {
+                        var value = $scope.categoryid.slice(1);
+                        sqls2 = 'SELECT * FROM PRODUCT WHERE name LIKE "%' + value + '%" ORDER BY `id` ASC';
+                    };
+                };
+            };
+        };
+
+        //SQL TRANSACTION
+        db.transaction(function (tx2) {
+            var varid = 0;
+            //VAR ID FOR INITIAL PAGE LOAD
+            console.log(sqls2);
+            tx2.executeSql(sqls2, [], function (tx2, results2) {
+
+                    //PUT ELEMENTS IN TEMPRORY ARRAY
+                    for (var i = 0; i < results2.rows.length; i++) {
+                        tempproducts.push(results2.rows.item(i));
+                    };
+
+                    //OPERATIONS ON TEMPRORY ARRAY
+                    for (var j = 0; j < tempproducts.length; j++) {
+                        if (productid != 0) {
+                            //BECAUSE ON INITIAL PAGE CALL 0 IS BEIGN PASSED AS PRODUCT ID 
+                            if (tempproducts[j].id == productid) {
+                                if (next == 1) {
+                                    if (tempproducts.length > (j + 1)) {
+                                        varid = j + 1;
+                                    } else {
+                                        varid = 0;
+                                    };
+                                } else {
+                                    if ((j - 1) < 0) {
+                                        varid = tempproducts.length - 1;
+                                    } else {
+                                        varid = j - 1;
+                                    };
+                                };
+                            };
+                        };
+                    };
+                    oncategoryproductofflinesuccess(tempproducts[varid]);
+                },
+                function (tx2, results2) {});
+        });
+    };
+
+    //INITITAL FUNCTION CALL ON PAGE LOAD FOR PRODUCT
+    $scope.getnextproduct(0, 1);
+
+    //SCHEME AND NEW PRODUCTS
+    $scope.getscheme = function (cid) {
+        MyServices.setsearchtxt("");
+        MyServices.setcategory(cid);
+        $location.path("/app/dealer/" + $scope.retailerid + "/" + cid);
+        $location.replace(); //DONT KEEP HISTORY
+    };
+
+
+    //SEARCH VALUE SHOULD NOT DISSAPEAR FROM INPUT BOX
+    var searchtxt = MyServices.getsearchtxt();
+    if (searchtxt != "") {
+        $scope.searchtext = searchtxt;
+    };
+
+    //FUNCTION TO SEARCH PRODUCT
+    $scope.searchproduct = function (searchvalue) {
+        var retail = MyServices.getretailer();
+        MyServices.setsearchtxt(searchvalue);
+        console.log(searchvalue);
+        var searchtext = "f" + searchvalue;
+        MyServices.setcategory(searchtext);
+        $location.path("/app/dealer/" + retail + "/" + searchtext);
+    };
+    
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 
@@ -517,6 +639,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
     $scope.pid;
     $scope.pquantity;
 
+    //FUNCTION THAT GIVES COLOR TO LIST
     $scope.giveclass = function (category) {
         var returnval = "";
         if (category == "scheme") {
@@ -575,171 +698,10 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
     };
 
 
-    /*    //FIND PRODUCT
-    var productSuccess = function (data, status) {
-        console.log(data.name);
-        $scope.product = data;
-        $scope.pid = data.id;
-        $scope.pname = data.name;
-        $scope.pquantity = data.mrp;
-        //MyServices.setproductCatdata(data);
-        //console.log(productname);
-    };
-
-    function findproduct(id) {
-        console.log("product ID is " + id);
-        MyServices.findoneproduct(id).success(productSuccess);
-    };*/
-
-
     //INITIAL CALLING PRODUCTS ON PAGE LOAD
     $scope.choice = "scheme";
-    //CAEGORY AND PRODUCTS
-    $scope.categoryid = $stateParams.cid;
-    MyServices.setcategory($stateParams.cid);
-
-    //DEFINING THE ARRAY VARIABLE
-    $scope.categoryproductdata = {};
-
-    //GIVING VALUES IN VARIABLE - ONLINE
-    var oncategoryproductsuccess = function (data, status) {
-        $ionicLoading.hide();
-        $scope.categoryproductdata = data;
-        //CATEGORY SCHEME INFO//
-        if ($scope.categoryproductdata.scheme2) {
-            if ($scope.categoryproductdata.scheme2.name) {
-                $scope.categoryname = "Scheme : " + $scope.categoryproductdata.scheme2.name + " (" + $scope.categoryproductdata.scheme2.discount_percent + "%)";
-            } else {
-                $scope.categoryname = ""
-            };
-        };
-        ////
-    };
-
-    //GIVING VALUES IN VARIABLE - OFFLINE
-    var oncategoryproductofflinesuccess = function (data) {
-        $ionicLoading.hide();
-        console.log(data);
-        $scope.categoryproductdata = data;
-        /*if ($scope.categoryproductdata.scheme2) {
-            if ($scope.categoryproductdata.scheme2.name) {
-                $scope.categoryname = "Scheme : " + $scope.categoryproductdata.scheme2.name + " (" + $scope.categoryproductdata.scheme2.discount_percent + "%)";
-            } else {
-                $scope.categoryname = ""
-            };
-        };*/
-    };
-
-    //OFFLINE PRODUCT CALL FUNCTION
-    nextproductoffline = function (productid, next) {
-        var tempproducts = [];
-        var sqls2;
-        if (parseInt($scope.categoryid) > 0) {
-            sqls2 = 'SELECT * FROM PRODUCT WHERE "category" = "' + $scope.categoryid + '"';
-        } else {
-            if ($scope.categoryid == "new") {
-                sqls2 = 'SELECT * FROM PRODUCT WHERE "isnew" = "1"';
-            } else {
-                if ($scope.categoryid == "scheme") {
-                    sqls2 = 'SELECT * FROM PRODUCT WHERE "scheme" > 3';
-                } else {
-                    var findindicator = $scope.categoryid.charAt(0);
-                    if (findindicator == "f") {
-                        var value = $scope.categoryid.slice(1);
-                        sqls2 = 'SELECT * FROM PRODUCT WHERE name LIKE "%' + value + '%"';
-                    };
-                };
-            };
-        };
-        db.transaction(function (tx2) {
-
-            console.log(sqls2);
-            tx2.executeSql(sqls2, [], function (tx2, results2) {
-                for (var i = 0; i < results2.rows.length; i++) {
-                    tempproducts.push(results2.rows.item(i));
-                };
-                var one
-                if (next == 1) {
-                    one = 9999;
-                    for (var j = 0; j < tempproducts.length; j++) {
-                        if (tempproducts[j].id > productid) {
-                            var two = one;
-                            one = Math.min(tempproducts[j].id, one);
-                            if (one != two) {
-                                var varid = j;
-                            };
-                        };
-                    };
-                    if (one == 9999) {
-                        for (var j = 0; j < tempproducts.length; j++) {
-                            var two = one;
-                            one = Math.min(tempproducts[j].id, one)
-                            if (one != two) {
-                                var varid = j;
-                            };
-                        };
-                    };
-                } else {
-                    one = 0;
-                    for (var j = 0; j < tempproducts.length; j++) {
-                        if (tempproducts[j].id < productid) {
-                            var two = one;
-                            one = Math.max(tempproducts[j].id, one);
-                            if (one != two) {
-                                var varid = j;
-                            };
-                        };
-                    };
-                    if (one == 0) {
-                        for (var j = 0; j < tempproducts.length; j++) {
-                            var two = one;
-                            one = Math.max(tempproducts[j].id, one)
-                            if (one != two) {
-                                var varid = j;
-                            };
-                        };
-                    };
-                };
-                console.log(one);
-                oncategoryproductofflinesuccess(tempproducts[varid]);
-
-            }, function (tx2, results2) {});
-        });
-
-    };
-
-    //INITITAL FUNCTION CALL ON PAGE LOAD FOR PRODUCT
-    nextproductoffline(0, 1);
-
-    //NEXT BUTTON AN PREVIOUS BUTTON (1 FOR NEXT, 0 FOR PREVIOUS)
-    $scope.getnextproduct = function (next) {
-        nextproductoffline($scope.categoryproductdata.id, next);
-    };
-
-    //SCHEME AND NEW PRODUCTS
-    $scope.getscheme = function (cid) {
-        MyServices.setsearchtxt("");
-        MyServices.setcategory(cid);
-        var retailer = MyServices.getretailer();
-        $location.path("/app/dealer/" + $scope.retailerid + "/" + cid);
-        $location.replace();
-    };
 
 
-    //SEARCH
-    var searchtxt = MyServices.getsearchtxt();
-    if (searchtxt != "") {
-        $scope.searchtext = searchtxt;
-    }
-    $scope.searchproduct = function (searchvalue) {
-        var retail = MyServices.getretailer();
-        MyServices.setsearchtxt(searchvalue);
-        console.log(searchvalue);
-        var searchtext = "f" + searchvalue;
-        console.log(searchtext);
-        MyServices.setcategory(searchtext);
-        $location.path("/app/dealer/" + retail + "/" + searchtext);
-    };
 
     //TOP TEN ORDERS
     $scope.toptendata = [];
