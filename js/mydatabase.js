@@ -261,13 +261,13 @@ var mydatabase = angular.module('mydatabase', [])
             },
 
             sendcartoffline: function (orid, ouid, ocart, remark) {
-                if ($.jStorage.get("offlineorderid") > 0) {
+                /*if ($.jStorage.get("offlineorderid") > 0) {
                     orderid = $.jStorage.get("offlineorderid");
                 } else {
                     orderid = 0
-                };
-                orderid += 1;
-                $.jStorage.set("offlineorderid", orderid);
+                };*/
+                //orderid += 1;
+                //$.jStorage.set("offlineorderid", orderid);
                 db.transaction(function (tx) {
                     if (ocart.length == 0) {
                         var sqls = 'INSERT INTO ORDERS (orderid, userid, retailerid, id, productcode, name, quantity, mrp, totalprice, category, remark) VALUES (' + orderid + ',' + ouid + ',' + orid + ',null,null,null,null,null,null,null," no remark ")';

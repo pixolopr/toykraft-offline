@@ -90,7 +90,7 @@ var myservices = angular.module('myservices', [])
         },
         checkretailer: function (retail) {
             if (retail == retailer) {
-
+                
             } else {
                 retailer = retail;
                 cart = [];
@@ -195,6 +195,7 @@ var myservices = angular.module('myservices', [])
                     totalprice: pmrp * pquantity,
                     category: category
                 });
+                
             } else {
                 if (cart[addquantityon].quantity > 0) {
                     cart[addquantityon].quantity = parseInt(cart[addquantityon].quantity) + pquantity;
@@ -230,6 +231,7 @@ var myservices = angular.module('myservices', [])
         removeObject: function (oid) {
 
             cart.splice(oid, 1);
+           
         },
         findnext: function (id, next) {
             return $http.get(adminurl + "product/getnextproduct", {

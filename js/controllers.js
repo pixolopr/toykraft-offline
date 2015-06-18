@@ -424,7 +424,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
     //RETRIEVING DATA FROM JSTORAGE
     $scope.categoryproductdata = {};
 
-
+    
 
     console.log($scope.categoryproductdata);
     //console.log($.jStorage.get("categories"));
@@ -466,6 +466,8 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
     if ($scope.retailerID == 0) {
         $location.path("/app/home");
     };
+    
+    console.log($scope.mycart);
 
     ////////////////////////////////////////////////////GAINING RETAILER INFO//////////////////////////////////////////////
     //GAINING RETAILER INFORMATION - ONLINE//
@@ -513,9 +515,19 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    //CAEGORY AND PRODUCTS
-    $scope.categoryid = $stateParams.cid;
-    MyServices.setcategory($stateParams.cid);
+    if (typeof $stateParams.cid != 'string') {
+        //CAEGORY AND PRODUCTS
+        if ($stateParams.cid > 0) {
+            $scope.categoryid = $stateParams.cid;
+            MyServices.setcategory($stateParams.cid);
+        } else {
+            $scope.categoryid = "0";
+        };
+    } else {
+        $scope.categoryid = $stateParams.cid;
+        MyServices.setcategory($stateParams.cid);
+    };
+
 
     //DEFINING THE ARRAY VARIABLE TO STORE PRODUCTS
     $scope.categoryproductdata = {};
@@ -626,7 +638,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         MyServices.setcategory(searchtext);
         $location.path("/app/dealer/" + retail + "/" + searchtext);
     };
-    
+
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
