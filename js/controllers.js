@@ -424,7 +424,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
     //RETRIEVING DATA FROM JSTORAGE
     $scope.categoryproductdata = {};
 
-    
+
 
     console.log($scope.categoryproductdata);
     //console.log($.jStorage.get("categories"));
@@ -466,7 +466,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
     if ($scope.retailerID == 0) {
         $location.path("/app/home");
     };
-    
+
     console.log($scope.mycart);
 
     ////////////////////////////////////////////////////GAINING RETAILER INFO//////////////////////////////////////////////
@@ -1053,33 +1053,25 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
     $scope.useremail = userdata.email;
 
 
-
+    
     $scope.sendOrder = function (retailerdata2) {
-        console.log("hello im in send order");
         if ($scope.firstclick == 0) {
             $scope.firstclick = 1;
-            console.log("Send Order pressed");
-            console.log(retailerdata2);
-            console.log($scope.mycart);
+            var u = MyServices.getuser();
+            var c = MyServices.getCart()
+            console.log(u);
+            console.log(c);
+            console.log(retailerdata2.remark);
+            MyDatabase.sendcartoffline(retailerdata2, u, c);
 
-            if (offline) {
-                var u = MyServices.getuser();
-                var c = MyServices.getCart()
-                console.log(u);
-                console.log(c);
-                console.log(retailerdata2.remark);
-                MyDatabase.sendcartoffline(retailerdata2.id, u.id, c, retailerdata2.remark);
-            } else {
-                $scope.number1 = retailerdata2.contactnumber;
-                $scope.number2 = retailerdata2.ownernumber;
-                MyServices.sendOrderNow(retailerdata2).success(orderSuccess);
-            };
-            $ionicLoading.show({
-                template: '<h1 class="ion-loading-c"></h1><br>Sendig order...',
-                animation: 'fade-in',
-                showBackdrop: true
-            });
+            MyServices.sendOrderNow(retailerdata2).success(orderSuccess);
         };
+
+        $ionicLoading.show({
+            template: '<h1 class="ion-loading-c"></h1><br>Sendig order...',
+            animation: 'fade-in',
+            showBackdrop: true
+        });
     };
 
 

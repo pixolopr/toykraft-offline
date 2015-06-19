@@ -1,5 +1,6 @@
 //VARIABLES NEEDED
-var adminurl = "http://admin.toy-kraft.com/rest/index.php/";
+//var adminurl = "http://admin.toy-kraft.com/rest/index.php/";
+var adminurl = "localhost/rest/index.php/";
 var zone;
 
 //CREATE THE DATABASE
@@ -12,18 +13,14 @@ db.transaction(function (tx) {
     tx.executeSql('CREATE TABLE IF NOT EXISTS USERS (id Integer PRIMARY KEY, name varchar, password varchar, username varchar, email varchar, mobile varchar, accesslevel Integer, zone Integer, lastlogin TIMESTAMP)');
     //tx.executeSql('DROP TABLE USERS');
 });
-db.transaction(function(tx){
-tx.executeSql('INSERT INTO `USERS` VALUES(1,"abc","toykraft","toykraft","","","","","")')
+db.transaction(function (tx) {
+    tx.executeSql('INSERT INTO `USERS` VALUES(1,"abc","toykraft","toykraft","","","","","")')
 })
 var mydatabase = angular.module('mydatabase', [])
     .factory('MyDatabase', function ($http, $location, MyServices) {
 
-        //var statedata = [];
-        //var checkstatedata = [];
-        //var checkcitydata = [];
-        //var checkareadata = [];
-        //var checkretailerdata = [];
-        //var categorydata = [];
+
+        var orderproductcount = 0;
 
         return {
 
@@ -52,43 +49,43 @@ var mydatabase = angular.module('mydatabase', [])
             //CREATING ALL TABLES ON SYNC PAGE LOAD
             createretailertables: function () {
                 db.transaction(function (tx) {
-                   tx.executeSql('CREATE TABLE IF NOT EXISTS STATE (id Integer PRIMARY KEY, zone Varchar, name Varchar)');
-                 //   tx.executeSql('DROP TABLE STATE');
+                    tx.executeSql('CREATE TABLE IF NOT EXISTS STATE (id Integer PRIMARY KEY, zone Varchar, name Varchar)');
+                    //   tx.executeSql('DROP TABLE STATE');
 
                 });
                 db.transaction(function (tx) {
-                   tx.executeSql('CREATE TABLE IF NOT EXISTS CITY (id Integer PRIMARY KEY, state Integer, name Varchar)');
-                 //   tx.executeSql('DROP TABLE CITY');
+                    tx.executeSql('CREATE TABLE IF NOT EXISTS CITY (id Integer PRIMARY KEY, state Integer, name Varchar)');
+                    //   tx.executeSql('DROP TABLE CITY');
 
                 });
                 db.transaction(function (tx) {
                     tx.executeSql('CREATE TABLE IF NOT EXISTS AREA (id Integer PRIMARY KEY, city Integer, name Varchar, distributor Integer)');
-                  //  tx.executeSql('DROP TABLE AREA');
+                    //  tx.executeSql('DROP TABLE AREA');
 
                 });
                 db.transaction(function (tx) {
                     tx.executeSql('CREATE TABLE IF NOT EXISTS RETAILER (id INTEGER PRIMARY KEY ,lat Integer,long Integer,area int,dob Date ,type_of_area Integer,sq_feet Float,store_image Varchar,name Varchar,number Varchar,email Varchar,address Varchar,ownername Varchar,ownernumber Varchar,contactname Varchar,contactnumber Varchar,timestamp TIMESTAMP, issync Integer)');
-                   // tx.executeSql('DROP TABLE RETAILER');
+                    // tx.executeSql('DROP TABLE RETAILER');
                 });
                 db.transaction(function (tx) {
-                   tx.executeSql('CREATE TABLE IF NOT EXISTS PRODUCT (id INTEGER PRIMARY KEY AUTOINCREMENT, name Varchar, product Varchar, encode Varchar, name2 Varchar, productcode Varchar, category Integer,video Varchar,mrp,description VARCHAR2(5000),age Integer,scheme Varchar,isnew Integer,timestamp Timestamp)');
-                   // tx.executeSql('DROP TABLE PRODUCT');
+                    tx.executeSql('CREATE TABLE IF NOT EXISTS PRODUCT (id INTEGER PRIMARY KEY AUTOINCREMENT, name Varchar, product Varchar, encode Varchar, name2 Varchar, productcode Varchar, category Integer,video Varchar,mrp,description VARCHAR2(5000),age Integer,scheme Varchar,isnew Integer,timestamp Timestamp)');
+                    // tx.executeSql('DROP TABLE PRODUCT');
                 });
                 db.transaction(function (tx) {
-                    tx.executeSql('CREATE TABLE IF NOT EXISTS ORDERS (id INTEGER AUTO_INCREMENT, retail Integer,sales Varchar,timestamp Timestamp,amount Integer,signature Varchar,salesid Integer,quantity Integer,remark Varchar,issync Integer)');
-                  //  tx.executeSql('DROP TABLE ORDERS');
+                    tx.executeSql('CREATE TABLE IF NOT EXISTS ORDERS (id INTEGER AUTO_INCREMENT, retail Integer,sales Varchar,timestamp Timestamp,amount double,signature integer,salesid Integer,quantity Integer,remark text,issync integer)');
+                    //tx.executeSql('DROP TABLE ORDERS');
                 });
                 db.transaction(function (tx) {
                     tx.executeSql('CREATE TABLE IF NOT EXISTS TOPTEN (product INTEGER, productcode, name, totalquantity)');
-                 //   tx.executeSql('DROP TABLE TOPTEN');
+                    //   tx.executeSql('DROP TABLE TOPTEN');
                 });
                 db.transaction(function (tx) {
-                    tx.executeSql('CREATE TABLE IF NOT EXISTS ORDERPRODUCT (id Integer PRIMARY KEY, orders Integer, product Integer, quantity Integer, amount Integer, scheme_id Integer, status Integer, category varchar, productcode varchar)');
-               // tx.executeSql('DROP TABLE ORDERPRODUCT ');
+                    tx.executeSql('CREATE TABLE IF NOT EXISTS ORDERPRODUCT (id Integer PRIMARY KEY, orders Integer, product Integer, quantity Integer, amount double, scheme_id Integer, status Integer, category integer, productcode varchar)');
+                    //tx.executeSql('DROP TABLE ORDERPRODUCT ');
                 });
                 db.transaction(function (tx) {
                     tx.executeSql('CREATE TABLE IF NOT EXISTS PRODUCTIMAGE (id Integer PRIMARY KEY, product Integer, image varchar)');
-                  //  tx.executeSql('DROP TABLE PRODUCTIMAGE');
+                    //  tx.executeSql('DROP TABLE PRODUCTIMAGE');
                 });
 
             },
@@ -226,7 +223,7 @@ var mydatabase = angular.module('mydatabase', [])
                     //$cordovaToast.show('Product Data Imported', 'long', 'bottom');
                 });
             },
-            
+
             //TOP TEN
             inserttopten: function (data) {
                 db.transaction(function (tx) {
@@ -242,16 +239,16 @@ var mydatabase = angular.module('mydatabase', [])
                     //$cordovaToast.show('Top Ten Data Imported', 'long', 'bottom');
                 });
             },
-            
+
             //SYNC CATEGORIES
             getcategoriesname: function () {
                 return $http.get(adminurl + "catelog/getcatelog");
             },
-            synccategorydata: function(data){
-            
+            synccategorydata: function (data) {
+
             },
-            
-            
+
+
             findproductbycategory: function (id) {
                 $http.get(adminurl + "", {
                     params: {
@@ -260,50 +257,71 @@ var mydatabase = angular.module('mydatabase', [])
                 })
             },
 
-            sendcartoffline: function (orid, ouid, ocart, remark) {
-                /*if ($.jStorage.get("offlineorderid") > 0) {
-                    orderid = $.jStorage.get("offlineorderid");
-                } else {
-                    orderid = 0
-                };*/
-                //orderid += 1;
-                //$.jStorage.set("offlineorderid", orderid);
-                db.transaction(function (tx) {
-                    if (ocart.length == 0) {
-                        var sqls = 'INSERT INTO ORDERS (orderid, userid, retailerid, id, productcode, name, quantity, mrp, totalprice, category, remark) VALUES (' + orderid + ',' + ouid + ',' + orid + ',null,null,null,null,null,null,null," no remark ")';
+
+            sendcartoffline: function (retailerdata, user, ocart) {
+
+                var finishofflineorder = function () {
+                    orderproductcount = 0;
+                    var aid = MyServices.getareaid();
+                    MyServices.clearcart();
+                    MyServices.setretailer(0);
+                    if (aid > 0) {
+                        window.location.replace(window.location.origin + window.location.pathname + "#/app/retailer/" + aid);
+                    } else {
+                        window.location.replace(window.location.origin + window.location.pathname + "#/app/home");
+                    };
+                };
+
+                var addorderproducts = function (cartproduct, orderid, checkval) {
+                    console.log(orderid);
+                    db.transaction(function (tx) {
+
+                        var sqls = 'INSERT INTO ORDERPRODUCT (orders, product, quantity, amount, scheme_id, status, category, productcode) VALUES (' + orderid + ', ' + cartproduct.id + ', ' + cartproduct.quantity + ', ' + cartproduct.totalprice + ', 0, 1, ' + cartproduct.category + ', "' + cartproduct.productcode + '")';
+                        console.log(sqls);
+
                         tx.executeSql(sqls, [], function (tx, results) {
-                            console.log('added no products with order id ' + orderid);
-                            var aid = MyServices.getareaid();
-                            MyServices.clearcart();
-                            MyServices.setretailer(0);
-                            if (aid > 0) {
-                                window.location.replace(window.location.origin + window.location.pathname + "#/app/retailer/" + aid);
-                            } else {
-                                window.location.replace(window.location.origin + window.location.pathname + "#/app/home");
+
+                            orderproductcount++;
+                            if (orderproductcount == checkval) {
+                                finishofflineorder();
                             };
                         }, function (tx, results) {
+                            console.log(results);
                             console.log('did not add no product with no name');
                         });
-                    } else {
-                        for (var i = 0; i < ocart.length; i++) {
-                            var sqls = 'INSERT INTO ORDERS (orderid, userid, retailerid, id, productcode, name, quantity, mrp, totalprice, category, remark) VALUES (' + orderid + ',' + ouid + ',' + orid + ',' + ocart[i].id + ',"' + ocart[i].productcode + '","' + ocart[i].name + '",' + ocart[i].quantity + ',"' + ocart[i].mrp + '","' + ocart[i].totalprice + '","' + ocart[i].category + '","' + remark + '")';
-                            console.log(sqls);
-                            tx.executeSql(sqls, [], function (tx, results) {
-                                console.log('added ' + i + ' products with order id ' + orderid);
-                                var aid = MyServices.getareaid();
-                                MyServices.clearcart();
-                                MyServices.setretailer(0);
-                                if (aid > 0) {
-                                    window.location.replace(window.location.origin + window.location.pathname + "#/app/retailer/" + aid);
-                                } else {
-                                    window.location.replace(window.location.origin + window.location.pathname + "#/app/home");
-                                };
-                            }, function (tx, results) {
-                                console.log('did not add product with name' + ocart.name);
-                            });
-                        };
                         //$cordovaToast.show('Order Placed Offline', 'long', 'bottom');
+                    });
+                };
+
+                var totalamount = 0;
+                var totalquantity = 0;
+                for (var c = 0; c < ocart.length; c++) {
+                    totalquantity += ocart[c].quantity;
+                    totalamount += ocart[c].totalprice;
+                };
+
+                db.transaction(function (tx) {
+
+                    if(retailerdata.remark == undefined){
+                        retailerdata.remark = "No Remark";
                     };
+                    var sqls = 'INSERT INTO ORDERS (retail ,sales, timestamp, amount, signature, salesid, quantity, remark, issync) VALUES (' + retailerdata.id + ', "' + user.name + '", "9:50", ' + totalamount + ' , 1 , ' + user.id + ', ' + totalquantity + ' , "' + retailerdata.remark + '", 0 )';
+
+                    tx.executeSql(sqls, [], function (tx, results) {
+                        var insertid = results.insertId;
+                        console.log(insertid);
+                        if (totalquantity > 0) {
+                            //INSERT INTO ORDERPRODUCTS
+                            for (c = 0; c < ocart.length; c++) {
+                                addorderproducts(ocart[c], insertid, ocart.length);
+                            };
+                        } else {
+                            finishofflineorder();
+                        };
+                    }, function (tx, results) {
+                        console.log('did not add no product with no name');
+                    });
+                    //$cordovaToast.show('Order Placed Offline', 'long', 'bottom');
                 });
             },
             syncsendorders: function (sqls, dsqls) {
