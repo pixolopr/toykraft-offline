@@ -1,4 +1,4 @@
-var adminurl = "http://mafiawarloots.com/clientunderworkcode/index.php/";
+//var adminurl = "http://mafiawarloots.com/clientunderworkcode/index.php/";
 
 var filenameee = "";
 angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 'ngCordova'])
@@ -66,18 +66,29 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 .controller('menuCtrl', function ($scope, MyDatabase) {
 
     console.log("Menu Ctrl");
-    
-    
-    $scope.getorsersynccount = function(){
+
+
+    $scope.getorsersynccount = function () {
         MyDatabase.setordersynccount();
         return MyDatabase.getordersynccount();
     };
-    
+
 })
 
 
 .controller('syncCtrl', function ($scope, $stateParams, MyServices, MyDatabase, $location, $cordovaNetwork, $cordovaToast) {
 
+
+        //SYNC ORDERS//
+
+        //GIVING VALUE TO NOTIFICATION
+        MyDatabase.setordersynccount();
+        $scope.getorsersynccount = function () {
+            MyDatabase.setordersynccount();
+            
+            return MyDatabase.getordersynccount();
+            
+        };
 
 
         //RETRIEVING DATA INTO TABLES (FIRST TIME)
@@ -149,24 +160,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         };
 
         $scope.sendofflineorders = function () {
-            db.transaction(function (tx) {
-                var sqls = 'SELECT max(orderid) as maxorder FROM ORDERS';
-                console.log(sqls);
-                tx.executeSql(sqls, [], function (tx, results) {
-                    numorders = parseInt(results.rows.item(0).maxorder);
-                    //see if it is greater than 0
-                    if (numorders > 0) {
-                        console.log("greater");
-                        console.log(numorders);
-                        for (var i = 1; i <= numorders; i++) {
-                            var sqls = 'SELECT * FROM ORDERS WHERE orderid=' + i;
-                            var dsqls = 'DELETE FROM ORDERS WHERE orderid=' + i;
-                            MyDatabase.syncsendorders(sqls, dsqls);
-                        };
-
-                    };
-                }, function (tx, results) {});
-            });
+            MyDatabase.syncorders();
         };
 
 
@@ -1077,7 +1071,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
             console.log(retailerdata2.remark);
             MyDatabase.sendcartoffline(retailerdata2, u, c);
 
-            MyServices.sendOrderNow(retailerdata2).success(orderSuccess);
+            //MyServices.sendOrderNow(retailerdata2).success(orderSuccess);
         };
 
         $ionicLoading.show({

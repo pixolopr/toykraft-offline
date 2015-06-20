@@ -1,6 +1,6 @@
 //VARIABLES NEEDED
 //var adminurl = "http://admin.toy-kraft.com/rest/index.php/";
-var adminurl = "localhost/rest/index.php/";
+var adminurl = "http://localhost/NetworkBackend/rest/index.php/";
 var zone;
 
 //CREATE THE DATABASE
@@ -24,18 +24,95 @@ var mydatabase = angular.module('mydatabase', [])
         var ordersynccount = 0;
 
         return {
-
+            //ORDER SYNC
             getordersynccount: function () {
                 return ordersynccount;
             },
             setordersynccount: function () {
-                console.log("setting");
-                db.transaction(function(tx) {
-                   tx.executeSql('SELECT COUNT(*) as `number` FROM ORDERS WHERE `issync` = 0', [], function(tx, results){
+                db.transaction(function (tx) {
+                    tx.executeSql('SELECT COUNT(*) as `number` FROM ORDERS WHERE `issync` = 0', [], function (tx, results) {
                         ordersynccount = results.rows.item(0).number;
-                   }, function(tx, results){
+                    }, function (tx, results) {
                         console.log(results);
-                   }) 
+                    })
+                });
+            },
+            syncorders: function () {
+                user = MyServices.getuser();
+
+                console.log("sync orders");
+
+                //SYNC SUCCESS
+                var syncordersuccess = function (id, ordersid) {
+                    console.log(id + " " + ordersid);
+                    db.transaction(function (tx) {
+                        console.log("sync value change");
+                        tx.executeSql('UPDATE `ORDERS` SET `id`='+id+',`issync`= 1 WHERE `id`=' +ordersid, [], function (tx, results) {
+                            console.log(results.rows);
+                            
+                        }, function (tx, results) {});
+                    });
+                };
+
+                //SYNC TO ONLINE
+                var syncordernow = function (cart, retaildata) {
+                    return $http.post(adminurl + "orders/makeorder", {
+                        cart: cart,
+                        user: user,
+                        retailer: retaildata,
+                    });
+                };
+
+                //RETAINING CART
+                var getcart = function (oid, rd) {
+                    console.log("retaining cart");
+                    db.transaction(function (tx) {
+                        tx.executeSql('SELECT * FROM `orderproduct` WHERE `orders` = ' + oid, [], function (tx, results) {
+                            var synccart = [];
+                            for (var gc = 0; gc < results.rows.length; gc++) {
+                                synccart[gc] = {};
+                                synccart[gc].category = results.rows.item(gc).category;
+                                synccart[gc].id = results.rows.item(gc).product;
+                                synccart[gc].mrp = results.rows.item(gc).amount;
+                                synccart[gc].name = results.rows.item(gc).name;
+                                synccart[gc].productcode = results.rows.item(gc).productcode;
+                                synccart[gc].quantity = results.rows.item(gc).quantity;
+                                synccart[gc].totalprice = results.rows.item(gc).quantity * results.rows.item(gc).amount;
+                            };
+                            console.log(synccart);
+                            syncordernow(synccart, rd).success(function (data, status) {
+                                syncordersuccess(data.id, oid)
+                            });
+                        }, function (tx, results) {});
+                    });
+                };
+
+                //RETAINING RETAILER
+                var getretailer = function (orderid, retailerid, remark) {
+                    console.log("retaining retailer");
+                    db.transaction(function (tx) {
+                        tx.executeSql('SELECT * FROM `RETAILER` WHERE `id` = ' + retailerid, [], function (tx, results) {
+                            console.log(results.rows);
+                            var retailerdata = {};
+                            retailerdata = results.rows.item(0);
+                            retailerdata.remark = remark;
+                            getcart(orderid, retailerdata);
+                        }, function (tx, results) {
+                            console.log(results);
+                        });
+                    });
+                };
+
+                //RETAINING ORDER
+                db.transaction(function (tx) {
+                    console.log("retaining order");
+                    tx.executeSql('SELECT * FROM `orders` WHERE `issync` = 0', [], function (tx, results) {
+                        console.log(results.rows);
+                        for (var os = 0; os < results.rows.length; os++) {
+                            console.log(results.rows.item(os).id + " " + results.rows.item(os).retail + " " + results.rows.item(os).remark)
+                            getretailer(results.rows.item(os).id, results.rows.item(os).retail, results.rows.item(os).remark);
+                        };
+                    }, function (tx, results) {});
                 });
             },
 
@@ -95,7 +172,7 @@ var mydatabase = angular.module('mydatabase', [])
                     //   tx.executeSql('DROP TABLE TOPTEN');
                 });
                 db.transaction(function (tx) {
-                    tx.executeSql('CREATE TABLE IF NOT EXISTS ORDERPRODUCT (id Integer PRIMARY KEY, orders Integer, product Integer, quantity Integer, amount double, scheme_id Integer, status Integer, category varchar, productcode varchar)');
+                    tx.executeSql('CREATE TABLE IF NOT EXISTS ORDERPRODUCT (id Integer PRIMARY KEY, orders Integer, product Integer, quantity Integer,name varchar, amount double, scheme_id Integer, status Integer, category varchar, productcode varchar)');
                     //tx.executeSql('DROP TABLE ORDERPRODUCT ');
                 });
                 db.transaction(function (tx) {
@@ -291,7 +368,7 @@ var mydatabase = angular.module('mydatabase', [])
                     console.log(orderid);
                     db.transaction(function (tx) {
 
-                        var sqls = 'INSERT INTO ORDERPRODUCT (orders, product, quantity, amount, scheme_id, status, category, productcode) VALUES (' + orderid + ', ' + cartproduct.id + ', ' + cartproduct.quantity + ', ' + cartproduct.totalprice + ', 0, 1, "' + cartproduct.category + '", "' + cartproduct.productcode + '")';
+                        var sqls = 'INSERT INTO ORDERPRODUCT (orders, product, quantity, name, amount, scheme_id, status, category, productcode) VALUES (' + orderid + ', ' + cartproduct.id + ', ' + cartproduct.quantity + ', "' + cartproduct.name + '",' + cartproduct.mrp + ', 0, 1, "' + cartproduct.category + '", "' + cartproduct.productcode + '")';
                         console.log(sqls);
 
                         tx.executeSql(sqls, [], function (tx, results) {
