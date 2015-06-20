@@ -21,8 +21,23 @@ var mydatabase = angular.module('mydatabase', [])
 
 
         var orderproductcount = 0;
+        var ordersynccount = 0;
 
         return {
+
+            getordersynccount: function () {
+                return ordersynccount;
+            },
+            setordersynccount: function () {
+                console.log("setting");
+                db.transaction(function(tx) {
+                   tx.executeSql('SELECT COUNT(*) as `number` FROM ORDERS WHERE `issync` = 0', [], function(tx, results){
+                        ordersynccount = results.rows.item(0).number;
+                   }, function(tx, results){
+                        console.log(results);
+                   }) 
+                });
+            },
 
             //SYNC ZONE DATA
             findzonebyuser: function () {
@@ -72,7 +87,7 @@ var mydatabase = angular.module('mydatabase', [])
                     // tx.executeSql('DROP TABLE PRODUCT');
                 });
                 db.transaction(function (tx) {
-                    tx.executeSql('CREATE TABLE IF NOT EXISTS ORDERS (id INTEGER AUTO_INCREMENT, retail Integer,sales Varchar,timestamp Timestamp,amount double,signature integer,salesid Integer,quantity Integer,remark text,issync integer)');
+                    tx.executeSql('CREATE TABLE IF NOT EXISTS ORDERS (id INTEGER PRIMARY KEY, retail Integer,sales Varchar,timestamp Timestamp,amount double,signature integer,salesid Integer,quantity Integer,remark text,issync integer)');
                     //tx.executeSql('DROP TABLE ORDERS');
                 });
                 db.transaction(function (tx) {
@@ -80,7 +95,7 @@ var mydatabase = angular.module('mydatabase', [])
                     //   tx.executeSql('DROP TABLE TOPTEN');
                 });
                 db.transaction(function (tx) {
-                    tx.executeSql('CREATE TABLE IF NOT EXISTS ORDERPRODUCT (id Integer PRIMARY KEY, orders Integer, product Integer, quantity Integer, amount double, scheme_id Integer, status Integer, category integer, productcode varchar)');
+                    tx.executeSql('CREATE TABLE IF NOT EXISTS ORDERPRODUCT (id Integer PRIMARY KEY, orders Integer, product Integer, quantity Integer, amount double, scheme_id Integer, status Integer, category varchar, productcode varchar)');
                     //tx.executeSql('DROP TABLE ORDERPRODUCT ');
                 });
                 db.transaction(function (tx) {
@@ -276,7 +291,7 @@ var mydatabase = angular.module('mydatabase', [])
                     console.log(orderid);
                     db.transaction(function (tx) {
 
-                        var sqls = 'INSERT INTO ORDERPRODUCT (orders, product, quantity, amount, scheme_id, status, category, productcode) VALUES (' + orderid + ', ' + cartproduct.id + ', ' + cartproduct.quantity + ', ' + cartproduct.totalprice + ', 0, 1, ' + cartproduct.category + ', "' + cartproduct.productcode + '")';
+                        var sqls = 'INSERT INTO ORDERPRODUCT (orders, product, quantity, amount, scheme_id, status, category, productcode) VALUES (' + orderid + ', ' + cartproduct.id + ', ' + cartproduct.quantity + ', ' + cartproduct.totalprice + ', 0, 1, "' + cartproduct.category + '", "' + cartproduct.productcode + '")';
                         console.log(sqls);
 
                         tx.executeSql(sqls, [], function (tx, results) {
@@ -302,7 +317,7 @@ var mydatabase = angular.module('mydatabase', [])
 
                 db.transaction(function (tx) {
 
-                    if(retailerdata.remark == undefined){
+                    if (retailerdata.remark == undefined) {
                         retailerdata.remark = "No Remark";
                     };
                     var sqls = 'INSERT INTO ORDERS (retail ,sales, timestamp, amount, signature, salesid, quantity, remark, issync) VALUES (' + retailerdata.id + ', "' + user.name + '", "9:50", ' + totalamount + ' , 1 , ' + user.id + ', ' + totalquantity + ' , "' + retailerdata.remark + '", 0 )';

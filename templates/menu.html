@@ -12,20 +12,28 @@
         <header class="bar bar-header bar-assertive">
             <h1 class="title">Categories</h1>
         </header>
-        <ion-content class="has-header" >
-            <ion-list class="menu-item"  ng-show="setslide();">
-                    <div nav-clear menu-close href="#" ng-repeat="category in categorynamedata">
+        <ion-content class="has-header">
+            <ion-list class="menu-item" ng-show="setslide();">
+                <div nav-clear menu-close href="#" ng-repeat="category in categorynamedata">
                     <h4 style="padding:10px;color:white;background:#b22222;">{{category.name}}</h4>
 
-                    
-                    <ion-item  ng-click="changecategory(subcategory.id);" ng-repeat="subcategory in category.subcategory" nav-clear  >
+
+                    <ion-item ng-click="changecategory(subcategory.id);" ng-repeat="subcategory in category.subcategory" nav-clear>
                         <span style="margin-left:20px;">{{subcategory.name}}</span>
                     </ion-item>
-                    
+
                 </div>
 
             </ion-list>
-            <button class="button button-assertive button-block" ng-click="gotosyncpage();" ng-hide="setslide();">Sync</button>
+            <ion-list ng-controller="menuCtrl">
+                <ion-item href="#/app/sync">Orders Sync <span class="badge badge-assertive">{{getorsersynccount()}}</span>
+                </ion-item>
+                <ion-item>
+                    <button menu-close class="button button-assertive button-block" ng-click="gotosyncpage();" ng-hide="setslide();">Sync</button>
+                </ion-item>
+            </ion-list>
+
+
         </ion-content>
     </ion-side-menu>
 

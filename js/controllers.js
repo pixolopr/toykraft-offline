@@ -5,7 +5,12 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
 .controller('AppCtrl', function ($scope, $ionicModal, $timeout, $location, MyServices, MyDatabase, $cordovaKeyboard, $ionicLoading) {
 
-    console.log("APP CONTROL");
+
+    //CREATE ALL TABLES DURING PAGE LOAD
+    MyDatabase.createretailertables();
+
+
+
     $scope.setslide = function () {
         var path = $location.path();
         var path2 = path.slice(0, 12)
@@ -58,14 +63,22 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
 })
 
+.controller('menuCtrl', function ($scope, MyDatabase) {
 
+    console.log("Menu Ctrl");
+    
+    
+    $scope.getorsersynccount = function(){
+        MyDatabase.setordersynccount();
+        return MyDatabase.getordersynccount();
+    };
+    
+})
 
 
 .controller('syncCtrl', function ($scope, $stateParams, MyServices, MyDatabase, $location, $cordovaNetwork, $cordovaToast) {
 
 
-        //CREATE ALL TABLES DURING PAGE LOAD
-        MyDatabase.createretailertables();
 
         //RETRIEVING DATA INTO TABLES (FIRST TIME)
         syncretailerstatedatasuccess = function (data, status) {
@@ -1053,7 +1066,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
     $scope.useremail = userdata.email;
 
 
-    
+
     $scope.sendOrder = function (retailerdata2) {
         if ($scope.firstclick == 0) {
             $scope.firstclick = 1;

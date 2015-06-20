@@ -9,7 +9,8 @@ var myservices = angular.module('myservices', [])
     var area = 0;
     var searchtxt = "";
     var areaID = 0;
-    var offlinemode = false;
+    
+    
     var d = new Date();
     //var myorderdate="2014-08-08";
     var myorderdate = d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2);
