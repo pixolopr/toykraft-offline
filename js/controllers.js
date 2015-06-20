@@ -76,20 +76,40 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 })
 
 
-.controller('syncCtrl', function ($scope, $stateParams, MyServices, MyDatabase, $location, $cordovaNetwork, $cordovaToast) {
+.controller('syncCtrl', function ($scope, $stateParams, MyServices, MyDatabase, $location, $interval, $cordovaNetwork, $cordovaToast) {
 
 
         //SYNC ORDERS//
 
         //GIVING VALUE TO NOTIFICATION
         MyDatabase.setordersynccount();
+
         $scope.getorsersynccount = function () {
             MyDatabase.setordersynccount();
-            
-            return MyDatabase.getordersynccount();
-            
-        };
 
+            return MyDatabase.getordersynccount();
+
+        };
+        $scope.callbacksuccess = function () {
+            console.log("abhay");
+            appleinterval = $interval(apply, 1000, 5);
+        };
+        var successfunc = function (data, status) {
+            console.log(data);
+        };
+        $scope.sendofflineorders = function () {
+            MyDatabase.syncorders($scope);
+        };
+        var apply = function () {
+            $scope.$apply();
+        };
+        /*
+            var apple = function() {
+                $interval.cancel(applyinterval);
+                $scope.$apply()
+                appleinterval = $interval(apple, 1000, 1);
+            };
+            */
 
         //RETRIEVING DATA INTO TABLES (FIRST TIME)
         syncretailerstatedatasuccess = function (data, status) {
@@ -159,9 +179,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
             MyServices.gettoptenproducts().success(toptendatasuccess);
         };
 
-        $scope.sendofflineorders = function () {
-            MyDatabase.syncorders();
-        };
+
 
 
         $scope.updateretailerdata = function () {

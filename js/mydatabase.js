@@ -31,17 +31,23 @@ var mydatabase = angular.module('mydatabase', [])
             setordersynccount: function () {
                 db.transaction(function (tx) {
                     tx.executeSql('SELECT COUNT(*) as `number` FROM ORDERS WHERE `issync` = 0', [], function (tx, results) {
+                        console.log(results.rows.item(0).number)
                         ordersynccount = results.rows.item(0).number;
                     }, function (tx, results) {
                         console.log(results);
                     })
                 });
             },
-            syncorders: function () {
+            syncorders: function (scope) {
                 user = MyServices.getuser();
 
                 console.log("sync orders");
 
+                var apply = function(sc)
+                {
+                    sc.$apply();
+                };
+                
                 //SYNC SUCCESS
                 var syncordersuccess = function (id, ordersid) {
                     console.log(id + " " + ordersid);
@@ -49,7 +55,10 @@ var mydatabase = angular.module('mydatabase', [])
                         console.log("sync value change");
                         tx.executeSql('UPDATE `ORDERS` SET `id`='+id+',`issync`= 1 WHERE `id`=' +ordersid, [], function (tx, results) {
                             console.log(results.rows);
-                            
+                            //angular.element(document.getElementById('syncCtrl')).scope().$apply();
+                            scope.$apply();
+                            apply(scope);
+                            scope.callbacksuccess();
                         }, function (tx, results) {});
                     });
                 };

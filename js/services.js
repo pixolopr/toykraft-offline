@@ -1,6 +1,8 @@
 //var adminurl = "http://admin.toy-kraft.com/rest/index.php/";
 var adminurl = "http://localhost/NetworkBackend/rest/index.php/";
+
 var myservices = angular.module('myservices', [])
+
 
 .factory('MyServices', function ($http, $location) {
     var productarray = [];
@@ -10,8 +12,11 @@ var myservices = angular.module('myservices', [])
     var area = 0;
     var searchtxt = "";
     var areaID = 0;
-    
-    
+
+    var ordersynccount = 0;
+
+
+
     var d = new Date();
     //var myorderdate="2014-08-08";
     var myorderdate = d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2);
@@ -92,7 +97,7 @@ var myservices = angular.module('myservices', [])
         },
         checkretailer: function (retail) {
             if (retail == retailer) {
-                
+
             } else {
                 retailer = retail;
                 cart = [];
@@ -197,7 +202,7 @@ var myservices = angular.module('myservices', [])
                     totalprice: pmrp * pquantity,
                     category: category
                 });
-                
+
             } else {
                 if (cart[addquantityon].quantity > 0) {
                     cart[addquantityon].quantity = parseInt(cart[addquantityon].quantity) + pquantity;
@@ -233,7 +238,7 @@ var myservices = angular.module('myservices', [])
         removeObject: function (oid) {
 
             cart.splice(oid, 1);
-           
+
         },
         findnext: function (id, next) {
             return $http.get(adminurl + "product/getnextproduct", {
@@ -290,7 +295,7 @@ var myservices = angular.module('myservices', [])
             });
         },
 
-        
+
         //SETTING GLOBAL CATEGORY DATA
         setproductCatdata: function (data) {
             productCatdata = data;
@@ -303,7 +308,7 @@ var myservices = angular.module('myservices', [])
                 params: data
             });
         },
-        print: function() {
+        print: function () {
             console.log("PRINTED");
         },
         sendemail: function (data) {
@@ -337,7 +342,7 @@ var myservices = angular.module('myservices', [])
                 return $http.post(smscall2);
             };
         },
-        setmode: function(val) {
+        setmode: function (val) {
             offlinemode = val;
         },
 
