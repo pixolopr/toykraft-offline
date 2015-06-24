@@ -30,7 +30,7 @@ var mydatabase = angular.module('mydatabase', [])
             },
             setordersynccount: function () {
                 db.transaction(function (tx) {
-                    tx.executeSql('SELECT COUNT(*) as `number` FROM ORDERS WHERE `issync` = 0', [], function (tx, results) {
+                    tx.executeSql('SELECT COUNT(*) as `number` FROM ORDERS WHERE `issync` = 0 AND `salesid`='+user.id, [], function (tx, results) {
                         console.log(results.rows.item(0).number)
                         ordersynccount = results.rows.item(0).number;
                     }, function (tx, results) {
@@ -53,13 +53,13 @@ var mydatabase = angular.module('mydatabase', [])
                     console.log(id + " " + ordersid);
                     db.transaction(function (tx) {
                         console.log("sync value change");
-                        tx.executeSql('UPDATE `ORDERS` SET `id`='+id+',`issync`= 1 WHERE `id`=' +ordersid, [], function (tx, results) {
+                        tx.executeSql('UPDATE `ORDERS` SET `id`='+id+',`issync`= 1 WHERE `id`=' +ordersid+' AND `salesid`='+user.id, [], function (tx, results) {
                             console.log(results.rows);
                             //angular.element(document.getElementById('syncCtrl')).scope().$apply();
                             scope.$apply();
                             apply(scope);
                             scope.callbacksuccess();
-                        }, function (tx, results) {});
+                        }, function (tx, results) {console.log("error");});
                     });
                 };
 
@@ -115,13 +115,13 @@ var mydatabase = angular.module('mydatabase', [])
                 //RETAINING ORDER
                 db.transaction(function (tx) {
                     console.log("retaining order");
-                    tx.executeSql('SELECT * FROM `orders` WHERE `issync` = 0', [], function (tx, results) {
+                    tx.executeSql('SELECT * FROM `orders` WHERE `issync` = 0 AND `salesid`='+user.id , [], function (tx, results) {
                         console.log(results.rows);
                         for (var os = 0; os < results.rows.length; os++) {
                             console.log(results.rows.item(os).id + " " + results.rows.item(os).retail + " " + results.rows.item(os).remark)
                             getretailer(results.rows.item(os).id, results.rows.item(os).retail, results.rows.item(os).remark);
                         };
-                    }, function (tx, results) {});
+                    }, function (tx, results) {console.log("error");});
                 });
             },
 
