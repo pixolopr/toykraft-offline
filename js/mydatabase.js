@@ -165,8 +165,8 @@ var mydatabase = angular.module('mydatabase', [])
 
                 });
                 db.transaction(function (tx) {
-                    tx.executeSql('CREATE TABLE IF NOT EXISTS RETAILER (id INTEGER PRIMARY KEY ,lat Integer,long Integer,area int,dob Date ,type_of_area Integer,sq_feet Float,store_image Varchar,name Varchar,number Varchar,email Varchar,address Varchar,ownername Varchar,ownernumber Varchar,contactname Varchar,contactnumber Varchar,timestamp TIMESTAMP, issync Integer)');
-                    // tx.executeSql('DROP TABLE RETAILER');
+                    tx.executeSql('CREATE TABLE IF NOT EXISTS RETAILER (id INTEGER,lat integer,long integer,area integer,dob date ,type_of_area varchar,sq_feet float,store_image Varchar,name Varchar,number Varchar,email Varchar,address Varchar,ownername Varchar,ownernumber Varchar,contactname Varchar,contactnumber Varchar,timestamp TIMESTAMP, issync varchar)');
+                    //  tx.executeSql('DROP TABLE RETAILER');
                 });
                 db.transaction(function (tx) {
                     tx.executeSql('CREATE TABLE IF NOT EXISTS PRODUCT (id INTEGER PRIMARY KEY AUTOINCREMENT, name Varchar, product Varchar, encode Varchar, name2 Varchar, productcode Varchar, category Integer,video Varchar,mrp,description VARCHAR2(5000),age Integer,scheme Varchar,isnew Integer,timestamp Timestamp)');
@@ -500,14 +500,15 @@ var mydatabase = angular.module('mydatabase', [])
                     }, function (tx2, results2) {});
                 });
             },
-            addnewretailer: function (data) {
+            addnewretailer: function (data,aid) {
                 console.log(data.area);
                 db.transaction(function (tx) {
                     db.transaction(function (tx) {
-                        var sqls = 'INSERT INTO RETAILER (id,lat,long,area,dob,type_of_area,sq_feet,store_image,name,number,email,address,ownername,ownernumber,contactname,contactnumber,timestamp, sync) VALUES (0,"' + data.lat + '","' + data.long + '","' + data.area + '","' + data.dob + '","' + data.type_of_area + '","' + data.sq_feet + '","' + data.store_image + '","' + data.name + '","' + data.number + '","' + data.email + '","' + data.address + '","' + data.ownername + '","' + data.ownernumber + '","' + data.contactname + '","' + data.contactnumber + '",null, "false")';
+                        var sqls = 'INSERT INTO RETAILER (id,lat,long,area,dob,type_of_area,sq_feet,store_image,name,number,email,address,ownername,ownernumber,contactname,contactnumber,timestamp,issync) VALUES (0,"' + data.lat + '","' + data.long + '","' + data.area + '","' + data.dob + '","' + data.type_of_area + '","' + data.sq_feet + '","' + data.store_image + '","' + data.name + '","' + data.number + '","' + data.email + '","' + data.address + '","' + data.ownername + '","' + data.ownernumber + '","' + data.contactname + '","' + data.contactnumber + '",null, "false")';
                         console.log(sqls);
                         tx.executeSql(sqls, [], function (tx, results) {
                             console.log("RAOW INSERTED");
+                            $location.path('/app/retailer/' +aid);
                         }, function (tx, results) {
                             console.log("RAOW NOT INSERTED");
                         });
@@ -637,17 +638,18 @@ var mydatabase = angular.module('mydatabase', [])
                 });
             },
             sendnewretailer: function (sqls) {
-                var addRetailerSuccess = function (data, status) {
+                var addRetailerSuccess = function (data, retailerdata) {
                     console.log(data);
-                    /*db.transaction(function (tx) {
-                    var sqls2 = 'UPDATE RETAILER SET sync = true, id = '+data.id+' WHERE name = '+data.name+'AND area = '+data.area ;
-                    tx.executeSql(sqls, [], function (tx, results) {
+                    console.log(retailerdata);
+                    db.transaction(function (tx) {
+                    var sqls2 = 'UPDATE RETAILER SET issync="true", id ='+data+' WHERE name ="'+retailerdata.name+'" AND area ='+retailerdata.area ;
+                    tx.executeSql(sqls2, [], function (tx, results) {
                         console.log("UPDATED");
                     }, function (tx, results) {
 
                     });
                     //$cordovaToast.show('Top Ten Data Imported', 'long', 'bottom');
-                });*/
+                });
                 };
                 db.transaction(function (tx) {
                     console.log(sqls);
@@ -655,7 +657,9 @@ var mydatabase = angular.module('mydatabase', [])
                         console.log(results.rows.length);
                         for (var i = 0; i < results.rows.length; i++) {
                             console.log(results.rows.item(i));
-                            MyServices.addNewRetailer(results.rows.item(i)).success(addRetailerSuccess);
+                            newretailerdata=results.rows.item(i);
+                            MyServices.addNewRetailer(results.rows.item(i)).success(function(data,status){
+                                addRetailerSuccess(data,newretailerdata);});
                         };
                     }, function (tx, results) {
 

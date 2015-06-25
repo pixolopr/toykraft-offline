@@ -189,7 +189,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
                  }, function (tx, results) {});
              });*/
             MyDatabase.sendretailerupdate('SELECT id, contactname, contactnumber, ownername, ownernumber FROM RETAILER WHERE sync = "false" AND id > 0');
-            MyDatabase.sendnewretailer('SELECT * FROM RETAILER WHERE sync = "false" AND id = 0');
+            MyDatabase.sendnewretailer('SELECT * FROM RETAILER WHERE issync = "false" AND id = 0');
         };
 
         /*//DUMMY OBJECTS TO STORE RECIEVED DATA
@@ -1594,12 +1594,10 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
                     $location.path(pathToGo);
 
                 };
-                if (offline) {
+               
                     console.log("ADD TO OFFLINE DB");
-                    MyDatabase.addnewretailer($scope.addretailer);
-                } else {
-                    MyServices.addNewRetailer($scope.addretailer).success(addRetailerSuccess);
-                };
+     
+                   MyDatabase.addnewretailer($scope.addretailer,aid);
 
             }
 
