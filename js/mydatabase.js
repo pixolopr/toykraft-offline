@@ -29,6 +29,8 @@ var mydatabase = angular.module('mydatabase', [])
                 return ordersynccount;
             },
             setordersynccount: function () {
+                var user = MyServices.getuser();
+                //console.log('SELECT COUNT(*) as `number` FROM ORDERS WHERE `issync` = 0 AND `salesid`='+user.id);
                 db.transaction(function (tx) {
                     tx.executeSql('SELECT COUNT(*) as `number` FROM ORDERS WHERE `issync` = 0 AND `salesid`='+user.id, [], function (tx, results) {
                         console.log(results.rows.item(0).number)
@@ -166,7 +168,7 @@ var mydatabase = angular.module('mydatabase', [])
                 });
                 db.transaction(function (tx) {
                     tx.executeSql('CREATE TABLE IF NOT EXISTS RETAILER (id INTEGER,lat integer,long integer,area integer,dob date ,type_of_area varchar,sq_feet float,store_image Varchar,name Varchar,number Varchar,email Varchar,address Varchar,ownername Varchar,ownernumber Varchar,contactname Varchar,contactnumber Varchar,timestamp TIMESTAMP, issync varchar)');
-                    //  tx.executeSql('DROP TABLE RETAILER');
+                    //tx.executeSql('DROP TABLE RETAILER');
                 });
                 db.transaction(function (tx) {
                     tx.executeSql('CREATE TABLE IF NOT EXISTS PRODUCT (id INTEGER PRIMARY KEY AUTOINCREMENT, name Varchar, product Varchar, encode Varchar, name2 Varchar, productcode Varchar, category Integer,video Varchar,mrp,description VARCHAR2(5000),age Integer,scheme Varchar,isnew Integer,timestamp Timestamp)');
@@ -281,7 +283,7 @@ var mydatabase = angular.module('mydatabase', [])
             },
             //RETAILER SYNC
             syncinretailerdata: function () {
-                return $http.get(adminurl + "retailer/find", {
+                return $http.get("http://admin.toy-kraft.com/rest/index.php/retailer/find", {
                     params: {}
                 })
             },
@@ -289,21 +291,18 @@ var mydatabase = angular.module('mydatabase', [])
             insertretailerdata: function (data) {
                 db.transaction(function (tx) {
                     for (var i = 0; i < data.length; i++) {
-                        var sqls = 'INSERT INTO RETAILER (id,lat,long,area,dob,type_of_area,sq_feet,store_image,name,number,email,address,ownername,ownernumber,contactname,contactnumber,timestamp, issync) VALUES ("' + data[i].id + '","' + data[i].lat + '","' + data[i].long + '","' + data[i].area + '","' + data[i].dob + '","' + data[i].type_of_area + '","' + data[i].sq_feet + '","' + data[i].store_image + '","' + data[i].name + '","' + data[i].number + '","' + data[i].email + '","' + data[i].address + '","' + data[i].ownername + '","' + data[i].ownernumber + '","' + data[i].contactname + '","' + data[i].contactnumber + '","' + data[i].timestamp + '",0)';
+                        var sqls = 'INSERT INTO RETAILER (id,lat,long,area,dob,type_of_area,sq_feet,store_image,name,number,email,address,ownername,ownernumber,contactname,contactnumber,timestamp, issync) VALUES (' + data[i].id + ',"' + data[i].lat + '","' + data[i].long + '","' + data[i].area + '","' + data[i].dob + '","' + data[i].type_of_area + '","' + data[i].sq_feet + '","' + data[i].store_image + '","' + data[i].name + '","' + data[i].number + '","' + data[i].email + '","' + data[i].address + '","' + data[i].ownername + '","' + data[i].ownernumber + '","' + data[i].contactname + '","' + data[i].contactnumber + '","' + data[i].timestamp + '",0)';
 
                         tx.executeSql(sqls, [], function (tx, results) {
                             console.log("RAOW INSERTED");
                         }, function (tx, results) {
-                            console.log("RAOW NOT INSERTED");
+                            console.log(results);
                         });
                     };
                     //$cordovaToast.show('Retailer Data Imported', 'long', 'bottom');
                 });
             },
-
-
-
-
+            
             //PRODUCT SYNC
             syncinproductdata: function () {
                 return $http.get(adminurl + "product/find", {
