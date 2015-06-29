@@ -150,8 +150,24 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
             MyDatabase.syncinretailercitydata().success(syncretailercitydatasuccess);
             //AREA
             MyDatabase.syncinretailerareadata().success(syncretailerareadatasuccess);
-            //RETAILER
-            MyDatabase.syncinretailerdata().success(syncretailerdatasuccess);
+
+            db.transaction(function (tx) {
+                var sqls = 'SELECT COUNT(*) as `number` FROM RETAILER';
+                console.log(sqls);
+                tx.executeSql(sqls, [], function (tx, results) {
+                    if(results.rows.item(0).number == 0){
+                        //RETAILER
+                        MyDatabase.syncinretailerdata().success(syncretailerdatasuccess);
+                    };
+                    
+                }, function (results) {
+                    console.log(results);
+                });
+            });
+
+
+
+
             //PRODUCT
             MyDatabase.syncinproductdata().success(syncproductdatasuccess);
             //CATEGORIES
@@ -1594,10 +1610,10 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
                     $location.path(pathToGo);
 
                 };
-               
-                    console.log("ADD TO OFFLINE DB");
-     
-                   MyDatabase.addnewretailer($scope.addretailer,aid);
+
+                console.log("ADD TO OFFLINE DB");
+
+                MyDatabase.addnewretailer($scope.addretailer, aid);
 
             }
 
