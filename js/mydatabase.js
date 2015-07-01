@@ -292,6 +292,7 @@ var mydatabase = angular.module('mydatabase', [])
             },
 
             insertretailerdata: function (data) {
+                console.log("of db");
                 db.transaction(function (tx) {
                     for (var i = 0; i < data.length; i++) {
                         var sqls = 'INSERT INTO RETAILER (id,lat,long,area,dob,type_of_area,sq_feet,store_image,name,number,email,address,ownername,ownernumber,contactname,contactnumber,timestamp, issync) VALUES (' + data[i].id + ',"' + data[i].lat + '","' + data[i].long + '","' + data[i].area + '","' + data[i].dob + '","' + data[i].type_of_area + '","' + data[i].sq_feet + '","' + data[i].store_image + '","' + data[i].name + '","' + data[i].number + '","' + data[i].email + '","' + data[i].address + '","' + data[i].ownername + '","' + data[i].ownernumber + '","' + data[i].contactname + '","' + data[i].contactnumber + '","' + data[i].timestamp + '",1)';
@@ -301,7 +302,7 @@ var mydatabase = angular.module('mydatabase', [])
                             console.log("Not inserted");
                         });
                     };
-                    $cordovaToast.show('Retailer Data Imported', 'long', 'bottom');
+                    //$cordovaToast.show('Retailer Data Imported', 'long', 'bottom');
                 });
             },
 
@@ -641,11 +642,12 @@ var mydatabase = angular.module('mydatabase', [])
             sendnewretailer: function (sqls) {
                 var addRetailerSuccess = function (data, retailerdata) {
                     db.transaction(function (tx) {
-                        var sqls2 = 'UPDATE RETAILER SET issync=1, id =' + data + ' WHERE id ="' + retailerdata.id;
+                        console.log(data);
+                        var sqls2 = 'UPDATE RETAILER SET issync=1, id =' + data + ' WHERE id ='+retailerdata.id;
                         tx.executeSql(sqls2, [], function (tx, results) {
                             console.log("UPDATED");
                         }, function (tx, results) {
-
+console.log("error");
                         });
                         tx.executeSql('UPDATE ORDERS SET retail=' + data + ' WHERE id ="' + retailerdata.id, [], function (tx, results) {}, null)
                         $cordovaToast.show('Updated Retailer to Online Db', 'long', 'bottom');

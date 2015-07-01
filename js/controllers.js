@@ -78,8 +78,8 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
 .controller('syncCtrl', function ($scope, $stateParams, MyServices, MyDatabase, $location, $interval, $cordovaNetwork, $cordovaToast) {
 
-         var type = $cordovaNetwork.isOnline();
-        console.log("The type of network is" + type);
+        var type = $cordovaNetwork.isOnline();
+        alert("The type of network is" + type);
         if (type != true) {
             showpopup('No internet connection !');
         };
@@ -222,7 +222,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
                  }, function (tx, results) {});
              });*/
             //MyDatabase.sendretailerupdate('SELECT id, contactname, contactnumber, ownername, ownernumber FROM RETAILER WHERE sync = "false" AND id > 0');
-            MyDatabase.sendnewretailer('SELECT * FROM RETAILER WHERE issync = 0');
+            MyDatabase.sendnewretailer('SELECT * FROM RETAILER WHERE `issync` = 0');
         };
 
         /*//DUMMY OBJECTS TO STORE RECIEVED DATA
