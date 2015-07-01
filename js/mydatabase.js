@@ -17,7 +17,7 @@ db.transaction(function (tx) {
     tx.executeSql('INSERT INTO `USERS` VALUES(1,"abc","toykraft","toykraft","","","","","")')
 })
 var mydatabase = angular.module('mydatabase', [])
-    .factory('MyDatabase', function ($http, $location, MyServices,  $cordovaNetwork, $cordovaToast) {
+    .factory('MyDatabase', function ($http, $location, MyServices, $cordovaNetwork, $cordovaToast) {
 
 
         var orderproductcount = 0;
@@ -32,7 +32,7 @@ var mydatabase = angular.module('mydatabase', [])
                 var user = MyServices.getuser();
                 //console.log('SELECT COUNT(*) as `number` FROM ORDERS WHERE `issync` = 0 AND `salesid`='+user.id);
                 db.transaction(function (tx) {
-                    tx.executeSql('SELECT COUNT(*) as `number` FROM ORDERS WHERE `issync` = 0 AND `salesid`='+user.id, [], function (tx, results) {
+                    tx.executeSql('SELECT COUNT(*) as `number` FROM ORDERS WHERE `issync` = 0 AND `salesid`=' + user.id, [], function (tx, results) {
                         console.log(results.rows.item(0).number)
                         ordersynccount = results.rows.item(0).number;
                     }, function (tx, results) {
@@ -45,23 +45,24 @@ var mydatabase = angular.module('mydatabase', [])
 
                 console.log("sync orders");
 
-                var apply = function(sc)
-                {
+                var apply = function (sc) {
                     sc.$apply();
                 };
-                
+
                 //SYNC SUCCESS
                 var syncordersuccess = function (id, ordersid) {
                     console.log(id + " " + ordersid);
                     db.transaction(function (tx) {
                         console.log("sync value change");
-                        tx.executeSql('UPDATE `ORDERS` SET `id`='+id+',`issync`= 1 WHERE `id`=' +ordersid+' AND `salesid`='+user.id, [], function (tx, results) {
+                        tx.executeSql('UPDATE `ORDERS` SET `id`=' + id + ',`issync`= 1 WHERE `id`=' + ordersid + ' AND `salesid`=' + user.id, [], function (tx, results) {
                             console.log(results.rows);
                             //angular.element(document.getElementById('syncCtrl')).scope().$apply();
                             scope.$apply();
                             apply(scope);
                             scope.callbacksuccess();
-                        }, function (tx, results) {console.log("error");});
+                        }, function (tx, results) {
+                            console.log("error");
+                        });
                     });
                 };
 
@@ -117,13 +118,15 @@ var mydatabase = angular.module('mydatabase', [])
                 //RETAINING ORDER
                 db.transaction(function (tx) {
                     console.log("retaining order");
-                    tx.executeSql('SELECT * FROM `orders` WHERE `issync` = 0 AND `salesid`='+user.id , [], function (tx, results) {
+                    tx.executeSql('SELECT * FROM `orders` WHERE `issync` = 0 AND `salesid`=' + user.id, [], function (tx, results) {
                         console.log(results.rows);
                         for (var os = 0; os < results.rows.length; os++) {
                             console.log(results.rows.item(os).id + " " + results.rows.item(os).retail + " " + results.rows.item(os).remark)
                             getretailer(results.rows.item(os).id, results.rows.item(os).retail, results.rows.item(os).remark);
                         };
-                    }, function (tx, results) {console.log("error");});
+                    }, function (tx, results) {
+                        console.log("error");
+                    });
                 });
             },
 
@@ -167,8 +170,8 @@ var mydatabase = angular.module('mydatabase', [])
 
                 });
                 db.transaction(function (tx) {
-                    tx.executeSql('CREATE TABLE IF NOT EXISTS RETAILER (id INTEGER,lat integer,long integer,area integer,dob date ,type_of_area varchar,sq_feet float,store_image Varchar,name Varchar,number Varchar,email Varchar,address Varchar,ownername Varchar,ownernumber Varchar,contactname Varchar,contactnumber Varchar,timestamp TIMESTAMP, issync varchar)');
-                    //tx.executeSql('DROP TABLE RETAILER');
+                 tx.executeSql('CREATE TABLE IF NOT EXISTS RETAILER (id INTEGER PRIMARY KEY AUTOINCREMENT,lat integer,long integer,area integer,dob date ,type_of_area varchar,sq_feet float,store_image Varchar,name Varchar,number Varchar,email Varchar,address Varchar,ownername Varchar,ownernumber Varchar,contactname Varchar,contactnumber Varchar,timestamp TIMESTAMP, issync integer)');
+                     //  tx.executeSql('DROP TABLE RETAILER');
                 });
                 db.transaction(function (tx) {
                     tx.executeSql('CREATE TABLE IF NOT EXISTS PRODUCT (id INTEGER PRIMARY KEY AUTOINCREMENT, name Varchar, product Varchar, encode Varchar, name2 Varchar, productcode Varchar, category Integer,video Varchar,mrp,description VARCHAR2(5000),age Integer,scheme Varchar,isnew Integer,timestamp Timestamp)');
@@ -244,7 +247,7 @@ var mydatabase = angular.module('mydatabase', [])
                             console.log("RAOW INSERTED");
                         }, null);
                     };
-$cordovaToast.show('Area Data Imported', 'long', 'bottom');
+                    $cordovaToast.show('Area Data Imported', 'long', 'bottom');
                 });
             },
 
@@ -283,7 +286,7 @@ $cordovaToast.show('Area Data Imported', 'long', 'bottom');
             },
             //RETAILER SYNC
             syncinretailerdata: function () {
-                return $http.get(adminurl+"retailer/find", {
+                return $http.get(adminurl + "retailer/find", {
                     params: {}
                 })
             },
@@ -302,7 +305,7 @@ $cordovaToast.show('Area Data Imported', 'long', 'bottom');
                     $cordovaToast.show('Retailer Data Imported', 'long', 'bottom');
                 });
             },
-            
+
             //PRODUCT SYNC
             syncinproductdata: function () {
                 return $http.get(adminurl + "product/find", {
@@ -513,7 +516,7 @@ $cordovaToast.show('Area Data Imported', 'long', 'bottom');
                     });
                 });
             },
-            
+
             editaretailer: function (data, name) {
                 db.transaction(function (tx) {
                     var sqls = 'UPDATE RETAILER SET email = "' + data.email + '", ownername = "' + data.ownername + '", ownernumber = "' + data.ownernumber + '", contactname = "' + data.contactname + '", contactnumber = "' + data.contactnumber + '", sync = "false" WHERE id = ' + data.id + ' AND name ="' + name + '"';
@@ -638,27 +641,26 @@ $cordovaToast.show('Area Data Imported', 'long', 'bottom');
             },
             sendnewretailer: function (sqls) {
                 var addRetailerSuccess = function (data, retailerdata) {
-                    console.log(data);
-                    console.log(retailerdata);
                     db.transaction(function (tx) {
-                    var sqls2 = 'UPDATE RETAILER SET issync="true", id ='+data+' WHERE name ="'+retailerdata.name+'" AND area ='+retailerdata.area ;
-                    tx.executeSql(sqls2, [], function (tx, results) {
-                        console.log("UPDATED");
-                    }, function (tx, results) {
+                        var sqls2 = 'UPDATE RETAILER SET issync=1, id =' + data + ' WHERE id ="' + retailerdata.id;
+                        tx.executeSql(sqls2, [], function (tx, results) {
+                            console.log("UPDATED");
+                        }, function (tx, results) {
 
+                        });
+                        tx.executeSql('UPDATE ORDERS SET retail='+data+' WHERE id ="' + retailerdata.id,[],function(tx,results){}, null)
+                        $cordovaToast.show('Updated Retailer to Online Db', 'long', 'bottom');
                     });
-                    //$cordovaToast.show('Top Ten Data Imported', 'long', 'bottom');
-                });
                 };
                 db.transaction(function (tx) {
                     console.log(sqls);
                     tx.executeSql(sqls, [], function (tx, results) {
                         console.log(results.rows.length);
                         for (var i = 0; i < results.rows.length; i++) {
-                            console.log(results.rows.item(i));
-                            newretailerdata=results.rows.item(i);
-                            MyServices.addNewRetailer(results.rows.item(i)).success(function(data,status){
-                                addRetailerSuccess(data,newretailerdata);});
+                            newretailerdata = results.rows.item(i);
+                            MyServices.addNewRetailer(results.rows.item(i)).success(function (data, status) {
+                                addRetailerSuccess(data, newretailerdata);
+                            });
                         };
                     }, function (tx, results) {
 
