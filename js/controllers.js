@@ -67,6 +67,9 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
     console.log("Menu Ctrl");
 
+    if ($.jStorage.get("categories")) {
+        $scope.categorynamedata = $.jStorage.get("categories");
+    };
 
     $scope.getorsersynccount = function () {
         MyDatabase.setordersynccount();
@@ -76,7 +79,9 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 })
 
 
-.controller('syncCtrl', function ($scope, $stateParams, MyServices, MyDatabase, $location, $interval, $cordovaNetwork, $cordovaToast) {
+.controller('syncCtrl', function ($scope, $stateParams, MyServices, MyDatabase, $location, $interval, $cordovaNetwork, $cordovaToast, $ionicPopup) {
+
+
 
         var type = $cordovaNetwork.isOnline();
         alert("The type of network is" + type);
@@ -109,9 +114,8 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
     ]
             });
 
-
-
         };
+
         //SYNC ORDERS//
 
         //GIVING VALUE TO NOTIFICATION
