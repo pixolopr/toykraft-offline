@@ -78,7 +78,40 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
 .controller('syncCtrl', function ($scope, $stateParams, MyServices, MyDatabase, $location, $interval, $cordovaNetwork, $cordovaToast) {
 
+        var type = $cordovaNetwork.isOnline();
+        console.log("The type of network is" + type);
+        if (type != true) {
+            showpopup('No internet connection !');
+        };
+        var showpopup = function (message) {
+            var myPopup = $ionicPopup.show({
+                template: '',
+                title: message,
+                subTitle: '',
+                buttons: [
 
+                    {
+                        text: '<b>Refresh</b>',
+                        type: 'button button-block button-assertive',
+                        onTap: function (e) {
+                            $location.path("#/app/sync");
+                        }
+      },
+
+
+                    {
+                        text: '<b>Home</b>',
+                        type: 'button button-block button-assertive',
+                        onTap: function (e) {
+                            $location.path("#/app/home");
+                        }
+      }
+    ]
+            });
+
+
+
+        };
         //SYNC ORDERS//
 
         //GIVING VALUE TO NOTIFICATION
@@ -155,11 +188,11 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
                 var sqls = 'SELECT COUNT(*) as `number` FROM RETAILER';
                 console.log(sqls);
                 tx.executeSql(sqls, [], function (tx, results) {
-                    if(results.rows.item(0).number == 0){
+                    if (results.rows.item(0).number == 0) {
                         //RETAILER
                         MyDatabase.syncinretailerdata().success(syncretailerdatasuccess);
                     };
-                    
+
                 }, function (results) {
                     console.log(results);
                 });
@@ -1529,45 +1562,20 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
 .controller('AddshopCtrl', function ($scope, $stateParams, $cordovaCamera, $cordovaFile, $http, MyServices, MyDatabase, $location, $ionicLoading, $cordovaGeolocation, $cordovaNetwork) {
 
-        offline = true;
-        console.log("OFFLINE MODE IS " + offline);
-        //CHECK IF INTERNET IS CONNECTED
-        /* $scope.type = $cordovaNetwork.getNetwork();
-        var isOnline = $cordovaNetwork.isOnline();
-        offline = !(isOnline);*/
-
         $ionicLoading.hide();
 
         var aid = $stateParams.areaid;
+
+        db.transaction(function (tx) {
+            tx.executeSql('SELECT `name` FROM AREA WHERE `id`=' + aid, [], function (tx, results) {
+                $scope.areaname = results.rows.item(0).name;
+            }, null)
+        });
+
         $scope.firstclick = 0;
 
-
-        var areasuccess = function (data, status) {
-            $scope.areaname = data.name;
-        };
-        MyServices.areaone(aid).success(areasuccess);
-
         $scope.filename2 = "";
-        //GEO-LOCATION
-        /*var onSuccess = function (position) {
-            alert('Latitude: ' + position.coords.latitude + '\n' +
-                'Longitude: ' + position.coords.longitude);
-             //$scope.lat = position.coords.latitude;
-            //$scope.long = position.coords.longitude;
-            $scope.addretailer.lat = '' + position.coords.latitude + '';
-            $scope.addretailer.long = '' + position.coords.longitude + '';
-        };
 
-        function onError(error) {
-            alert('code: ' + error.code + '\n' +
-                'message: ' + error.message + '\n');
-
-            $scope.addretailer.lat = 'not found';
-            $scope.addretailer.long = 'not found';
-        }
-        window.navigator.geolocation.getCurrentPosition(onSuccess, onError, {
-            enableHighAccuracy: true
-        });*/
         $cordovaGeolocation.getCurrentPosition().then(function (position) {
             $scope.addretailer.lat = '' + position.coords.latitude + '';
             $scope.addretailer.long = '' + position.coords.longitude + '';
@@ -1597,27 +1605,20 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         $scope.addRetailerFunction = function () {
             if ($scope.firstclick == 0) {
                 $scope.firstclick = 1;
-                console.log("retailer name is " + $scope.addretailer.name);
-                console.log($scope.addretailer);
 
-                function addRetailerSuccess(data, status) {
+                /*function addRetailerSuccess(data, status) {
                     //SUCCESS
                     console.log(data);
 
                     //REDIRECT
                     var pathToGo = "/app/retailer/" + aid;
-                    console.log($location.path());
                     $location.path(pathToGo);
 
-                };
+                };*/
 
-                console.log("ADD TO OFFLINE DB");
-
-                MyDatabase.addnewretailer($scope.addretailer, aid);
+                MyDatabase.addnewretailer($scope.addretailer);
 
             }
-
-            //sqfeet type dob area latitude longitude contactperson address contactnumber email compony code name
         };
 
 

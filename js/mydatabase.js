@@ -1,5 +1,5 @@
 //VARIABLES NEEDED
-var adminurl = "http://admin.toy-kraft.com/rest/index.php/";
+var adminurl = "http://toy-kraft.com/NetworkBackend/rest/index.php/";
 //var adminurl = "http://169.254.216.140/NetworkBackend/rest/index.php/";
 var zone;
 
@@ -17,7 +17,7 @@ db.transaction(function (tx) {
     tx.executeSql('INSERT INTO `USERS` VALUES(1,"abc","toykraft","toykraft","","","","","")')
 })
 var mydatabase = angular.module('mydatabase', [])
-    .factory('MyDatabase', function ($http, $location, MyServices) {
+    .factory('MyDatabase', function ($http, $location, MyServices,  $cordovaNetwork, $cordovaToast) {
 
 
         var orderproductcount = 0;
@@ -205,7 +205,7 @@ var mydatabase = angular.module('mydatabase', [])
                         var sqls = 'INSERT INTO STATE (id , zone, name) VALUES (' + data[i].id + ',"' + data[i].zone + '","' + data[i].name + '")';
                         tx.executeSql(sqls, [], function (tx, results) {}, null);
                     };
-                    //$cordovaToast.show('States Data Imported', 'long', 'bottom');
+                    $cordovaToast.show('States Data Imported', 'long', 'bottom');
                 });
             },
 
@@ -224,7 +224,7 @@ var mydatabase = angular.module('mydatabase', [])
                             console.log("RAOW INSERTED");
                         }, null);
                     };
-                    //$cordovaToast.show('City Data Imported', 'long', 'bottom');
+                    $cordovaToast.show('City Data Imported', 'long', 'bottom');
                 });
             },
 
@@ -244,7 +244,7 @@ var mydatabase = angular.module('mydatabase', [])
                             console.log("RAOW INSERTED");
                         }, null);
                     };
-
+$cordovaToast.show('Area Data Imported', 'long', 'bottom');
                 });
             },
 
@@ -283,7 +283,7 @@ var mydatabase = angular.module('mydatabase', [])
             },
             //RETAILER SYNC
             syncinretailerdata: function () {
-                return $http.get("http://admin.toy-kraft.com/rest/index.php/retailer/find", {
+                return $http.get(adminurl+"retailer/find", {
                     params: {}
                 })
             },
@@ -299,7 +299,7 @@ var mydatabase = angular.module('mydatabase', [])
                             console.log(results);
                         });
                     };
-                    //$cordovaToast.show('Retailer Data Imported', 'long', 'bottom');
+                    $cordovaToast.show('Retailer Data Imported', 'long', 'bottom');
                 });
             },
             
@@ -320,7 +320,7 @@ var mydatabase = angular.module('mydatabase', [])
                             console.log("PRODUCT RAOW NOT INSERTED");
                         });
                     };
-                    //$cordovaToast.show('Product Data Imported', 'long', 'bottom');
+                    $cordovaToast.show('Product Data Imported', 'long', 'bottom');
                 });
             },
 
@@ -389,7 +389,7 @@ var mydatabase = angular.module('mydatabase', [])
                             console.log(results);
                             console.log('did not add no product with no name');
                         });
-                        //$cordovaToast.show('Order Placed Offline', 'long', 'bottom');
+                        $cordovaToast.show('Order Placed Offline', 'long', 'bottom');
                     });
                 };
 
@@ -421,7 +421,7 @@ var mydatabase = angular.module('mydatabase', [])
                     }, function (tx, results) {
                         console.log('did not add no product with no name');
                     });
-                    //$cordovaToast.show('Order Placed Offline', 'long', 'bottom');
+                    $cordovaToast.show('Order Placed Offline', 'long', 'bottom');
                 });
             },
             syncsendorders: function (sqls, dsqls) {
@@ -499,21 +499,21 @@ var mydatabase = angular.module('mydatabase', [])
                     }, function (tx2, results2) {});
                 });
             },
-            addnewretailer: function (data,aid) {
-                console.log(data.area);
+            addnewretailer: function (data) {
                 db.transaction(function (tx) {
                     db.transaction(function (tx) {
                         var sqls = 'INSERT INTO RETAILER (id,lat,long,area,dob,type_of_area,sq_feet,store_image,name,number,email,address,ownername,ownernumber,contactname,contactnumber,timestamp,issync) VALUES (0,"' + data.lat + '","' + data.long + '","' + data.area + '","' + data.dob + '","' + data.type_of_area + '","' + data.sq_feet + '","' + data.store_image + '","' + data.name + '","' + data.number + '","' + data.email + '","' + data.address + '","' + data.ownername + '","' + data.ownernumber + '","' + data.contactname + '","' + data.contactnumber + '",null, "false")';
                         console.log(sqls);
                         tx.executeSql(sqls, [], function (tx, results) {
                             console.log("RAOW INSERTED");
-                            $location.path('/app/retailer/' +aid);
+                            window.location.replace(window.location.origin + window.location.pathname + "#/app/retailer/" + data.area);
                         }, function (tx, results) {
                             console.log("RAOW NOT INSERTED");
                         });
                     });
                 });
             },
+            
             editaretailer: function (data, name) {
                 db.transaction(function (tx) {
                     var sqls = 'UPDATE RETAILER SET email = "' + data.email + '", ownername = "' + data.ownername + '", ownernumber = "' + data.ownernumber + '", contactname = "' + data.contactname + '", contactnumber = "' + data.contactnumber + '", sync = "false" WHERE id = ' + data.id + ' AND name ="' + name + '"';
