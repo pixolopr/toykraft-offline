@@ -1,5 +1,5 @@
 //var adminurl = "http://admin.toy-kraft.com/rest/index.php/";
-var adminurl = "http://toy-kraft.com/NetworkBackend/rest/index.php/state/find";
+var adminurl = "http://localhost/NetworkBackend/rest/index.php/";
 
 var myservices = angular.module('myservices', [])
 
@@ -15,7 +15,7 @@ var myservices = angular.module('myservices', [])
 
     var ordersynccount = 0;
 
-
+    var retailerdownloadcount = 0;
 
     var d = new Date();
     //var myorderdate="2014-08-08";
@@ -164,6 +164,7 @@ var myservices = angular.module('myservices', [])
             });
         },
         addNewRetailer: function (object1) {
+            console.log(object1);
             return $http.get(adminurl + "retailer/create", {
                 params: object1
             });
@@ -345,6 +346,34 @@ var myservices = angular.module('myservices', [])
         setmode: function (val) {
             offlinemode = val;
         },
+        getcountofretailers: function () {
+
+        },
+        ordersync: function () {
+
+            var getcountofretailers = function () {
+                return $http.get(adminurl + "retailer/count", {
+                    params: {}
+                });
+            };
+
+            db.transaction(function (tx) {
+                tx.executeSql('SELECT COUNT(*) as `count` FROM `RETAILER`', [], function (tx, results) {
+                    getcountofretailers().success(function (data, status) {
+                        console.log(data);
+                        console.log(results.rows.item(0).count);
+                        data = data - results.rows.item(0).count;
+                        console.log("success" + data);
+                        retailerdownloadcount = data;
+                    });
+                }, null);
+            });
+
+        },
+        getdownloadretailercount: function()
+        {
+            return retailerdownloadcount;
+        }
 
     }
 });

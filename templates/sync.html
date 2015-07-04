@@ -8,17 +8,22 @@
     <ion-content class="has-header">
         <ul class="list">
             <ion-list>
-                <ion-item>
-                    <button class="button button-assertive button-block" ng-click="getdatatables()">IMPORT DATA TABLES</button>
+                <ion-item ng-if="it">
+                    <button class="button button-assertive button-block" ng-click="getdatatables()" >IMPORT DATA TABLES</button>
                 </ion-item>
-                <ion-item>
-                    <button class="button button-assertive button-block" ng-click="updateretailerdata()">UPDATE RETAILER DATA</button>
+                <ion-item ng-if="rt">
+                    <button class="button button-assertive button-block" ng-click="updateretailerdata()" >UPDATE RETAILER DATA</button>
                 </ion-item>
-                <ion-item>
+                <ion-item ng-if="tt">
                     <button class="button button-assertive button-block" ng-click="gettoptendata()">GET TOP TEN DATA</button>
                 </ion-item>
-                <ion-item>
-                    <button class="button button-assertive button-block" ng-click="sendofflineorders()">SEND OFFLINE ORDERS<span class="badge badge-assertive notification">{{getorsersynccount()}}</span>
+                <ion-item ng-if="os">
+                   
+                    <button class="button button-assertive button-block" ng-click="sendofflineorders()" >SEND OFFLINE ORDERS<span class="badge badge-assertive notification">{{getorsersynccount()}}</span>
+                    </button>
+                    </ion-item>
+                 <ion-item ng-if="os">
+                    <button class="button button-assertive button-block" ng-click="downloadateretailerdata()" >UPDATE RETAILERS<span class="badge badge-assertive notification">{{getretailersynccount()}}</span>
                     </button>
                 </ion-item>
             </ion-list>

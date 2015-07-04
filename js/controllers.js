@@ -80,10 +80,75 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
 
 .controller('syncCtrl', function ($scope, $stateParams, MyServices, MyDatabase, $location, $interval, $cordovaNetwork, $cordovaToast, $ionicPopup) {
+        $scope.it = true;
+        $scope.rt = false;
+        $scope.os = false;
 
 
+        var importtable = function () {
+            $scope.it = true;
+            db.transaction(function (tx) {
+                tx.executeSql('SELECT * FROM `RETAILER`', [], function (tx, results) {
+                    if (results.rows.length > 0) {
+                        uploadretailer();
+                    };
+                }, null);
+            });
+        };
+        importtable();
 
-        var type = $cordovaNetwork.isOnline();
+        var uploadretailer = function () {
+            db.transaction(function (tx) {
+                tx.executeSql('SELECT * FROM `RETAILER` WHERE `issync`=0', [], function (tx, results) {
+                    if (results.rows.length > 0) {
+                        $scope.it = false;
+                        $scope.rt = true;
+                        //
+
+                    } else {
+                        $scope.it = false;
+                        $scope.os = true;
+                        MyServices.ordersync();
+                    };
+
+                }, null)
+            });
+
+
+        };
+
+        $scope.downloadateretailerdata = function () {
+            var onlineid = [];
+            var offlineid = [];
+            var unsync = [];
+            //GET id OF retailers online -> array
+            //GET ids of RETAILERS offline -> array (might have to parseInt)
+            for (var i = 0; i < onlineid.length; i++) {
+                if (offlineid.indexOf(onlineid[i]) == -1) {
+                    unsync.push(onlineid[i]);
+                };
+            };
+
+            var retailerinfofound = function (data, status) {
+                db.transaction(function (tx) {
+                    var sqls = 'INSERT INTO RETAILER (id,lat,long,area,dob,type_of_area,sq_feet,store_image,name,number,email,address,ownername,ownernumber,contactname,contactnumber,timestamp, issync) VALUES (' + data.id + ',"' + data.lat + '","' + data.long + '","' + data.area + '","' + data.dob + '","' + data.type_of_area + '","' + data.sq_feet + '","' + data.store_image + '","' + data.name + '","' + data.number + '","' + data.email + '","' + data.address + '","' + data.ownername + '","' + data.ownernumber + '","' + data.contactname + '","' + data.contactnumber + '","' + data.timestamp + '",0)';
+                    tx.executeSql(sqls, [], function (tx, results) {
+                        console.log("RAOW INSERTED");
+                        $scope.downloadateretailercount - 1;
+                        $scope.$apply();
+                    }, function (tx, results) {
+                        console.log("Not inserted");
+                    });
+                    //$cordovaToast.show('Retailer Data Imported', 'long', 'bottom');
+                });
+            };
+
+            for (var j = 0; j < unsync.length; j++) {
+                MyServices.findoneretailer(unsync[0]).success(retailerinfofound);
+            };
+        };
+
+        /*  var type = $cordovaNetwork.isOnline();
         alert("The type of network is" + type);
         if (type != true) {
             showpopup('No internet connection !');
@@ -114,7 +179,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
     ]
             });
 
-        };
+        };*/
 
         //SYNC ORDERS//
 
@@ -127,6 +192,13 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
             return MyDatabase.getordersynccount();
 
         };
+        $scope.downloadateretailercount = 0;
+        $scope.getretailersynccount = function () {
+            $scope.downloadateretailercount = MyServices.getdownloadretailercount();
+            return $scope.downloadateretailercount;
+        };
+        $scope.getretailersynccount();
+
         $scope.callbacksuccess = function () {
             console.log("abhay");
             appleinterval = $interval(apply, 1000, 5);
@@ -226,7 +298,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
                  }, function (tx, results) {});
              });*/
             //MyDatabase.sendretailerupdate('SELECT id, contactname, contactnumber, ownername, ownernumber FROM RETAILER WHERE sync = "false" AND id > 0');
-            MyDatabase.sendnewretailer('SELECT * FROM RETAILER WHERE `issync` = 0');
+            MyDatabase.sendnewretailer('SELECT * FROM RETAILER WHERE `issync` = 0', $scope.r);
         };
 
         /*//DUMMY OBJECTS TO STORE RECIEVED DATA
