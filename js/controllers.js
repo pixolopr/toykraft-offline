@@ -125,26 +125,6 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
 
 
-        /*  $scope.button = false;
-        console.log($scope.button);
-
-        var fnc = function () {
-            MyDatabase.examine($scope);
-        };
-
-        var testing = function () {
-            console.log($scope.button);
-            console.log("called");
-            $interval(fnc, 2000, 1);
-        };
-        var checkbutton = function () {
-            console.log($scope.button);
-
-        }
-
-        testing();
-*/
-
 
         $scope.downloadateretailerdata = function () {
             var onlineid = [];
