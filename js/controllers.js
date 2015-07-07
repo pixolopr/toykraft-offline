@@ -85,28 +85,19 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         $scope.os = false;
 
 
-        var importtable = function () {
-            $scope.it = true;
+        $scope.uploadretailer = function () {
             db.transaction(function (tx) {
-                tx.executeSql('SELECT * FROM `RETAILER`', [], function (tx, results) {
-                    if (results.rows.length > 0) {
-                        uploadretailer();
-                    };
-                }, null);
-            });
-        };
-        importtable();
-
-        var uploadretailer = function () {
-            db.transaction(function (tx) {
+                console.log("update retailer");
                 tx.executeSql('SELECT * FROM `RETAILER` WHERE `issync`=0', [], function (tx, results) {
+                    console.log(results.rows)
                     if (results.rows.length > 0) {
-                        $scope.it = false;
+
                         $scope.rt = true;
-                        //
+                        console.log($scope.it);
+                        $scope.$apply();
 
                     } else {
-                        $scope.it = false;
+
                         $scope.os = true;
                         MyServices.ordersync();
                     };
@@ -116,6 +107,44 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
 
         };
+
+        var importtable = function () {
+            $scope.it = true;
+            db.transaction(function (tx) {
+                tx.executeSql('SELECT * FROM `RETAILER`', [], function (tx, results) {
+
+                    if (results.rows.length > 0) {
+                        console.log("hide");
+                        $scope.it = false;
+                        $scope.uploadretailer();
+                    };
+                }, null);
+            });
+        };
+        importtable();
+
+
+
+        /*  $scope.button = false;
+        console.log($scope.button);
+
+        var fnc = function () {
+            MyDatabase.examine($scope);
+        };
+
+        var testing = function () {
+            console.log($scope.button);
+            console.log("called");
+            $interval(fnc, 2000, 1);
+        };
+        var checkbutton = function () {
+            console.log($scope.button);
+
+        }
+
+        testing();
+*/
+
 
         $scope.downloadateretailerdata = function () {
             var onlineid = [];
@@ -236,7 +265,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         syncretailerdatasuccess = function (data, status) {
             console.log(data);
             $scope.retailerdatao = data;
-            MyDatabase.insertretailerdata(data);
+            MyDatabase.insertretailerdata(data, $scope);
         };
         syncproductdatasuccess = function (data, status) {
             console.log(data);
@@ -298,7 +327,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
                  }, function (tx, results) {});
              });*/
             //MyDatabase.sendretailerupdate('SELECT id, contactname, contactnumber, ownername, ownernumber FROM RETAILER WHERE sync = "false" AND id > 0');
-            MyDatabase.sendnewretailer('SELECT * FROM RETAILER WHERE `issync` = 0', $scope.r);
+            MyDatabase.sendnewretailer('SELECT * FROM RETAILER WHERE `issync` = 0', $scope);
         };
 
         /*//DUMMY OBJECTS TO STORE RECIEVED DATA

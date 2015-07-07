@@ -156,44 +156,44 @@ var mydatabase = angular.module('mydatabase', [])
             createretailertables: function () {
                 db.transaction(function (tx) {
                     tx.executeSql('CREATE TABLE IF NOT EXISTS STATE (id Integer PRIMARY KEY, zone Varchar, name Varchar)');
-                    //   tx.executeSql('DROP TABLE STATE');
+                     //  tx.executeSql('DROP TABLE STATE');
 
                 });
                 db.transaction(function (tx) {
                     tx.executeSql('CREATE TABLE IF NOT EXISTS CITY (id Integer PRIMARY KEY, state Integer, name Varchar)');
-                    //   tx.executeSql('DROP TABLE CITY');
+                     //  tx.executeSql('DROP TABLE CITY');
 
                 });
-                db.transaction(function (tx) {
-                    tx.executeSql('CREATE TABLE IF NOT EXISTS AREA (id Integer PRIMARY KEY, city Integer, name Varchar, distributor Integer)');
-                    //  tx.executeSql('DROP TABLE AREA');
+             db.transaction(function (tx) {
+                   tx.executeSql('CREATE TABLE IF NOT EXISTS AREA (id Integer PRIMARY KEY, city Integer, name Varchar, distributor Integer)');
+                    //   tx.executeSql('DROP TABLE AREA');
 
                 });
-                db.transaction(function (tx) {
-                    tx.executeSql('CREATE TABLE IF NOT EXISTS RETAILER (id INTEGER PRIMARY KEY AUTOINCREMENT,lat integer,long integer,area integer,dob date ,type_of_area varchar,sq_feet float,store_image Varchar,name Varchar,number Varchar,email Varchar,address Varchar,ownername Varchar,ownernumber Varchar,contactname Varchar,contactnumber Varchar,timestamp TIMESTAMP, issync Integer)');
-                    //tx.executeSql('DROP TABLE RETAILER');
+               db.transaction(function (tx) {
+                     tx.executeSql('CREATE TABLE IF NOT EXISTS RETAILER (id INTEGER PRIMARY KEY AUTOINCREMENT,lat integer,long integer,area integer,dob date ,type_of_area varchar,sq_feet float,store_image Varchar,name Varchar,number Varchar,email Varchar,address Varchar,ownername Varchar,ownernumber Varchar,contactname Varchar,contactnumber Varchar,timestamp TIMESTAMP, issync Integer)');
+                   //tx.executeSql('DROP TABLE RETAILER');
                 });
-                db.transaction(function (tx) {
+              db.transaction(function (tx) {
                     tx.executeSql('CREATE TABLE IF NOT EXISTS PRODUCT (id INTEGER PRIMARY KEY AUTOINCREMENT, name Varchar, product Varchar, encode Varchar, name2 Varchar, productcode Varchar, category Integer,video Varchar,mrp,description VARCHAR2(5000),age Integer,scheme Varchar,isnew Integer,timestamp Timestamp)');
 
-                    // tx.executeSql('DROP TABLE PRODUCT');
+                     // tx.executeSql('DROP TABLE PRODUCT');
                 });
                 db.transaction(function (tx) {
-                    tx.executeSql('CREATE TABLE IF NOT EXISTS ORDERS (id INTEGER PRIMARY KEY, retail Integer,sales Varchar,timestamp Timestamp,amount double,signature integer,salesid Integer,quantity Integer,remark text,issync integer)');
-                    //tx.executeSql('DROP TABLE ORDERS');
-                    //tx.executeSql('DELETE FROM ORDERS');
+                     tx.executeSql('CREATE TABLE IF NOT EXISTS ORDERS (id INTEGER PRIMARY KEY, retail Integer,sales Varchar,timestamp Timestamp,amount double,signature integer,salesid Integer,quantity Integer,remark text,issync integer)');
+                  // tx.executeSql('DROP TABLE ORDERS');
+                    // tx.executeSql('DELETE FROM ORDERS');
                 });
-                db.transaction(function (tx) {
+               db.transaction(function (tx) {
                     tx.executeSql('CREATE TABLE IF NOT EXISTS TOPTEN (product INTEGER, productcode, name, totalquantity)');
-                    //   tx.executeSql('DROP TABLE TOPTEN');
+                      // tx.executeSql('DROP TABLE TOPTEN');
                 });
-                db.transaction(function (tx) {
+               db.transaction(function (tx) {
                     tx.executeSql('CREATE TABLE IF NOT EXISTS ORDERPRODUCT (id Integer PRIMARY KEY, orders Integer, product Integer, quantity Integer,name varchar, amount double, scheme_id Integer, status Integer, category varchar, productcode varchar)');
-                    //tx.executeSql('DROP TABLE ORDERPRODUCT ');
+                    // tx.executeSql('DROP TABLE ORDERPRODUCT ');
                 });
-                db.transaction(function (tx) {
+               db.transaction(function (tx) {
                     tx.executeSql('CREATE TABLE IF NOT EXISTS PRODUCTIMAGE (id Integer PRIMARY KEY, product Integer, image varchar)');
-                    //  tx.executeSql('DROP TABLE PRODUCTIMAGE');
+                    // tx.executeSql('DROP TABLE PRODUCTIMAGE');
                 });
 
             },
@@ -304,12 +304,15 @@ var mydatabase = angular.module('mydatabase', [])
                 });
             },
 
-            insertretailerdata: function (data) {
+            insertretailerdata: function (data,scope) {
                 console.log("of db");
                 db.transaction(function (tx) {
                     for (var i = 0; i < data.length; i++) {
-                        var sqls = 'INSERT INTO RETAILER (id,lat,long,area,dob,type_of_area,sq_feet,store_image,name,number,email,address,ownername,ownernumber,contactname,contactnumber,timestamp, issync) VALUES (' + data[i].id + ',"' + data[i].lat + '","' + data[i].long + '","' + data[i].area + '","' + data[i].dob + '","' + data[i].type_of_area + '","' + data[i].sq_feet + '","' + data[i].store_image + '","' + data[i].name + '","' + data[i].number + '","' + data[i].email + '","' + data[i].address + '","' + data[i].ownername + '","' + data[i].ownernumber + '","' + data[i].contactname + '","' + data[i].contactnumber + '","' + data[i].timestamp + '",0)';
+                        var sqls = 'INSERT INTO RETAILER (id,lat,long,area,dob,type_of_area,sq_feet,store_image,name,number,email,address,ownername,ownernumber,contactname,contactnumber,timestamp, issync) VALUES (' + data[i].id + ',"' + data[i].lat + '","' + data[i].long + '","' + data[i].area + '","' + data[i].dob + '","' + data[i].type_of_area + '","' + data[i].sq_feet + '","' + data[i].store_image + '","' + data[i].name + '","' + data[i].number + '","' + data[i].email + '","' + data[i].address + '","' + data[i].ownername + '","' + data[i].ownernumber + '","' + data[i].contactname + '","' + data[i].contactnumber + '","' + data[i].timestamp + '",1)';
                         tx.executeSql(sqls, [], function (tx, results) {
+                            scope.it=false;
+                            scope.uploadretailer();
+                            scope.$apply();
                             console.log("RAOW INSERTED");
                         }, function (tx, results) {
                             console.log("Not inserted");
@@ -657,10 +660,14 @@ var mydatabase = angular.module('mydatabase', [])
                 var addRetailerSuccess = function (data) {
                     db.transaction(function (tx) {
                         tx.executeSql('UPDATE `RETAILER` SET `issync`=1,`id`=' + data[1] + '  WHERE `id` =' + data[0], [], function (tx, results) {
+                           scope.rt=false;
+                            scope.os=true;
+                            scope.$apply();
                             console.log("hye")
                         }, null);
                         tx.executeSql('UPDATE `ORDERS` SET `retail`=' + data[1] + '  WHERE `retail` =' + data[0], [], function (tx, results) {
-                            console.log("hye")
+                            console.log("hye");
+                            
                         }, null)
                     });
                 };
@@ -669,6 +676,12 @@ var mydatabase = angular.module('mydatabase', [])
                     console.log(sqls);
                     tx.executeSql(sqls, [], function (tx, results) {
                         console.log(results.rows.length);
+                        if(results.rows.length<=0)
+                        {
+                        scope.rt=false;
+                            scope.os=true;
+                            scope.$apply();
+                        }else{
                         for (var i = 0; i < results.rows.length; i++) {
                             console.log(results.rows.item(i));
                             newretailerdata = results.rows.item(i);
@@ -679,6 +692,7 @@ var mydatabase = angular.module('mydatabase', [])
 
                             });
                         };
+                        };
                     }, function (tx, results) {
 
                     });
@@ -688,6 +702,16 @@ var mydatabase = angular.module('mydatabase', [])
             getcountofretailers: function () {
                 return $http.get(adminurl + "retailer/count", {
                     params: {}
+                });
+            },
+            examine: function (scope) {
+                db.transaction(function(tx){
+                tx.executeSql('SELECT * FROM ZONE',[],function(tx,results){
+                    console.log(scope.button);
+                    scope.button = true;
+                    console.log(scope.button);
+                    scope.$apply();
+                },null);
                 });
             },
 
