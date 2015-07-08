@@ -32,7 +32,7 @@ var mydatabase = angular.module('mydatabase', [])
                 var user = MyServices.getuser();
                 //console.log('SELECT COUNT(*) as `number` FROM ORDERS WHERE `issync` = 0 AND `salesid`='+user.id);
                 db.transaction(function (tx) {
-                    tx.executeSql('SELECT COUNT(*) as `number` FROM ORDERS WHERE `issync` = 0 AND `salesid`=' + user.id, [], function (tx, results) {
+                    tx.executeSql('SELECT COUNT(*) as `number` FROM ORDERS WHERE `issync` = 0 AND `salesid`=' + user.user_id, [], function (tx, results) {
                         console.log(results.rows.item(0).number)
                         ordersynccount = results.rows.item(0).number;
                     }, function (tx, results) {
@@ -51,10 +51,11 @@ var mydatabase = angular.module('mydatabase', [])
 
                 //SYNC SUCCESS
                 var syncordersuccess = function (id, ordersid) {
-                    console.log(id + " " + ordersid);
+                    console.log( ordersid);
+                    console.log(id);
                     db.transaction(function (tx) {
                         console.log("sync value change");
-                        tx.executeSql('UPDATE `ORDERS` SET `id`=' + id + ',`issync`= 1 WHERE `id`=' + ordersid + ' AND `salesid`=' + user.id, [], function (tx, results) {
+                        tx.executeSql('UPDATE `ORDERS` SET `id`=' + id + ',`issync`= 1 WHERE `id`=' + ordersid + ' AND `salesid`=' + user.user_id, [], function (tx, results) {
                             console.log(results.rows);
                             //angular.element(document.getElementById('syncCtrl')).scope().$apply();
                             scope.$apply();
@@ -79,7 +80,7 @@ var mydatabase = angular.module('mydatabase', [])
                 var getcart = function (oid, rd) {
                     console.log("retaining cart");
                     db.transaction(function (tx) {
-                        tx.executeSql('SELECT * FROM `orderproduct` WHERE `orders` = ' + oid, [], function (tx, results) {
+                        tx.executeSql('SELECT * FROM `ORDERPRODUCT` WHERE `orders` = ' + oid, [], function (tx, results) {
                             var synccart = [];
                             for (var gc = 0; gc < results.rows.length; gc++) {
                                 synccart[gc] = {};
@@ -118,7 +119,7 @@ var mydatabase = angular.module('mydatabase', [])
                 //RETAINING ORDER
                 db.transaction(function (tx) {
                     console.log("retaining order");
-                    tx.executeSql('SELECT * FROM `orders` WHERE `issync` = 0 AND `salesid`=' + user.id, [], function (tx, results) {
+                    tx.executeSql('SELECT * FROM `orders` WHERE `issync` = 0 AND `salesid`=' + user.user_id, [], function (tx, results) {
                         console.log(results.rows);
                         for (var os = 0; os < results.rows.length; os++) {
                             console.log(results.rows.item(os).id + " " + results.rows.item(os).retail + " " + results.rows.item(os).remark)
@@ -324,7 +325,7 @@ var mydatabase = angular.module('mydatabase', [])
 
             //PRODUCT SYNC
             syncinproductdata: function () {
-                return $http.get(adminurl + "product/find", {
+                return $http.get("http://admin.toy-kraft.com/rest/index.php/product/find", {
                     params: {}
                 })
             },
@@ -424,7 +425,7 @@ var mydatabase = angular.module('mydatabase', [])
                     if (retailerdata.remark == undefined) {
                         retailerdata.remark = "No Remark";
                     };
-                    var sqls = 'INSERT INTO ORDERS (retail ,sales, timestamp, amount, signature, salesid, quantity, remark, issync) VALUES (' + retailerdata.id + ', "' + user.name + '", "9:50", ' + totalamount + ' , 1 , ' + user.id + ', ' + totalquantity + ' , "' + retailerdata.remark + '", 0 )';
+                    var sqls = 'INSERT INTO ORDERS (retail ,sales, timestamp, amount, signature, salesid, quantity, remark, issync) VALUES (' + retailerdata.id + ', "' + user.username + '", "9:50", ' + totalamount + ' , 1 , ' + user.user_id + ', ' + totalquantity + ' , "' + retailerdata.remark + '", 0 )';
 
                     tx.executeSql(sqls, [], function (tx, results) {
                         var insertid = results.insertId;
