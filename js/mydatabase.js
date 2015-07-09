@@ -1,6 +1,6 @@
 //VARIABLES NEEDED
 /*var adminurl = "http://localhost/NetworkBackend/rest/index.php/";*/
-var adminurl="http://admin.toy-kraft.com/rest/index.php/retailer/find";
+var adminurl="http://admin.toy-kraft.com/rest/index.php/";
 //var adminurl = "http://169.254.216.140/NetworkBackend/rest/index.php/";
 var zone;
 
