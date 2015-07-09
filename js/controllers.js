@@ -88,10 +88,10 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         $scope.uploadretailer = function () {
             db.transaction(function (tx) {
                 console.log("update retailer");
-                tx.executeSql('SELECT * FROM `RETAILER` WHERE `issync`=0', [], function (tx, results) {
-                    console.log(results.rows)
-                    if (results.rows.length > 0) {
-
+                tx.executeSql('SELECT COUNT(*) as `count` FROM `RETAILER` WHERE `issync`=0', [], function (tx, results) {
+                    console.log(results.rows.item(0).count)
+                    if (results.rows.item(0).count > 0) {
+                        $scope.uploadretailersynccount = results.rows.item(0).count;
                         $scope.rt = true;
                         console.log($scope.it);
                         $scope.$apply();
@@ -157,9 +157,9 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
             };
         };
 
-        /*  var type = $cordovaNetwork.isOnline();
+          var type = $cordovaNetwork.isOffline();
         alert("The type of network is" + type);
-        if (type != true) {
+        if (type == true) {
             showpopup('No internet connection !');
         };
         var showpopup = function (message) {
@@ -188,7 +188,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
     ]
             });
 
-        };*/
+        };
 
         //SYNC ORDERS//
 
@@ -201,6 +201,11 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
             return MyDatabase.getordersynccount();
 
         };
+        /* $scope.uploadretailersynccount=function(){
+         $scope.uploadretailer=MyServices.getuploadretailercount();
+             return $scope.uploadretailer;
+            
+         }*/
         $scope.downloadateretailercount = 0;
         $scope.getretailersynccount = function () {
             $scope.downloadateretailercount = MyServices.getdownloadretailercount();

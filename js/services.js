@@ -1,6 +1,6 @@
 //var adminurl = "http://admin.toy-kraft.com/rest/index.php/";
-var adminurl = "http://localhost/NetworkBackend/rest/index.php/";
-
+//var adminurl = "http://localhost/NetworkBackend/rest/index.php/";
+var adminurl="http://admin.toy-kraft.com/rest/index.php/retailer/find";
 var myservices = angular.module('myservices', [])
 
 
@@ -374,6 +374,7 @@ var myservices = angular.module('myservices', [])
         {
             return retailerdownloadcount;
         }
+       
 
     }
 });
