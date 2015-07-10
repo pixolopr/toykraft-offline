@@ -107,10 +107,10 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
 
         };
-
-        var importtable = function () {
-            $scope.it = true;
-            db.transaction(function (tx) {
+    //this function is for hiding button when all tables have filled 
+    var hideimporttablebutton=function()
+    {
+     db.transaction(function (tx) {
                 tx.executeSql('SELECT * FROM `RETAILER`', [], function (tx, results) {
 
                     if (results.rows.length > 0) {
@@ -120,8 +120,21 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
                     };
                 }, null);
             });
+    };
+    hideimporttablebutton();
+
+      $scope.importtable = function () {
+        
+           
+           $scope.importtablecount=$scope.importtablecount+1;
+          console.log($scope.importtablecount);
+            if($scope.importtablecount==6)
+            {
+             $scope.it = false;
+                        $scope.uploadretailer();
+            }
         };
-        importtable();
+        $scope.importtable();
 
 
 
@@ -158,7 +171,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         };
 
           var type = $cordovaNetwork.isOffline();
-        alert("The type of network is" + type);
+        //alert("The type of network is" + type);
         if (type == true) {
             showpopup('No internet connection !');
         };
@@ -237,15 +250,15 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         //RETRIEVING DATA INTO TABLES (FIRST TIME)
         syncretailerstatedatasuccess = function (data, status) {
             console.log(data);
-            MyDatabase.insertretailerstatedata(data);
+            MyDatabase.insertretailerstatedata(data,$scope);
         };
         syncretailercitydatasuccess = function (data, status) {
             console.log(data);
-            MyDatabase.insertretailercitydata(data);
+            MyDatabase.insertretailercitydata(data,$scope);
         };
         syncretailerareadatasuccess = function (data, status) {
             console.log(data);
-            MyDatabase.insertretailerareadata(data);
+            MyDatabase.insertretailerareadata(data,$scope);
         };
         syncretailerdatasuccess = function (data, status) {
             console.log(data);
@@ -254,7 +267,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         };
         syncproductdatasuccess = function (data, status) {
             console.log(data);
-            MyDatabase.insertproductdata(data);
+            MyDatabase.insertproductdata(data,$scope);
         };
         synccategorydatasuccess = function (data, status) {
             //INSERTING DATA IN JSTORAGE
@@ -262,11 +275,12 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
             $scope.categorynamedata = $.jStorage.get("categories");
         };
         syncproductimagedatasuccess = function (data, status) {
-            MyDatabase.insertproductimagedata(data);
+            MyDatabase.insertproductimagedata(data,$scope);
         };
 
         //GET DATA FROM ONLINE API
         $scope.getdatatables = function () {
+            $scope.importtablecount=0;
             //STATE
             MyDatabase.syncinretailerstatedata().success(syncretailerstatedatasuccess);
             //CITY
@@ -1643,6 +1657,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         db.transaction(function (tx) {
             tx.executeSql('SELECT `name` FROM AREA WHERE `id`=' + aid, [], function (tx, results) {
                 $scope.areaname = results.rows.item(0).name;
+                console.log($scope.areaname);
             }, null)
         });
 
