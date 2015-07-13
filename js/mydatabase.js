@@ -18,7 +18,7 @@ db.transaction(function (tx) {
     tx.executeSql('INSERT INTO `USERS` VALUES(1,"abc","toykraft","toykraft","","","","","")')
 })
 var mydatabase = angular.module('mydatabase', [])
-    .factory('MyDatabase', function ($http, $location, MyServices, $cordovaNetwork, $cordovaToast) { 
+    .factory('MyDatabase', function ($http, $location, MyServices, $cordovaNetwork, $cordovaToast) {
 
 
         var orderproductcount = 0;
@@ -206,14 +206,14 @@ var mydatabase = angular.module('mydatabase', [])
                     params: {}
                 })
             },
-            insertretailerstatedata: function (data,scope) {
+            insertretailerstatedata: function (data, scope) {
                 db.transaction(function (tx) {
                     for (var i = 0; i < data.length; i++) {
                         var sqls = 'INSERT INTO STATE (id , zone, name) VALUES (' + data[i].id + ',"' + data[i].zone + '","' + data[i].name + '")';
                         tx.executeSql(sqls, [], function (tx, results) {}, null);
                     };
-                  //$cordovaToast.show('States Data Imported', 'long', 'bottom');
-                      
+                    //$cordovaToast.show('States Data Imported', 'long', 'bottom');
+
                     scope.importtable();
                     scope.$apply();
                 });
@@ -225,7 +225,7 @@ var mydatabase = angular.module('mydatabase', [])
                     params: {}
                 })
             },
-            insertretailercitydata: function (data,scope) {
+            insertretailercitydata: function (data, scope) {
                 db.transaction(function (tx) {
                     for (var i = 0; i < data.length; i++) {
                         var sqls = 'INSERT INTO CITY (id , state, name) VALUES (' + data[i].id + ',"' + data[i].state + '","' + data[i].name + '")';
@@ -234,8 +234,8 @@ var mydatabase = angular.module('mydatabase', [])
                             console.log("RAOW INSERTED");
                         }, null);
                     };
-                     //$cordovaToast.show('City Data Imported', 'long', 'bottom');
-                    
+                    //$cordovaToast.show('City Data Imported', 'long', 'bottom');
+
                     scope.importtable();
                     scope.$apply();
                 });
@@ -248,7 +248,7 @@ var mydatabase = angular.module('mydatabase', [])
                 })
 
             },
-            insertretailerareadata: function (data,scope) {
+            insertretailerareadata: function (data, scope) {
                 db.transaction(function (tx) {
                     for (var i = 0; i < data.length; i++) {
                         var sqls = 'INSERT INTO AREA (id , city, name,distributor) VALUES (' + data[i].id + ',' + data[i].city + ',"' + data[i].name + '",' + data[i].distributor + ')';
@@ -257,9 +257,9 @@ var mydatabase = angular.module('mydatabase', [])
                             console.log("RAOW INSERTED");
                         }, null);
                     };
-                      //$cordovaToast.show('Area Data Imported', 'long', 'bottom');
-                    
-                    
+                    //$cordovaToast.show('Area Data Imported', 'long', 'bottom');
+
+
                     scope.importtable();
                     scope.$apply();
                 });
@@ -272,7 +272,7 @@ var mydatabase = angular.module('mydatabase', [])
                 })
 
             },
-            insertproductimagedata: function (data,scope) {
+            insertproductimagedata: function (data, scope) {
                 db.transaction(function (tx) {
                     for (var i = 0; i < data.length; i++) {
                         var sqls = 'INSERT INTO PRODUCTIMAGE (id , product, image) VALUES (' + data[i].id + ',"' + data[i].product + '","' + data[i].image + '")';
@@ -324,16 +324,16 @@ var mydatabase = angular.module('mydatabase', [])
                     for (var i = 0; i < data.length; i++) {
                         var sqls = 'INSERT INTO RETAILER (id,lat,long,area,dob,type_of_area,sq_feet,store_image,name,number,email,address,ownername,ownernumber,contactname,contactnumber,timestamp, issync) VALUES (' + data[i].id + ',"' + data[i].lat + '","' + data[i].long + '","' + data[i].area + '","' + data[i].dob + '","' + data[i].type_of_area + '","' + data[i].sq_feet + '","' + data[i].store_image + '","' + data[i].name + '","' + data[i].number + '","' + data[i].email + '","' + data[i].address + '","' + data[i].ownername + '","' + data[i].ownernumber + '","' + data[i].contactname + '","' + data[i].contactnumber + '","' + data[i].timestamp + '",1)';
                         tx.executeSql(sqls, [], function (tx, results) {
-                           /* scope.it = false;
-                            scope.uploadretailer();
-                            scope.$apply();*/
+                            /* scope.it = false;
+                             scope.uploadretailer();
+                             scope.$apply();*/
                             console.log("RAOW INSERTED");
                         }, function (tx, results) {
                             console.log("Not inserted");
                         });
                     };
-                   //$cordovaToast.show('Retailer Data Imported', 'long', 'bottom');
-                    
+                    //$cordovaToast.show('Retailer Data Imported', 'long', 'bottom');
+
                     scope.importtable();
                     scope.$apply();
                 });
@@ -345,7 +345,7 @@ var mydatabase = angular.module('mydatabase', [])
                     params: {}
                 })
             },
-            insertproductdata: function (data,scope) {
+            insertproductdata: function (data, scope) {
                 db.transaction(function (tx) {
                     for (var i = 0; i < data.length; i++) {
                         var sqls = 'INSERT INTO PRODUCT (id, name, product, encode, name2, productcode, category,video,mrp,description,age,scheme,isnew,timestamp) VALUES (' + data[i].id + ',"' + data[i].name + '","' + data[i].product + '","' + data[i].encode + '","' + data[i].name2 + '","' + data[i].productcode + '","' + data[i].category + '","' + data[i].video + '","' + data[i].mrp + '","' + data[i].description + '","' + data[i].age + '","' + data[i].scheme + '","' + data[i].isnew + '","' + data[i].timestamp + '")';
@@ -356,8 +356,8 @@ var mydatabase = angular.module('mydatabase', [])
                             console.log("PRODUCT RAOW NOT INSERTED");
                         });
                     };
-                   //$cordovaToast.show('Product Data Imported', 'long', 'bottom');
-                    
+                    //$cordovaToast.show('Product Data Imported', 'long', 'bottom');
+
                     scope.importtable();
                     scope.$apply();
                 });
@@ -428,7 +428,7 @@ var mydatabase = angular.module('mydatabase', [])
                             console.log(results);
                             console.log('did not add no product with no name');
                         });
-                         //$cordovaToast.show('Order Placed Offline', 'long', 'bottom');
+                        //$cordovaToast.show('Order Placed Offline', 'long', 'bottom');
                     });
                 };
 
@@ -460,7 +460,7 @@ var mydatabase = angular.module('mydatabase', [])
                     }, function (tx, results) {
                         console.log('did not add no product with no name');
                     });
-                     //$cordovaToast.show('Order Placed Offline', 'long', 'bottom');
+                    //$cordovaToast.show('Order Placed Offline', 'long', 'bottom');
                 });
             },
             syncsendorders: function (sqls, dsqls) {
@@ -672,17 +672,24 @@ var mydatabase = angular.module('mydatabase', [])
                     }, function (tx, results) {
 
                     });
-                      //$cordovaToast.show('Top Ten Data Imported', 'long', 'bottom');
+                    //$cordovaToast.show('Top Ten Data Imported', 'long', 'bottom');
                 });
             },
             sendnewretailer: function (sqls, scope) {
 
                 var addRetailerSuccess = function (data) {
+                    console.log('string1');
                     db.transaction(function (tx) {
                         tx.executeSql('UPDATE `RETAILER` SET `issync`=1,`id`=' + data[1] + '  WHERE `id` =' + data[0], [], function (tx, results) {
-                            scope.uploadretailersynccount = scope.uploadretailersynccount - 1;
-                           
-                             scope.$apply();
+                            scope.uploadretailersynccount--;
+                            
+                            if (scope.uploadretailersynccount == 0) {
+                                scope.rt = false;
+                                scope.os = true;
+                                scope.$apply();
+                            };
+                            
+                            scope.$apply();
                             console.log("hye")
                         }, null);
                         tx.executeSql('UPDATE `ORDERS` SET `retail`=' + data[1] + '  WHERE `retail` =' + data[0], [], function (tx, results) {
@@ -692,7 +699,7 @@ var mydatabase = angular.module('mydatabase', [])
 
                     });
                 };
-                
+
                 db.transaction(function (tx) {
                     console.log(sqls);
                     tx.executeSql(sqls, [], function (tx, results) {
@@ -711,11 +718,7 @@ var mydatabase = angular.module('mydatabase', [])
                                     addRetailerSuccess(data);
 
                                 });
-                                 if (scope.uploadretailersynccount == 1) {
-                                scope.rt = false;
-                                scope.os = true;
-                                     scope.$apply();
-                            }
+
                             };
                         };
                     }, function (tx, results) {
