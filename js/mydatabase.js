@@ -680,18 +680,21 @@ var mydatabase = angular.module('mydatabase', [])
                 var addRetailerSuccess = function (data) {
                     console.log('string1');
                     db.transaction(function (tx) {
+                        console.log("db trans");
                         tx.executeSql('UPDATE `RETAILER` SET `issync`=1,`id`=' + data[1] + '  WHERE `id` =' + data[0], [], function (tx, results) {
                             scope.uploadretailersynccount--;
-                            
+
                             if (scope.uploadretailersynccount == 0) {
                                 scope.rt = false;
                                 scope.os = true;
                                 scope.$apply();
                             };
-                            
+
                             scope.$apply();
                             console.log("hye")
-                        }, null);
+                        }, function (tx, results) {
+                            console.log(results);
+                        });
                         tx.executeSql('UPDATE `ORDERS` SET `retail`=' + data[1] + '  WHERE `retail` =' + data[0], [], function (tx, results) {
                             console.log("hye");
 
