@@ -79,7 +79,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 })
 
 
-.controller('syncCtrl', function ($scope, $stateParams, MyServices, MyDatabase, $location, $interval, $cordovaNetwork, $cordovaToast, $ionicPopup) {
+.controller('syncCtrl', function ($scope, $stateParams, MyServices, MyDatabase, $location, $interval, $cordovaNetwork, $cordovaToast, $ionicPopup, $state) {
         $scope.it = true;
         $scope.rt = false;
         $scope.os = false;
@@ -107,10 +107,9 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
 
         };
-    //this function is for hiding button when all tables have filled 
-    var hideimporttablebutton=function()
-    {
-     db.transaction(function (tx) {
+        //this function is for hiding button when all tables have filled 
+        var hideimporttablebutton = function () {
+            db.transaction(function (tx) {
                 tx.executeSql('SELECT * FROM `RETAILER`', [], function (tx, results) {
 
                     if (results.rows.length > 0) {
@@ -120,18 +119,17 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
                     };
                 }, null);
             });
-    };
-    hideimporttablebutton();
+        };
+        hideimporttablebutton();
 
-      $scope.importtable = function () {
-        
-           
-           $scope.importtablecount=$scope.importtablecount+1;
-          console.log($scope.importtablecount);
-            if($scope.importtablecount==6)
-            {
-             $scope.it = false;
-                        $scope.uploadretailer();
+        $scope.importtable = function () {
+
+
+            $scope.importtablecount = $scope.importtablecount + 1;
+            console.log($scope.importtablecount);
+            if ($scope.importtablecount == 6) {
+                $scope.it = false;
+                $scope.uploadretailer();
             }
         };
         $scope.importtable();
@@ -151,6 +149,8 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
                 };
             };
 
+            //http://localhost/NetworkBackend/rest/index.php/retailer/getretailerids
+            
             var retailerinfofound = function (data, status) {
                 db.transaction(function (tx) {
                     var sqls = 'INSERT INTO RETAILER (id,lat,long,area,dob,type_of_area,sq_feet,store_image,name,number,email,address,ownername,ownernumber,contactname,contactnumber,timestamp, issync) VALUES (' + data.id + ',"' + data.lat + '","' + data.long + '","' + data.area + '","' + data.dob + '","' + data.type_of_area + '","' + data.sq_feet + '","' + data.store_image + '","' + data.name + '","' + data.number + '","' + data.email + '","' + data.address + '","' + data.ownername + '","' + data.ownernumber + '","' + data.contactname + '","' + data.contactnumber + '","' + data.timestamp + '",0)';
@@ -166,15 +166,13 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
             };
 
             for (var j = 0; j < unsync.length; j++) {
-                MyServices.findoneretailer(unsync[0]).success(retailerinfofound);
+                MyServices.findoneretailer(unsync[j]).success(retailerinfofound);
             };
         };
 
-          var type = $cordovaNetwork.isOffline();
-        //alert("The type of network is" + type);
-        if (type == true) {
-            showpopup('No internet connection !');
-        };
+
+
+        console.log($location.path());
         var showpopup = function (message) {
             var myPopup = $ionicPopup.show({
                 template: '',
@@ -186,7 +184,11 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
                         text: '<b>Refresh</b>',
                         type: 'button button-block button-assertive',
                         onTap: function (e) {
-                            $location.path("#/app/sync");
+                            $state.transitionTo($state.current, $stateParams, {
+                                reload: true,
+                                inherit: false,
+                                notify: true
+                            });
                         }
       },
 
@@ -202,6 +204,14 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
             });
 
         };
+
+        var type = false;
+        //var type = $cordovaNetwork.isOffline();
+        //alert("The type of network is" + type);
+        if (type == true) {
+            showpopup('No internet connection !');
+        };
+
 
         //SYNC ORDERS//
 
@@ -250,15 +260,15 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         //RETRIEVING DATA INTO TABLES (FIRST TIME)
         syncretailerstatedatasuccess = function (data, status) {
             console.log(data);
-            MyDatabase.insertretailerstatedata(data,$scope);
+            MyDatabase.insertretailerstatedata(data, $scope);
         };
         syncretailercitydatasuccess = function (data, status) {
             console.log(data);
-            MyDatabase.insertretailercitydata(data,$scope);
+            MyDatabase.insertretailercitydata(data, $scope);
         };
         syncretailerareadatasuccess = function (data, status) {
             console.log(data);
-            MyDatabase.insertretailerareadata(data,$scope);
+            MyDatabase.insertretailerareadata(data, $scope);
         };
         syncretailerdatasuccess = function (data, status) {
             console.log(data);
@@ -267,7 +277,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         };
         syncproductdatasuccess = function (data, status) {
             console.log(data);
-            MyDatabase.insertproductdata(data,$scope);
+            MyDatabase.insertproductdata(data, $scope);
         };
         synccategorydatasuccess = function (data, status) {
             //INSERTING DATA IN JSTORAGE
@@ -275,12 +285,12 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
             $scope.categorynamedata = $.jStorage.get("categories");
         };
         syncproductimagedatasuccess = function (data, status) {
-            MyDatabase.insertproductimagedata(data,$scope);
+            MyDatabase.insertproductimagedata(data, $scope);
         };
 
         //GET DATA FROM ONLINE API
         $scope.getdatatables = function () {
-            $scope.importtablecount=0;
+            $scope.importtablecount = 0;
             //STATE
             MyDatabase.syncinretailerstatedata().success(syncretailerstatedatasuccess);
             //CITY

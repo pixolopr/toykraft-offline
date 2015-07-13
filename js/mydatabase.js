@@ -1,6 +1,6 @@
 //VARIABLES NEEDED
-//var adminurl = "http://localhost/NetworkBackend/rest/index.php/";
-var adminurl="http://toy-kraft.com/NetworkBackend/rest/index.php/";
+var adminurl = "http://localhost/NetworkBackend/rest/index.php/";
+//var adminurl="http://toy-kraft.com/NetworkBackend/rest/index.php/";
 //var adminurl = "http://169.254.216.140/NetworkBackend/rest/index.php/";
 var zone;
 
@@ -18,7 +18,7 @@ db.transaction(function (tx) {
     tx.executeSql('INSERT INTO `USERS` VALUES(1,"abc","toykraft","toykraft","","","","","")')
 })
 var mydatabase = angular.module('mydatabase', [])
-    .factory('MyDatabase', function ($http, $location, MyServices, $cordovaNetwork, $cordovaToast) {
+    .factory('MyDatabase', function ($http, $location, MyServices, $cordovaNetwork, $cordovaToast) { 
 
 
         var orderproductcount = 0;
@@ -212,7 +212,7 @@ var mydatabase = angular.module('mydatabase', [])
                         var sqls = 'INSERT INTO STATE (id , zone, name) VALUES (' + data[i].id + ',"' + data[i].zone + '","' + data[i].name + '")';
                         tx.executeSql(sqls, [], function (tx, results) {}, null);
                     };
-                  $cordovaToast.show('States Data Imported', 'long', 'bottom');
+                  //$cordovaToast.show('States Data Imported', 'long', 'bottom');
                       
                     scope.importtable();
                     scope.$apply();
@@ -234,7 +234,7 @@ var mydatabase = angular.module('mydatabase', [])
                             console.log("RAOW INSERTED");
                         }, null);
                     };
-                     $cordovaToast.show('City Data Imported', 'long', 'bottom');
+                     //$cordovaToast.show('City Data Imported', 'long', 'bottom');
                     
                     scope.importtable();
                     scope.$apply();
@@ -257,7 +257,7 @@ var mydatabase = angular.module('mydatabase', [])
                             console.log("RAOW INSERTED");
                         }, null);
                     };
-                      $cordovaToast.show('Area Data Imported', 'long', 'bottom');
+                      //$cordovaToast.show('Area Data Imported', 'long', 'bottom');
                     
                     
                     scope.importtable();
@@ -314,7 +314,7 @@ var mydatabase = angular.module('mydatabase', [])
                     }, function (tx, results) {
                         console.log("Not inserted");
                     });
-                    $cordovaToast.show('Retailer Data Imported', 'long', 'bottom');
+                    //$cordovaToast.show('Retailer Data Imported', 'long', 'bottom');
                 });
             },
 
@@ -332,7 +332,7 @@ var mydatabase = angular.module('mydatabase', [])
                             console.log("Not inserted");
                         });
                     };
-                   $cordovaToast.show('Retailer Data Imported', 'long', 'bottom');
+                   //$cordovaToast.show('Retailer Data Imported', 'long', 'bottom');
                     
                     scope.importtable();
                     scope.$apply();
@@ -356,7 +356,7 @@ var mydatabase = angular.module('mydatabase', [])
                             console.log("PRODUCT RAOW NOT INSERTED");
                         });
                     };
-                   $cordovaToast.show('Product Data Imported', 'long', 'bottom');
+                   //$cordovaToast.show('Product Data Imported', 'long', 'bottom');
                     
                     scope.importtable();
                     scope.$apply();
@@ -375,7 +375,7 @@ var mydatabase = angular.module('mydatabase', [])
                             console.log("TOP TEN NOT INSERTED");
                         });
                     };
-                    $cordovaToast.show('Top Ten Data Imported', 'long', 'bottom');
+                    //$cordovaToast.show('Top Ten Data Imported', 'long', 'bottom');
                 });
             },
 
@@ -428,7 +428,7 @@ var mydatabase = angular.module('mydatabase', [])
                             console.log(results);
                             console.log('did not add no product with no name');
                         });
-                         $cordovaToast.show('Order Placed Offline', 'long', 'bottom');
+                         //$cordovaToast.show('Order Placed Offline', 'long', 'bottom');
                     });
                 };
 
@@ -460,7 +460,7 @@ var mydatabase = angular.module('mydatabase', [])
                     }, function (tx, results) {
                         console.log('did not add no product with no name');
                     });
-                     $cordovaToast.show('Order Placed Offline', 'long', 'bottom');
+                     //$cordovaToast.show('Order Placed Offline', 'long', 'bottom');
                 });
             },
             syncsendorders: function (sqls, dsqls) {
@@ -658,7 +658,7 @@ var mydatabase = angular.module('mydatabase', [])
                     }, function (tx, results) {
 
                     });
-                    $cordovaToast.show('Top Ten Data Imported', 'long', 'bottom');
+                    //$cordovaToast.show('Top Ten Data Imported', 'long', 'bottom');
                 });*/
                 };
                 db.transaction(function (tx) {
@@ -672,7 +672,7 @@ var mydatabase = angular.module('mydatabase', [])
                     }, function (tx, results) {
 
                     });
-                      $cordovaToast.show('Top Ten Data Imported', 'long', 'bottom');
+                      //$cordovaToast.show('Top Ten Data Imported', 'long', 'bottom');
                 });
             },
             sendnewretailer: function (sqls, scope) {
@@ -721,7 +721,7 @@ var mydatabase = angular.module('mydatabase', [])
                     }, function (tx, results) {
 
                     });
-                    $cordovaToast.show('Top Ten Data Imported', 'long', 'bottom');
+                    //$cordovaToast.show('Top Ten Data Imported', 'long', 'bottom');
                 });
             },
             getcountofretailers: function () {
