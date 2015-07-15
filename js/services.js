@@ -361,7 +361,7 @@ var myservices = angular.module('myservices', [])
                     getcountofretailers().success(function (data, status) {
                         console.log(data);
                         console.log(results.rows.item(0).count);
-                        if(results.rows.item(0).count<=data){
+                        if(data>=results.rows.item(0).count){
                         data = data - results.rows.item(0).count;
                         console.log("success" + data);
                         retailerdownloadcount = data;
