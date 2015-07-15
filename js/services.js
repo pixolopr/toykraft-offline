@@ -1,4 +1,3 @@
-
 var adminurl = "http://localhost/NetworkBackend/rest/index.php/";
 //var adminurl="http://toy-kraft.com/NetworkBackend/rest/index.php/";
 var myservices = angular.module('myservices', [])
@@ -362,19 +361,26 @@ var myservices = angular.module('myservices', [])
                     getcountofretailers().success(function (data, status) {
                         console.log(data);
                         console.log(results.rows.item(0).count);
+                        if(results.rows.item(0).count<=data){
                         data = data - results.rows.item(0).count;
                         console.log("success" + data);
                         retailerdownloadcount = data;
+                        }
                     });
                 }, null);
             });
 
         },
-        getdownloadretailercount: function()
-        {
+        getdownloadretailercount: function () {
             return retailerdownloadcount;
-        }
-       
+        },
+        getonlineretailerid: function () {
+            return $http.get(adminurl + "retailer/getretailerids", {
+                params: {}
+            });
+        },
+
+
 
     }
 });
