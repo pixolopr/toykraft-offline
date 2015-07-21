@@ -348,7 +348,7 @@ var myservices = angular.module('myservices', [])
         getcountofretailers: function () {
 
         },
-        ordersync: function () {
+        ordersync: function (scope) {
 
             var getcountofretailers = function () {
                 return $http.get(adminurl + "retailer/count", {
@@ -365,6 +365,7 @@ var myservices = angular.module('myservices', [])
                         data = data - results.rows.item(0).count;
                         console.log("success" + data);
                         retailerdownloadcount = data;
+                            scope.getretailersynccount();
                         }
                     });
                 }, null);
@@ -372,6 +373,7 @@ var myservices = angular.module('myservices', [])
 
         },
         getdownloadretailercount: function () {
+            console.log(retailerdownloadcount);
             return retailerdownloadcount;
         },
         getonlineretailerid: function () {

@@ -172,8 +172,8 @@ var mydatabase = angular.module('mydatabase', [])
 
                 });
                 db.transaction(function (tx) {
-                    tx.executeSql('CREATE TABLE IF NOT EXISTS RETAILER (id INTEGER PRIMARY KEY AUTOINCREMENT,lat integer,long integer,area integer,dob date ,type_of_area varchar,sq_feet float,store_image Varchar,name Varchar,number Varchar,email Varchar,address Varchar,ownername Varchar,ownernumber Varchar,contactname Varchar,contactnumber Varchar,timestamp TIMESTAMP, issync Integer)');
-                    //tx.executeSql('DROP TABLE RETAILER');
+                     tx.executeSql('CREATE TABLE IF NOT EXISTS RETAILER (id INTEGER PRIMARY KEY AUTOINCREMENT,lat integer,long integer,area integer,dob date ,type_of_area varchar,sq_feet float,store_image Varchar,name Varchar,number Varchar,email Varchar,address Varchar,ownername Varchar,ownernumber Varchar,contactname Varchar,contactnumber Varchar,timestamp TIMESTAMP, issync Integer)');
+                   // tx.executeSql('DROP TABLE RETAILER');
                 });
                 db.transaction(function (tx) {
                     tx.executeSql('CREATE TABLE IF NOT EXISTS PRODUCT (id INTEGER PRIMARY KEY AUTOINCREMENT, name Varchar, product Varchar, encode Varchar, name2 Varchar, productcode Varchar, category Integer,video Varchar,mrp,description VARCHAR2(5000),age Integer,scheme Varchar,isnew Integer,timestamp Timestamp)');

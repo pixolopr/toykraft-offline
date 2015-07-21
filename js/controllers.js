@@ -99,7 +99,9 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
                     } else {
 
                         $scope.os = true;
-                        MyServices.ordersync();
+                        console.log("function called");
+                        MyServices.ordersync($scope);
+                       // $scope.getretailersynccount();
                     };
 
                 }, null)
@@ -154,7 +156,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
                     var sqls = 'INSERT INTO RETAILER (id,lat,long,area,dob,type_of_area,sq_feet,store_image,name,number,email,address,ownername,ownernumber,contactname,contactnumber,timestamp, issync) VALUES (' + data.id + ',"' + data.lat + '","' + data.long + '","' + data.area + '","' + data.dob + '","' + data.type_of_area + '","' + data.sq_feet + '","' + data.store_image + '","' + data.name + '","' + data.number + '","' + data.email + '","' + data.address + '","' + data.ownername + '","' + data.ownernumber + '","' + data.contactname + '","' + data.contactnumber + '","' + data.timestamp + '",1)';
                     tx.executeSql(sqls, [], function (tx, results) {
                         console.log("RAOW INSERTED");
-                        $scope.downloadateretailercount - 1;
+                         $scope.downloadateretailercount--;
                         $scope.$apply();
                     }, function (tx, results) {
                         console.log("Not inserted");
@@ -257,9 +259,9 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         $scope.downloadateretailercount = 0;
         $scope.getretailersynccount = function () {
             $scope.downloadateretailercount = MyServices.getdownloadretailercount();
-            return $scope.downloadateretailercount;
-        };
-        $scope.getretailersynccount();
+           // return $scope.downloadateretailercount;
+       };
+       
 
         $scope.callbacksuccess = function () {
             console.log("abhay");
