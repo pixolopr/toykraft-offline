@@ -41,7 +41,7 @@ var mydatabase = angular.module('mydatabase', [])
                     })
                 });
             },
-            syncorders: function (scope) {
+            syncorders: function (scope, oid2) {
                 user = MyServices.getuser();
 
                 console.log("sync orders");
@@ -56,12 +56,12 @@ var mydatabase = angular.module('mydatabase', [])
                     console.log(id);
                     db.transaction(function (tx) {
                         console.log("sync value change");
-                         tx.executeSql('UPDATE `ORDERPRODUCT` SET `orders`=' + id +' WHERE `id`=' + ordersid , [], function (tx, results) {
+                        tx.executeSql('UPDATE `ORDERPRODUCT` SET `orders`=' + id + ' WHERE `id`=' + ordersid, [], function (tx, results) {
                             console.log(results.rows);
                             //angular.element(document.getElementById('syncCtrl')).scope().$apply();
                             scope.$apply();
                             apply(scope);
-                           // scope.callbacksuccess();
+                            // scope.callbacksuccess();
                         }, function (tx, results) {
                             console.log("error");
                         });
@@ -74,7 +74,7 @@ var mydatabase = angular.module('mydatabase', [])
                         }, function (tx, results) {
                             console.log("error");
                         });
-                       
+
                     });
                 };
 
@@ -87,7 +87,7 @@ var mydatabase = angular.module('mydatabase', [])
                     });
                 };
 
-                //RETAINING CART
+                //RETAINING CART//THIS PART IS CREATING CART
                 var getcart = function (oid, rd) {
                     console.log("retaining cart");
                     db.transaction(function (tx) {
@@ -104,6 +104,7 @@ var mydatabase = angular.module('mydatabase', [])
                                 synccart[gc].totalprice = results.rows.item(gc).quantity * results.rows.item(gc).amount;
                             };
                             console.log(synccart);
+
                             syncordernow(synccart, rd).success(function (data, status) {
                                 syncordersuccess(data.id, oid)
                             });
@@ -127,19 +128,23 @@ var mydatabase = angular.module('mydatabase', [])
                     });
                 };
 
-                //RETAINING ORDER
-                db.transaction(function (tx) {
-                    console.log("retaining order");
-                    tx.executeSql('SELECT * FROM `orders` WHERE `issync` = 0 AND `salesid`=' + user.id, [], function (tx, results) {
-                        console.log(results.rows);
-                        for (var os = 0; os < results.rows.length; os++) {
-                            console.log(results.rows.item(os).id + " " + results.rows.item(os).retail + " " + results.rows.item(os).remark)
-                            getretailer(results.rows.item(os).id, results.rows.item(os).retail, results.rows.item(os).remark);
-                        };
-                    }, function (tx, results) {
-                        console.log("error");
+                if (oid2 == null) {
+                    //RETAINING ORDER
+                    db.transaction(function (tx) {
+                        console.log("retaining order");
+                        tx.executeSql('SELECT * FROM `orders` WHERE `issync` = 0 AND `salesid`=' + user.id, [], function (tx, results) {
+                            console.log(results.rows);
+                            for (var os = 0; os < results.rows.length; os++) {
+                                console.log(results.rows.item(os).id + " " + results.rows.item(os).retail + " " + results.rows.item(os).remark)
+                                getretailer(results.rows.item(os).id, results.rows.item(os).retail, results.rows.item(os).remark);
+                            };
+                        }, function (tx, results) {
+                            console.log("error");
+                        });
                     });
-                });
+                } else {
+                    getretailer(oid2, retail2, remark2);
+                };
             },
 
             //SYNC ZONE DATA
@@ -182,8 +187,8 @@ var mydatabase = angular.module('mydatabase', [])
 
                 });
                 db.transaction(function (tx) {
-                     tx.executeSql('CREATE TABLE IF NOT EXISTS RETAILER (id INTEGER PRIMARY KEY AUTOINCREMENT,lat integer,long integer,area integer,dob date ,type_of_area varchar,sq_feet float,store_image Varchar,name Varchar,number Varchar,email Varchar,address Varchar,ownername Varchar,ownernumber Varchar,contactname Varchar,contactnumber Varchar,timestamp TIMESTAMP, issync Integer)');
-                   // tx.executeSql('DROP TABLE RETAILER');
+                    tx.executeSql('CREATE TABLE IF NOT EXISTS RETAILER (id INTEGER PRIMARY KEY AUTOINCREMENT,lat integer,long integer,area integer,dob date ,type_of_area varchar,sq_feet float,store_image Varchar,name Varchar,number Varchar,email Varchar,address Varchar,ownername Varchar,ownernumber Varchar,contactname Varchar,contactnumber Varchar,timestamp TIMESTAMP, issync Integer)');
+                    // tx.executeSql('DROP TABLE RETAILER');
                 });
                 db.transaction(function (tx) {
                     tx.executeSql('CREATE TABLE IF NOT EXISTS PRODUCT (id INTEGER PRIMARY KEY AUTOINCREMENT, name Varchar, product Varchar, encode Varchar, name2 Varchar, productcode Varchar, category Integer,video Varchar,mrp,description VARCHAR2(5000),age Integer,scheme Varchar,isnew Integer,timestamp Timestamp)');
@@ -192,7 +197,7 @@ var mydatabase = angular.module('mydatabase', [])
                 });
                 db.transaction(function (tx) {
                     tx.executeSql('CREATE TABLE IF NOT EXISTS ORDERS (id INTEGER PRIMARY KEY, retail Integer,sales Varchar,timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,amount double,signature integer,salesid Integer,quantity Integer,remark text,issync integer)');
-                    // tx.executeSql('DROP TABLE ORDERS');
+                    //tx.executeSql('DROP TABLE ORDERS');
                     // tx.executeSql('DELETE FROM ORDERS');
                 });
                 db.transaction(function (tx) {
@@ -450,12 +455,12 @@ var mydatabase = angular.module('mydatabase', [])
                 };
 
                 db.transaction(function (tx) {
-//var timeStamp=;
+                    //var timeStamp=;
                     if (retailerdata.remark == undefined) {
                         retailerdata.remark = "No Remark";
                     };
                     var sqls = 'INSERT INTO ORDERS (retail ,sales, amount, signature, salesid, quantity, remark, issync) VALUES (' + retailerdata.id + ', "' + user.name + '",' + totalamount + ' , 1 , ' + user.id + ', ' + totalquantity + ' , "' + retailerdata.remark + '", 0 )';
-console.log(sqls);
+                    console.log(sqls);
                     tx.executeSql(sqls, [], function (tx, results) {
                         var insertid = results.insertId;
                         console.log(insertid);
@@ -755,66 +760,96 @@ console.log(sqls);
                     }, null);
                 });
             },
-            getdatedata:function(date,user,scope)
-            {
-                scope.ordersdata=[];
+            getdatedata: function (date, user, scope) {
+                scope.ordersdata = [];
                 console.log(date);
                 console.log(user);
-                var sqls='SELECT * FROM `ORDERS` WHERE `salesid`='+user.id+' AND GETDATE(`timestamp`)='+date;
+                var sqls = 'SELECT * FROM `ORDERS` WHERE `salesid`=' + user.id + ' AND GETDATE(`timestamp`)=' + date;
                 console.log(sqls);
-            db.transaction(function(tx){
-            tx.executeSql('SELECT * FROM `ORDERS` WHERE `salesid`='+user.id,[],function(tx,results){
-            console.log("success");
-                for(var i=0;i<results.rows.length;i++)
-                {
-                    scope.ordersdata[i]=results.rows.item(i);
-                }
-                console.log(results.rows.length);
-            },null);
-            });
+                db.transaction(function (tx) {
+                    tx.executeSql('SELECT * FROM `ORDERS` WHERE `salesid`=' + user.id, [], function (tx, results) {
+                        console.log("success");
+                        for (var i = 0; i < results.rows.length; i++) {
+                            scope.ordersdata[i] = results.rows.item(i);
+                        }
+                        console.log(results.rows.length);
+                    }, null);
+                });
             },
-    getorderproductdetails:function(retailerdetails,orderdetailsdata,scope){
-    db.transaction(function(tx){
-    tx.executeSql('SELECT * FROM `ORDERPRODUCT` WHERE `orders`='+orderdetailsdata.id,[],function(tx,results){
-         var details=[{}];
-        var orderproduct=[]
-        console.log(results.rows.length);
-        for(var i=0;i<results.rows.length;i++)
-            {
-             orderproduct[i]=results.rows.item(i);   
-        };
-        console.log(results.rows.length);
-        var details=[{}];
-   details[0].retailerdata=retailerdetails;
-     details[0].orderdata=orderdetailsdata;
-        details[0].orderproductdata=orderproduct;
-        console.log(details);
-       scope.orderdetails(details);
-        scope.$apply();
-    },null);
-    });
-    },
-        getretailerdetail:function(orderdetails,MyDatabase,scope){
-            db.transaction(function(tx){
-            tx.executeSql('SELECT * FROM `RETAILER` WHERE id='+orderdetails.retail,[],function(tx,results){
-                console.log(results.rows.length);
-            MyDatabase.getorderproductdetails(results.rows.item(0),orderdetails,scope);
-            },null);
-            });
+            getorderproductdetails: function (retailerdetails, orderdetailsdata, scope) {
+                db.transaction(function (tx) {
+                    tx.executeSql('SELECT * FROM `ORDERPRODUCT` WHERE `orders`=' + orderdetailsdata.id, [], function (tx, results) {
+                        var details = [{}];
+                        var orderproduct = []
+                        console.log(results.rows.length);
+                        for (var i = 0; i < results.rows.length; i++) {
+                            orderproduct[i] = results.rows.item(i);
+                        };
+                        console.log(results.rows.length);
+                        var details = [{}];
+                        details[0].retailerdata = retailerdetails;
+                        details[0].orderdata = orderdetailsdata;
+                        details[0].orderproductdata = orderproduct;
+                        console.log(details);
+                        scope.orderdetails(details);
+                        scope.$apply();
+                    }, null);
+                });
             },
-            getorderdetail:function(id,MyDatabase,scope)
-        {
-        db.transaction(function(tx){
-            var orderdetails=[];
-        tx.executeSql('SELECT * FROM `ORDERS` WHERE id='+id,[],function(tx,results){
-        console.log(results.rows);
-           MyDatabase.getretailerdetail(results.rows.item(0),MyDatabase,scope);
-        },function(tx,results){console.log("error");});
-        });
-        },
-        
-        
-            
+            getretailerdetail: function (orderdetails, MyDatabase, scope) {
+                db.transaction(function (tx) {
+                    tx.executeSql('SELECT * FROM `RETAILER` WHERE id=' + orderdetails.retail, [], function (tx, results) {
+                        console.log(results.rows.length);
+                        MyDatabase.getorderproductdetails(results.rows.item(0), orderdetails, scope);
+                    }, null);
+                });
+            },
+            getorderdetail: function (id, MyDatabase, scope) {
+                db.transaction(function (tx) {
+                    var orderdetails = [];
+                    tx.executeSql('SELECT * FROM `ORDERS` WHERE id=' + id, [], function (tx, results) {
+                        console.log(results.rows);
+                        MyDatabase.getretailerdetail(results.rows.item(0), MyDatabase, scope);
+                    }, function (tx, results) {
+                        console.log("error");
+                    });
+                });
+            },
+
+
+
 
         }
     });
+
+
+
+
+/*var getcart = function (oid, rd) {
+                    console.log("retaining cart");
+                    db.transaction(function (tx) {
+                        tx.executeSql('SELECT * FROM `ORDERPRODUCT` WHERE `orders` = ' + oid, [], function (tx, results) {
+                            var synccart = [];
+                            for (var gc = 0; gc < results.rows.length; gc++) {
+                                synccart[gc] = {};
+                                synccart[gc].category = results.rows.item(gc).category;
+                                synccart[gc].id = results.rows.item(gc).product;
+                                synccart[gc].mrp = results.rows.item(gc).amount;
+                                synccart[gc].name = results.rows.item(gc).name;
+                                synccart[gc].productcode = results.rows.item(gc).productcode;
+                                synccart[gc].quantity = results.rows.item(gc).quantity;
+                                synccart[gc].totalprice = results.rows.item(gc).quantity * results.rows.item(gc).amount;
+                            };
+                            console.log(synccart);
+                            
+                            //GET REtAILER DATA SOTRE IN VAR
+                            //GET USER
+                            
+                            MyDatabase.sendcartoffline()
+                            
+                        }, function (tx, results) {});
+                    });
+                };
+                
+                
+                */
