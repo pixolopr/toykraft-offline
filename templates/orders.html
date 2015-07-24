@@ -14,9 +14,9 @@
      <div class="col"><button class="button button-assertive button-block" ng-click="openRetailer();">Retailer</button></div>
 </div>
            
-            <p class="assertive text-center" ng-show="ordersdata=='false'" style="padding:20%;">No order found</p>
+            <p class="assertive text-center" ng-show="!ordersdata.length" style="padding:20%;">No order found</p>
             <div class="padding" ng-controller="DealerCtrl">
-                <table class="table2" ng-show="ordersdata!='false'">
+                <table class="table2" ng-show="ordersdata.length">
                     <thead><tr>
                             <th>Order Id</th>
                             <th>Retailer</th>

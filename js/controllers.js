@@ -1299,9 +1299,9 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
 })
 
-.controller('OrderCtrl', function ($scope, $stateParams, MyServices, $ionicModal, $location, $ionicLoading, $ionicPopup, $timeout) {
+.controller('OrderCtrl', function ($scope, $stateParams, MyServices, $ionicModal, $location, $ionicLoading, $ionicPopup, $timeout,MyDatabase) {
     $ionicLoading.hide();
-
+//$scope.ordersdata = 'false';
 
     var user = MyServices.getuser();
     console.log(user);
@@ -1590,20 +1590,22 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
     };
 
     //GET DATA BY DATE
-    datedatasuccess = function (data, status) {
+   /* datedatasuccess = function (data, status) {
         $scope.ordersdata = data;
 
-    };
+    };*/
     $scope.datechange = function (did) {
         MyServices.setmyorderdate(did);
-        MyServices.getdatedata(did).success(datedatasuccess);
+       MyDatabase.getdatedata(did,MyServices.getuser(),$scope);//.success(datedatasuccess);
+       // MyServices.getdatedata(did).success(datedatasuccess);
         $scope.closeDate();
     };
 
     $scope.selecteddate = MyServices.getmyorderdate();
 
     if (MyServices.getmyorderdate()) {
-        MyServices.getdatedata(MyServices.getmyorderdate()).success(datedatasuccess);
+       // MyServices.getdatedata(MyServices.getmyorderdate()).success(datedatasuccess);
+       MyDatabase.getdatedata(MyServices.getmyorderdate(),MyServices.getuser(),$scope);
     } else if (MyServices.getmyorderretailer().retailer != "") {
         //$scope.filter=MyServices.getmyorderretailer();
         MyServices.findzone().success(zonesuccess);
@@ -1651,20 +1653,26 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
 })
 
-.controller('OrderdetailCtrl', function ($scope, $stateParams, MyServices, $ionicLoading) {
+.controller('OrderdetailCtrl', function ($scope, $stateParams, MyServices, $ionicLoading,MyDatabase) {
 
     var orderID = $stateParams.id;
     //console.log(user);
-    var orderdetails = function (data, status) {
+    $scope.orderdetails = function (data) {
+        
+        console.log("called");
+        console.log(data[0].orderdata.amount);
         $ionicLoading.hide();
-        $scope.user = data.sales;
-        $scope.total = data.amount;
-        $scope.retailerdata = data.retailer;
-        $scope.orderdetailsdata = data.orderproduct;
+        $scope.user = data[0].orderdata.sales;
+        $scope.total = data[0].orderdata.amount;
+        $scope.retailerdata = data[0].retailerdata;
+        $scope.orderdetailsdata = data[0].orderproductdata;
+        console.log( $scope.orderdetailsdata);
+        console.log( $scope.retailerdata);
         $scope.gettotalquantity();
 
     };
-    MyServices.getorderdetail(orderID).success(orderdetails);
+  // MyServices.getorderdetail(orderID).success(orderdetails);
+    MyDatabase.getorderdetail(orderID,MyDatabase,$scope);
 
     $scope.gettotalquantity = function () {
         $scope.quantitytotal = 0;
