@@ -1579,8 +1579,6 @@ $scope.recart=synccart;
     };*/
     retailersuccessini = function (data, status) {
         $scope.retailerdata = data;
-        console.log("Chinatn shah");
-        // MyServices.getretailerdata(MyServices.getmyorderretailer().retailer).success(retailerdatasuccess);
     };
     $scope.areachange = function (aid) {
         $scope.retailerdata = [];
@@ -1640,6 +1638,7 @@ $scope.recart=synccart;
 
      };*/
     $scope.datechange = function (did) {
+        console.log(did);
         MyServices.setmyorderdate(did);
         MyDatabase.getdatedata(did, MyServices.getuser(), $scope); //.success(datedatasuccess);
         // MyServices.getdatedata(did).success(datedatasuccess);
@@ -1649,7 +1648,6 @@ $scope.recart=synccart;
     $scope.selecteddate = MyServices.getmyorderdate();
 
     if (MyServices.getmyorderdate()) {
-        // MyServices.getdatedata(MyServices.getmyorderdate()).success(datedatasuccess);
         MyDatabase.getdatedata(MyServices.getmyorderdate(), MyServices.getuser(), $scope);
     } else if (MyServices.getmyorderretailer().retailer != "") {
         console.log("else condition");

@@ -189,7 +189,7 @@ var mydatabase = angular.module('mydatabase', [])
                 });
                 db.transaction(function (tx) {
                     tx.executeSql('CREATE TABLE IF NOT EXISTS RETAILER (id INTEGER PRIMARY KEY AUTOINCREMENT,lat integer,long integer,area integer,dob date ,type_of_area varchar,sq_feet float,store_image Varchar,name Varchar,number Varchar,email Varchar,address Varchar,ownername Varchar,ownernumber Varchar,contactname Varchar,contactnumber Varchar,timestamp TIMESTAMP, issync Integer)');
-                    // tx.executeSql('DROP TABLE RETAILER');
+                    //tx.executeSql('DROP TABLE RETAILER');
                 });
                 db.transaction(function (tx) {
                     tx.executeSql('CREATE TABLE IF NOT EXISTS PRODUCT (id INTEGER PRIMARY KEY AUTOINCREMENT, name Varchar, product Varchar, encode Varchar, name2 Varchar, productcode Varchar, category Integer,video Varchar,mrp,description VARCHAR2(5000),age Integer,scheme Varchar,isnew Integer,timestamp Timestamp)');
@@ -767,14 +767,14 @@ console.log(ocart);
                 scope.ordersdata = [];
                 console.log(date);
                 console.log(user);
-                var sqls = 'SELECT * FROM `ORDERS` WHERE `salesid`=' + user.id + ' AND GETDATE(`timestamp`)=' + date;
+                var sqls = 'SELECT * FROM `ORDERS` WHERE `salesid`=' + user.id + ' AND date(`timestamp`)= "' + date+'"';
                 console.log(sqls);
                 db.transaction(function (tx) {
-                    tx.executeSql('SELECT * FROM `ORDERS` WHERE `salesid`=' + user.id, [], function (tx, results) {
+                    tx.executeSql(sqls, [], function (tx, results) {
                         console.log("success");
                         for (var i = 0; i < results.rows.length; i++) {
                             scope.ordersdata[i] = results.rows.item(i);
-                        }
+                        };
                         console.log(results.rows.length);
                     }, null);
                 });
