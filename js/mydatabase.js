@@ -15,7 +15,8 @@ db.transaction(function (tx) {
     //tx.executeSql('DROP TABLE USERS');
 });
 db.transaction(function (tx) {
-    tx.executeSql('INSERT INTO `USERS` VALUES(1,"abc","toykraft","toykraft","","","","","")')
+    tx.executeSql('INSERT INTO `USERS` VALUES(1,"abc","toykraft","toykraft","","","","3","")');
+    // tx.executeSql('DELETE FROM `USERS`');
 })
 var mydatabase = angular.module('mydatabase', [])
     .factory('MyDatabase', function ($http, $location, MyServices, $cordovaNetwork, $cordovaToast) {
@@ -317,7 +318,7 @@ var mydatabase = angular.module('mydatabase', [])
             },
             //RETAILER SYNC
             syncinretailerdata: function () {
-                return $http.get("http://admin.toy-kraft.com/rest/index.php/retailer/find", {
+                return $http.get(adminurl+"retailer/find", {
                     params: {}
                 })
             },
@@ -413,7 +414,9 @@ var mydatabase = angular.module('mydatabase', [])
 
 
             sendcartoffline: function (retailerdata, user, ocart) {
-
+console.log(retailerdata);
+console.log(user);
+console.log(ocart);
                 var finishofflineorder = function () {
                     orderproductcount = 0;
                     var aid = MyServices.getareaid();
@@ -776,6 +779,22 @@ var mydatabase = angular.module('mydatabase', [])
                     }, null);
                 });
             },
+
+            getdatabyretailer: function (retailer, scope) {
+                var ordersdatabyretailerid = [];
+                db.transaction(function (tx) {
+                    tx.executeSql('SELECT * FROM `ORDERS` WHERE `retail`=' + retailer, [], function (tx, results) {
+                        console.log("success");
+                        for (var i = 0; i < results.rows.length; i++) {
+                            ordersdatabyretailerid[i] = results.rows.item(i);
+                        };
+                        scope.retailerdatasuccess(ordersdatabyretailerid);
+                        scope.$apply();
+                        console.log(results.rows.length);
+                    }, null);
+
+                });
+            },
             getorderproductdetails: function (retailerdetails, orderdetailsdata, scope) {
                 db.transaction(function (tx) {
                     tx.executeSql('SELECT * FROM `ORDERPRODUCT` WHERE `orders`=' + orderdetailsdata.id, [], function (tx, results) {
@@ -815,10 +834,71 @@ var mydatabase = angular.module('mydatabase', [])
                     });
                 });
             },
+            //States Data
+            findstates: function (zid, scope) {
+                db.transaction(function (tx) {
+                    tx.executeSql('SELECT * FROM `STATE` WHERE `zone`=' + zid, [], function (tx, results) {
+                        console.log("hey");
+                        for (var i = 0; i < results.rows.length; i++) {
+                            scope.statedata[i] = results.rows.item(i);
+                        };
+                        scope.$apply();
+                    }, function (tx, results) {
+                        console.log("hey");
+                    });
+                });
 
-
-
-
+            },
+            //City Data
+            findcity: function (sid, scope) {
+                console.log(sid);
+                db.transaction(function (tx) {
+                    tx.executeSql('SELECT * FROM CITY WHERE state=' + sid, [], function (tx, results) {
+                        console.log("City");
+                        for (var i = 0; i < results.rows.length; i++) {
+                            console.log(results.rows.item(i));
+                            scope.citydata[i] = results.rows.item(i);
+                        };
+                        scope.$apply();
+                    }, null);
+                });
+            },
+            findarea: function (cid, scope) {
+                console.log(cid);
+                db.transaction(function (tx) {
+                    tx.executeSql('select * from AREA where city=' + cid, [], function (tx, results) {
+                        for (var i = 0; i < results.rows.length; i++) {
+                            scope.areadata[i] = results.rows.item(i);
+                        };
+                        scope.$apply();
+                    }, null);
+                });
+            },
+            findretailer: function (aid, scope) {
+                console.log(aid);
+                db.transaction(function (tx) {
+                    tx.executeSql('select * from RETAILER where area=' + aid, [], function (tx, results) {
+                        for (var i = 0; i < results.rows.length; i++) {
+                            scope.retailerdata[i] = results.rows.item(i);
+                        };
+                        scope.$apply();
+                    }, null);
+                });
+            },
+            retaileridforreorder:function(oid,syncart,scope,MyDatabase)
+            {
+                db.transaction(function(tx){
+                tx.executeSql('SELECT * from ORDERS where id='+oid,[],function(tx,results){
+                    var retailerdata={};
+                     retailerdata.id=results.rows.item(0).retail;
+                     retailerdata.remark=results.rows.item(0).remark;
+                    console.log(user);
+                    MyDatabase.sendcartoffline(retailerdata,user,syncart)
+                /*scope.reorder(results.rows.item(0).retail,syncart,user);
+                    scope.$apply();*/
+                },null);
+                });
+            },
         }
     });
 

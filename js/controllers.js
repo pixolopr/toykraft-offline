@@ -101,7 +101,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
                         $scope.os = true;
                         console.log("function called");
                         MyServices.ordersync($scope);
-                       // $scope.getretailersynccount();
+                        // $scope.getretailersynccount();
                     };
 
                 }, null)
@@ -151,12 +151,12 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
                     };
                 };
             };
-            var retailerinfofound = function (data,status) {
+            var retailerinfofound = function (data, status) {
                 db.transaction(function (tx) {
                     var sqls = 'INSERT INTO RETAILER (id,lat,long,area,dob,type_of_area,sq_feet,store_image,name,number,email,address,ownername,ownernumber,contactname,contactnumber,timestamp, issync) VALUES (' + data.id + ',"' + data.lat + '","' + data.long + '","' + data.area + '","' + data.dob + '","' + data.type_of_area + '","' + data.sq_feet + '","' + data.store_image + '","' + data.name + '","' + data.number + '","' + data.email + '","' + data.address + '","' + data.ownername + '","' + data.ownernumber + '","' + data.contactname + '","' + data.contactnumber + '","' + data.timestamp + '",1)';
                     tx.executeSql(sqls, [], function (tx, results) {
                         console.log("RAOW INSERTED");
-                         $scope.downloadateretailercount--;
+                        $scope.downloadateretailercount--;
                         $scope.$apply();
                     }, function (tx, results) {
                         console.log("Not inserted");
@@ -165,36 +165,36 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
                 });
             };
 
-        
-        //GET id OF retailers online -> array
-        MyServices.getonlineretailerid().success(function (data, status) {
-            console.log(data);
-            /* onlineid=data;
-             console.log(onlineid);*/
-            checkretailerexist(data);
-        });
 
-        //GET ids of RETAILERS offline -> array (might have to parseInt)
-        db.transaction(function (tx) {
-            tx.executeSql('SELECT `id` FROM `RETAILER`', [], function (tx, results) {
-                console.log(results);
-                console.log(tx);
-                for (var i = 0; i < results.rows.length; i++) {
-                    offlineid.push(results.rows.item(i).id);
-                };
-                console.log(offlineid);
-            }, function (tx, results) {
-                console.log("result not found");
+            //GET id OF retailers online -> array
+            MyServices.getonlineretailerid().success(function (data, status) {
+                console.log(data);
+                /* onlineid=data;
+                 console.log(onlineid);*/
+                checkretailerexist(data);
             });
-        });
 
-        //http://localhost/NetworkBackend/rest/index.php/retailer/getretailerids
+            //GET ids of RETAILERS offline -> array (might have to parseInt)
+            db.transaction(function (tx) {
+                tx.executeSql('SELECT `id` FROM `RETAILER`', [], function (tx, results) {
+                    console.log(results);
+                    console.log(tx);
+                    for (var i = 0; i < results.rows.length; i++) {
+                        offlineid.push(results.rows.item(i).id);
+                    };
+                    console.log(offlineid);
+                }, function (tx, results) {
+                    console.log("result not found");
+                });
+            });
+
+            //http://localhost/NetworkBackend/rest/index.php/retailer/getretailerids
 
 
 
-        /* for (var j = 0; j < unsync.length; j++) {
-             MyServices.findoneretailer(unsync[j]).success(retailerinfofound);
-         };*/
+            /* for (var j = 0; j < unsync.length; j++) {
+                 MyServices.findoneretailer(unsync[j]).success(retailerinfofound);
+             };*/
 
 
         };
@@ -259,9 +259,9 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         $scope.downloadateretailercount = 0;
         $scope.getretailersynccount = function () {
             $scope.downloadateretailercount = MyServices.getdownloadretailercount();
-           // return $scope.downloadateretailercount;
-       };
-       
+            // return $scope.downloadateretailercount;
+        };
+
 
         $scope.callbacksuccess = function () {
             console.log("abhay");
@@ -537,12 +537,12 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
 .controller('StateCtrl', function ($scope, $stateParams, $http, MyServices, MyDatabase, $ionicLoading) {
 
-    zone = 4;
+    // zone = 4;
     var zoneID = $stateParams.id;
     $scope.statedata = [];
 
     db.transaction(function (tx) {
-        var sqls = 'SELECT * FROM STATE WHERE "zone" = "' + zone + '"';
+        var sqls = 'SELECT * FROM STATE WHERE "zone" = "' + zoneID + '"';
         tx.executeSql(sqls, [], function (tx, results) {
             for (var i = 0; i < results.rows.length; i++) {
                 $scope.statedata.push(results.rows.item(i));
@@ -1299,9 +1299,10 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
 })
 
-.controller('OrderCtrl', function ($scope, $stateParams, MyServices, $ionicModal, $location, $ionicLoading, $ionicPopup, $timeout,MyDatabase) {
+.controller('OrderCtrl', function ($scope, $stateParams, MyServices, $ionicModal, $location, $ionicLoading, $ionicPopup, $timeout, MyDatabase) {
     $ionicLoading.hide();
-//$scope.ordersdata = 'false';
+   // var ismodalclosed=false;
+    //$scope.ordersdata = 'false';
 
     var user = MyServices.getuser();
     console.log(user);
@@ -1484,13 +1485,13 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
     };
 
     //REORDER ORDER
-    var reorder = function (data, status) {
-        console.log(data);
-        $scope.retailerid = data.retailer.id;
+   $scope.reorder = function (retailerid,synccart,user) {
+       // console.log(data);
+        $scope.retailerid = retailerid;
         MyServices.setretailer($scope.retailerid);
         MyServices.setcart($scope.recart);
-        $scope.recart = data.orderproduct;
-
+       // $scope.recart = data.orderproduct;
+$scope.recart=synccart;
         for (i = 0; i < $scope.recart.length; i++) {
             $scope.addToCart($scope.recart[i].id, $scope.recart[i].productcode, $scope.recart[i].name, $scope.recart[i].quantity, $scope.recart[i].amount);
         };
@@ -1500,7 +1501,30 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
     $scope.resendorder = function (orderid) {
         $scope.orderID = orderid;
-        MyServices.getorderdetail(orderid).success(reorder);
+        
+        var getcart = function (oid) {
+                    console.log("retaining cart");
+                    db.transaction(function (tx) {
+                        tx.executeSql('SELECT * FROM `ORDERPRODUCT` WHERE `orders` = ' + oid, [], function (tx, results) {
+                            var synccart = [];
+                            for (var gc = 0; gc < results.rows.length; gc++) {
+                                synccart[gc] = {};
+                                synccart[gc].category = results.rows.item(gc).category;
+                                synccart[gc].id = results.rows.item(gc).product;
+                                synccart[gc].mrp = results.rows.item(gc).amount;
+                                synccart[gc].name = results.rows.item(gc).name;
+                                synccart[gc].productcode = results.rows.item(gc).productcode;
+                                synccart[gc].quantity = results.rows.item(gc).quantity;
+                                synccart[gc].totalprice = results.rows.item(gc).quantity * results.rows.item(gc).amount;
+                            };
+                            
+                            MyDatabase.retaileridforreorder(orderid,synccart,$scope,MyDatabase);
+                        },null);});
+        };
+        getcart(orderid);
+        
+        //  MyServices.getorderdetail(orderid).success(reorder);
+
     };
 
     console.log(user.zone);
@@ -1514,40 +1538,54 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
     };
 
     $scope.ordersdata = 'false';
-
+ $scope.statedata = [];
+     $scope.citydata = [];
+    $scope.areadata = [];
+    $scope.retailerdata = [];
     //STATE
-    statesuccess = function (data, status) {
-        console.log(data);
-        $scope.statedata = data;
-    };
-    MyServices.findstate(zid).success(statesuccess);
-
+   
+    /* statesuccess = function (data, status) {
+         console.log(data);
+         $scope.statedata = data;
+     };*/
+    // MyServices.findstate(zid).success(statesuccess);
+    MyDatabase.findstates(zid, $scope);
     //CITY
-    citysuccess = function (data, status) {
+   
+    /*citysuccess = function (data, status) {
         $scope.citydata = data;
-    };
+    };*/
     $scope.statechange = function (sid) {
-        MyServices.findcity(sid).success(citysuccess);
+         $scope.citydata = [];
+        // MyServices.findcity(sid).success(citysuccess);
+        MyDatabase.findcity(sid, $scope);
     };
     //AREA
-    areasuccess = function (data, status) {
+    
+
+    /*areasuccess = function (data, status) {
         $scope.areadata = data;
-    };
+    };*/
     $scope.citychange = function (cid) {
-        MyServices.findarea(cid).success(areasuccess);
+    $scope.areadata = [];
+        // MyServices.findarea(cid).success(areasuccess);
+        MyDatabase.findarea(cid, $scope);
     };
     //RETAILER
-    retailersuccess = function (data, status) {
+    
+    /*retailersuccess = function (data, status) {
         $scope.retailerdata = data;
 
-    };
+    };*/
     retailersuccessini = function (data, status) {
         $scope.retailerdata = data;
         console.log("Chinatn shah");
-        MyServices.getretailerdata(MyServices.getmyorderretailer().retailer).success(retailerdatasuccess);
+        // MyServices.getretailerdata(MyServices.getmyorderretailer().retailer).success(retailerdatasuccess);
     };
     $scope.areachange = function (aid) {
-        MyServices.findretailer(aid).success(retailersuccess);
+        $scope.retailerdata = [];
+        // MyServices.findretailer(aid).success(retailersuccess);
+        MyDatabase.findretailer(aid, $scope);
     };
 
     $scope.resettoold = function () {
@@ -1570,7 +1608,9 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
     };
 
     //GET RETAILER DATA
-    retailerdatasuccess = function (data, status) {
+    $scope.retailerdatasuccess = function (data) {
+        console.log("called");
+        console.log(data);
         $scope.ordersdata = data;
         $scope.filter = {
             zone: "",
@@ -1580,41 +1620,51 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
             retailer: ""
         };
         $scope.filter = MyServices.getmyorderretailer();
+        console.log($scope.filter);
     };
     $scope.retailerchange = function (filter) {
+        console.log($scope.ismodalclosed);
         MyServices.setmyorderretailer(filter);
         MyServices.setmyorderdate(false);
 
-        MyServices.getretailerdata(filter.retailer).success(retailerdatasuccess);
+        // MyServices.getretailerdata(filter.retailer).success(retailerdatasuccess);
+        MyDatabase.getdatabyretailer(filter.retailer, $scope);
+        if($scope.ismodalclosed==false){
         $scope.closeRetailer();
+        };
     };
 
     //GET DATA BY DATE
-   /* datedatasuccess = function (data, status) {
-        $scope.ordersdata = data;
+    /* datedatasuccess = function (data, status) {
+         $scope.ordersdata = data;
 
-    };*/
+     };*/
     $scope.datechange = function (did) {
         MyServices.setmyorderdate(did);
-       MyDatabase.getdatedata(did,MyServices.getuser(),$scope);//.success(datedatasuccess);
-       // MyServices.getdatedata(did).success(datedatasuccess);
+        MyDatabase.getdatedata(did, MyServices.getuser(), $scope); //.success(datedatasuccess);
+        // MyServices.getdatedata(did).success(datedatasuccess);
         $scope.closeDate();
     };
 
     $scope.selecteddate = MyServices.getmyorderdate();
 
     if (MyServices.getmyorderdate()) {
-       // MyServices.getdatedata(MyServices.getmyorderdate()).success(datedatasuccess);
-       MyDatabase.getdatedata(MyServices.getmyorderdate(),MyServices.getuser(),$scope);
+        // MyServices.getdatedata(MyServices.getmyorderdate()).success(datedatasuccess);
+        MyDatabase.getdatedata(MyServices.getmyorderdate(), MyServices.getuser(), $scope);
     } else if (MyServices.getmyorderretailer().retailer != "") {
+        console.log("else condition");
         //$scope.filter=MyServices.getmyorderretailer();
-        MyServices.findzone().success(zonesuccess);
-        MyServices.findstate(MyServices.getmyorderretailer().zone).success(statesuccess);
-        MyServices.findcity(MyServices.getmyorderretailer().state).success(citysuccess);
-        MyServices.findarea(MyServices.getmyorderretailer().city).success(areasuccess);
-        MyServices.findretailer(MyServices.getmyorderretailer().area).success(retailersuccessini);
-    }
-
+        // MyServices.findzone().success(zonesuccess);
+        /* MyServices.findstate(MyServices.getmyorderretailer().zone).success(statesuccess);
+         MyServices.findcity(MyServices.getmyorderretailer().state).success(citysuccess);
+         MyServices.findarea(MyServices.getmyorderretailer().city).success(areasuccess);
+         MyServices.findretailer(MyServices.getmyorderretailer().area).success(retailersuccessini);*/
+        MyDatabase.findstates(MyServices.getmyorderretailer().zone, $scope);
+        MyDatabase.findcity(MyServices.getmyorderretailer().state, $scope);
+        MyDatabase.findarea(MyServices.getmyorderretailer().city, $scope);
+        MyDatabase.findretailer(MyServices.getmyorderretailer().area, $scope);
+        $scope.retailerchange(MyServices.getmyorderretailer());
+    };
 
     //MyServices.getuserorders(user.id).success(userorders);
 
@@ -1644,21 +1694,27 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         $scope.oModal2 = modal;
     });
     $scope.openRetailer = function () {
+
         $scope.oModal2.show();
+      $scope.ismodalclosed=false;
+        console.log($scope.ismodalclosed);
+        
     };
     $scope.closeRetailer = function () {
         $scope.oModal2.hide();
+        $scope.ismodalclosed=true;
+        console.log($scope.ismodalclosed);
     };
 
 
 })
 
-.controller('OrderdetailCtrl', function ($scope, $stateParams, MyServices, $ionicLoading,MyDatabase) {
+.controller('OrderdetailCtrl', function ($scope, $stateParams, MyServices, $ionicLoading, MyDatabase) {
 
     var orderID = $stateParams.id;
     //console.log(user);
     $scope.orderdetails = function (data) {
-        
+
         console.log("called");
         console.log(data[0].orderdata.amount);
         $ionicLoading.hide();
@@ -1666,13 +1722,13 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         $scope.total = data[0].orderdata.amount;
         $scope.retailerdata = data[0].retailerdata;
         $scope.orderdetailsdata = data[0].orderproductdata;
-        console.log( $scope.orderdetailsdata);
-        console.log( $scope.retailerdata);
+        console.log($scope.orderdetailsdata);
+        console.log($scope.retailerdata);
         $scope.gettotalquantity();
 
     };
-  // MyServices.getorderdetail(orderID).success(orderdetails);
-    MyDatabase.getorderdetail(orderID,MyDatabase,$scope);
+    // MyServices.getorderdetail(orderID).success(orderdetails);
+    MyDatabase.getorderdetail(orderID, MyDatabase, $scope);
 
     $scope.gettotalquantity = function () {
         $scope.quantitytotal = 0;
