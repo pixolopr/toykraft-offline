@@ -318,7 +318,7 @@ var mydatabase = angular.module('mydatabase', [])
             },
             //RETAILER SYNC
             syncinretailerdata: function () {
-                return $http.get(adminurl+"retailer/find", {
+                return $http.get("http://admin.toy-kraft.com/rest/index.php/retailer/find", {
                     params: {}
                 })
             },
