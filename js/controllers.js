@@ -81,9 +81,55 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
 .controller('syncCtrl', function ($scope, $stateParams, MyServices, MyDatabase, $location, $interval, $cordovaNetwork, $cordovaToast, $ionicPopup, $state) {
         $scope.it = true;
+        $scope.tt = false;
         $scope.rt = false;
         $scope.os = false;
 
+        ///////////////////////TOP TEN SYNC//////////////////////////////////////////////////////////////////
+
+        //CHECK IF TOP TEN IS UPDATED
+        var onlinetopten = function (data, status) {
+            console.log(data);
+            db.transaction(function (tx) {
+                tx.executeSql('SELECT * FROM `TOPTEN`', [], function (tx, results) {
+                    console.log(results.rows)
+                    if (results.rows.length == 0) {
+                        $scope.tt = true;
+                        $scope.$apply();
+                    };
+                    for (var ttu = 0; ttu < results.rows.length; ttu++) {
+                        if (results.rows.item(ttu).product != data[ttu].product) {
+                            $scope.tt = true;
+                            $scope.$apply();
+                        };
+                    };
+                }, null);
+            })
+        };
+        var toptenupdated = function () {
+            MyServices.gettoptenproducts().success(onlinetopten);
+        };
+        ////IF INTERNET EXISTS////
+        toptenupdated();
+        ////IF INTERNET EXISTS////
+
+        var toptendatasuccess = function (data, status) {
+            MyDatabase.inserttopten($scope, data);
+        };
+        $scope.gettoptendata = function () {
+            db.transaction(function (tx) {
+                var sqls = 'TRUNCATE TABLE TOPTEN';
+                console.log(sqls);
+                tx.executeSql(sqls, [], function (tx, results) {
+                    console.log("TOP TEN RAOW DELETED");
+                }, function (tx, results) {
+                    console.log("TOP TEN NOT DELETED");
+                });
+            });
+            MyServices.gettoptenproducts().success(toptendatasuccess);
+        };
+
+        //////////////////////////////////////////////////////////////////////////////////
 
         $scope.uploadretailer = function () {
             db.transaction(function (tx) {
@@ -337,21 +383,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        var toptendatasuccess = function (data, status) {
-            MyDatabase.inserttopten(data);
-        };
-        $scope.gettoptendata = function () {
-            db.transaction(function (tx) {
-                var sqls = 'TRUNCATE TABLE TOPTEN';
-                console.log(sqls);
-                tx.executeSql(sqls, [], function (tx, results) {
-                    console.log("TOP TEN RAOW DELETED");
-                }, function (tx, results) {
-                    console.log("TOP TEN NOT DELETED");
-                });
-            });
-            MyServices.gettoptenproducts().success(toptendatasuccess);
-        };
+
 
 
 
@@ -914,7 +946,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
 
 
-    //TOP TEN ORDERS
+    //TOP TEN ORDERS////////////////////////////////////////
     $scope.toptendata = [];
     $ionicModal.fromTemplateUrl('templates/topten.html', {
         id: '1',
@@ -929,25 +961,19 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         $ionicLoading.hide();
     };
     $scope.gettopten = function () {
+        $scope.toptendata = [];
         $scope.oModal1.show();
-        if (offline) {
-            db.transaction(function (tx) {
-                var sqls = 'SELECT * FROM TOPTEN';
-                console.log(sqls);
-                tx.executeSql(sqls, [], function (tx, results) {
-                    for (var i = 0; i < results.rows.length; i++) {
-                        console.log(i);
-                        if ($scope.toptendata.length < 10) {
-                            $scope.toptendata.push(results.rows.item(i));
-                        };
-                    };
-                }, function (tx, results) {});
-            });
-
-        } else {
-            MyServices.gettoptenproducts().success(toptendatasuccess);
-        };
+        db.transaction(function (tx) {
+            var sqls = 'SELECT * FROM TOPTEN';
+            tx.executeSql(sqls, [], function (tx, results) {
+                for (var i = 0; i < results.rows.length; i++) {
+                    $scope.toptendata.push(results.rows.item(i));
+                };
+                $scope.$apply();
+            }, function (tx, results) {});
+        });
     };
+    //////////////END OF TOP TEN////////////////////////////////
 
     //EDIT RETAILERS
     $scope.editretailer = {};
@@ -1067,6 +1093,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         }
         console.log("REMOVE FUNCITON CALLED");
     };
+
 
     //E-mail FUNCTION
     var email = function () {
@@ -1301,7 +1328,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
 .controller('OrderCtrl', function ($scope, $stateParams, MyServices, $ionicModal, $location, $ionicLoading, $ionicPopup, $timeout, MyDatabase) {
     $ionicLoading.hide();
-   // var ismodalclosed=false;
+    // var ismodalclosed=false;
     //$scope.ordersdata = 'false';
 
     var user = MyServices.getuser();
@@ -1485,13 +1512,13 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
     };
 
     //REORDER ORDER
-   $scope.reorder = function (retailerid,synccart,user) {
-       // console.log(data);
+    $scope.reorder = function (retailerid, synccart, user) {
+        // console.log(data);
         $scope.retailerid = retailerid;
         MyServices.setretailer($scope.retailerid);
         MyServices.setcart($scope.recart);
-       // $scope.recart = data.orderproduct;
-$scope.recart=synccart;
+        // $scope.recart = data.orderproduct;
+        $scope.recart = synccart;
         for (i = 0; i < $scope.recart.length; i++) {
             $scope.addToCart($scope.recart[i].id, $scope.recart[i].productcode, $scope.recart[i].name, $scope.recart[i].quantity, $scope.recart[i].amount);
         };
@@ -1501,28 +1528,29 @@ $scope.recart=synccart;
 
     $scope.resendorder = function (orderid) {
         $scope.orderID = orderid;
-        
+
         var getcart = function (oid) {
-                    console.log("retaining cart");
-                    db.transaction(function (tx) {
-                        tx.executeSql('SELECT * FROM `ORDERPRODUCT` WHERE `orders` = ' + oid, [], function (tx, results) {
-                            var synccart = [];
-                            for (var gc = 0; gc < results.rows.length; gc++) {
-                                synccart[gc] = {};
-                                synccart[gc].category = results.rows.item(gc).category;
-                                synccart[gc].id = results.rows.item(gc).product;
-                                synccart[gc].mrp = results.rows.item(gc).amount;
-                                synccart[gc].name = results.rows.item(gc).name;
-                                synccart[gc].productcode = results.rows.item(gc).productcode;
-                                synccart[gc].quantity = results.rows.item(gc).quantity;
-                                synccart[gc].totalprice = results.rows.item(gc).quantity * results.rows.item(gc).amount;
-                            };
-                            
-                            MyDatabase.retaileridforreorder(orderid,synccart,$scope,MyDatabase);
-                        },null);});
+            console.log("retaining cart");
+            db.transaction(function (tx) {
+                tx.executeSql('SELECT * FROM `ORDERPRODUCT` WHERE `orders` = ' + oid, [], function (tx, results) {
+                    var synccart = [];
+                    for (var gc = 0; gc < results.rows.length; gc++) {
+                        synccart[gc] = {};
+                        synccart[gc].category = results.rows.item(gc).category;
+                        synccart[gc].id = results.rows.item(gc).product;
+                        synccart[gc].mrp = results.rows.item(gc).amount;
+                        synccart[gc].name = results.rows.item(gc).name;
+                        synccart[gc].productcode = results.rows.item(gc).productcode;
+                        synccart[gc].quantity = results.rows.item(gc).quantity;
+                        synccart[gc].totalprice = results.rows.item(gc).quantity * results.rows.item(gc).amount;
+                    };
+
+                    MyDatabase.retaileridforreorder(orderid, synccart, $scope, MyDatabase);
+                }, null);
+            });
         };
         getcart(orderid);
-        
+
         //  MyServices.getorderdetail(orderid).success(reorder);
 
     };
@@ -1538,12 +1566,12 @@ $scope.recart=synccart;
     };
 
     $scope.ordersdata = 'false';
- $scope.statedata = [];
-     $scope.citydata = [];
+    $scope.statedata = [];
+    $scope.citydata = [];
     $scope.areadata = [];
     $scope.retailerdata = [];
     //STATE
-   
+
     /* statesuccess = function (data, status) {
          console.log(data);
          $scope.statedata = data;
@@ -1551,28 +1579,28 @@ $scope.recart=synccart;
     // MyServices.findstate(zid).success(statesuccess);
     MyDatabase.findstates(zid, $scope);
     //CITY
-   
+
     /*citysuccess = function (data, status) {
         $scope.citydata = data;
     };*/
     $scope.statechange = function (sid) {
-         $scope.citydata = [];
+        $scope.citydata = [];
         // MyServices.findcity(sid).success(citysuccess);
         MyDatabase.findcity(sid, $scope);
     };
     //AREA
-    
+
 
     /*areasuccess = function (data, status) {
         $scope.areadata = data;
     };*/
     $scope.citychange = function (cid) {
-    $scope.areadata = [];
+        $scope.areadata = [];
         // MyServices.findarea(cid).success(areasuccess);
         MyDatabase.findarea(cid, $scope);
     };
     //RETAILER
-    
+
     /*retailersuccess = function (data, status) {
         $scope.retailerdata = data;
 
@@ -1627,8 +1655,8 @@ $scope.recart=synccart;
 
         // MyServices.getretailerdata(filter.retailer).success(retailerdatasuccess);
         MyDatabase.getdatabyretailer(filter.retailer, $scope);
-        if($scope.ismodalclosed==false){
-        $scope.closeRetailer();
+        if ($scope.ismodalclosed == false) {
+            $scope.closeRetailer();
         };
     };
 
@@ -1694,13 +1722,13 @@ $scope.recart=synccart;
     $scope.openRetailer = function () {
 
         $scope.oModal2.show();
-      $scope.ismodalclosed=false;
+        $scope.ismodalclosed = false;
         console.log($scope.ismodalclosed);
-        
+
     };
     $scope.closeRetailer = function () {
         $scope.oModal2.hide();
-        $scope.ismodalclosed=true;
+        $scope.ismodalclosed = true;
         console.log($scope.ismodalclosed);
     };
 

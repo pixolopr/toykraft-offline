@@ -376,7 +376,7 @@ var mydatabase = angular.module('mydatabase', [])
             },
 
             //TOP TEN
-            inserttopten: function (data) {
+            inserttopten: function (scope, data) {
                 db.transaction(function (tx) {
                     for (var i = 0; i < data.length; i++) {
                         var sqls = 'INSERT INTO TOPTEN (product, productcode, name, totalquantity) VALUES (' + data[i].product + ',"' + data[i].productcode + '","' + data[i].name + '","' + data[i].totalquantity + '")';
@@ -387,6 +387,8 @@ var mydatabase = angular.module('mydatabase', [])
                             console.log("TOP TEN NOT INSERTED");
                         });
                     };
+                    scope.tt = false;
+                    scope.$apply();
                     //$cordovaToast.show('Top Ten Data Imported', 'long', 'bottom');
                 });
             },

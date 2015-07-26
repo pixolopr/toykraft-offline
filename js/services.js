@@ -301,7 +301,7 @@ var myservices = angular.module('myservices', [])
             productCatdata = data;
         },
         gettoptenproducts: function () {
-            return $http.get(adminurl + "product/gettoptenproducts");
+            return $http.get(adminurl+"product/gettoptenproducts");
         },
         editretailerdetails: function (data) {
             return $http.get(adminurl + "retailer/updatecontact", {
