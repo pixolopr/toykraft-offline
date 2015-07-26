@@ -16,7 +16,7 @@ db.transaction(function (tx) {
 });
 db.transaction(function (tx) {
     tx.executeSql('INSERT INTO `USERS` VALUES(1,"abc","toykraft","toykraft","","","","3","")');
-    // tx.executeSql('DELETE FROM `USERS`');
+    //tx.executeSql('DELETE FROM `USERS`');
 })
 var mydatabase = angular.module('mydatabase', [])
     .factory('MyDatabase', function ($http, $location, MyServices, $cordovaNetwork, $cordovaToast) {
@@ -57,7 +57,7 @@ var mydatabase = angular.module('mydatabase', [])
                     console.log(id);
                     db.transaction(function (tx) {
                         console.log("sync value change");
-                        tx.executeSql('UPDATE `ORDERPRODUCT` SET `orders`=' + id + ' WHERE `id`=' + ordersid, [], function (tx, results) {
+                        tx.executeSql('UPDATE `ORDERPRODUCT` SET `orders`=' + id + ' WHERE `orders`=' + ordersid, [], function (tx, results) {
                             console.log(results.rows);
                             //angular.element(document.getElementById('syncCtrl')).scope().$apply();
                             scope.$apply();
@@ -129,23 +129,19 @@ var mydatabase = angular.module('mydatabase', [])
                     });
                 };
 
-                if (oid2 == null) {
-                    //RETAINING ORDER
-                    db.transaction(function (tx) {
-                        console.log("retaining order");
-                        tx.executeSql('SELECT * FROM `orders` WHERE `issync` = 0 AND `salesid`=' + user.id, [], function (tx, results) {
-                            console.log(results.rows);
-                            for (var os = 0; os < results.rows.length; os++) {
-                                console.log(results.rows.item(os).id + " " + results.rows.item(os).retail + " " + results.rows.item(os).remark)
-                                getretailer(results.rows.item(os).id, results.rows.item(os).retail, results.rows.item(os).remark);
-                            };
-                        }, function (tx, results) {
-                            console.log("error");
-                        });
+                //RETAINING ORDER
+                db.transaction(function (tx) {
+                    console.log("retaining order");
+                    tx.executeSql('SELECT * FROM `orders` WHERE `issync` = 0 AND `salesid`=' + user.id, [], function (tx, results) {
+                        console.log(results.rows);
+                        for (var os = 0; os < results.rows.length; os++) {
+                            console.log(results.rows.item(os).id + " " + results.rows.item(os).retail + " " + results.rows.item(os).remark)
+                            getretailer(results.rows.item(os).id, results.rows.item(os).retail, results.rows.item(os).remark);
+                        };
+                    }, function (tx, results) {
+                        console.log("error");
                     });
-                } else {
-                    getretailer(oid2, retail2, remark2);
-                };
+                });
             },
 
             //SYNC ZONE DATA
@@ -414,9 +410,9 @@ var mydatabase = angular.module('mydatabase', [])
 
 
             sendcartoffline: function (retailerdata, user, ocart) {
-console.log(retailerdata);
-console.log(user);
-console.log(ocart);
+                console.log(retailerdata);
+                console.log(user);
+                console.log(ocart);
                 var finishofflineorder = function () {
                     orderproductcount = 0;
                     var aid = MyServices.getareaid();
@@ -767,7 +763,7 @@ console.log(ocart);
                 scope.ordersdata = [];
                 console.log(date);
                 console.log(user);
-                var sqls = 'SELECT * FROM `ORDERS` WHERE `salesid`=' + user.id + ' AND date(`timestamp`)= "' + date+'"';
+                var sqls = 'SELECT * FROM `ORDERS` WHERE `salesid`=' + user.id + ' AND date(`timestamp`)= "' + date + '"';
                 console.log(sqls);
                 db.transaction(function (tx) {
                     tx.executeSql(sqls, [], function (tx, results) {
@@ -885,18 +881,17 @@ console.log(ocart);
                     }, null);
                 });
             },
-            retaileridforreorder:function(oid,syncart,scope,MyDatabase)
-            {
-                db.transaction(function(tx){
-                tx.executeSql('SELECT * from ORDERS where id='+oid,[],function(tx,results){
-                    var retailerdata={};
-                     retailerdata.id=results.rows.item(0).retail;
-                     retailerdata.remark=results.rows.item(0).remark;
-                    console.log(user);
-                    MyDatabase.sendcartoffline(retailerdata,user,syncart)
-                /*scope.reorder(results.rows.item(0).retail,syncart,user);
-                    scope.$apply();*/
-                },null);
+            retaileridforreorder: function (oid, syncart, scope, MyDatabase) {
+                db.transaction(function (tx) {
+                    tx.executeSql('SELECT * from ORDERS where id=' + oid, [], function (tx, results) {
+                        var retailerdata = {};
+                        retailerdata.id = results.rows.item(0).retail;
+                        retailerdata.remark = results.rows.item(0).remark;
+                        console.log(user);
+                        MyDatabase.sendcartoffline(retailerdata, user, syncart)
+                            /*scope.reorder(results.rows.item(0).retail,syncart,user);
+                                scope.$apply();*/
+                    }, null);
                 });
             },
         }
