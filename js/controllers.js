@@ -535,7 +535,6 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
             $scope.monthtallydata.calls = results.rows.item(0).calls;
             $scope.monthtallydata.amount = results.rows.item(0).amount;
             $scope.monthtallydata.quantity = results.rows.item(0).quantity;
-            $scope.monthtallydata.orders = results.rows.item(0).calls;
             
             $scope.$apply();
             
@@ -566,7 +565,6 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
             $scope.todtallydata.calls = results.rows.item(0).calls;
             $scope.todtallydata.amount = results.rows.item(0).amount;
             $scope.todtallydata.quantity = results.rows.item(0).quantity;
-            $scope.todtallydata.orders = results.rows.item(0).calls;
             
             $scope.$apply();
             

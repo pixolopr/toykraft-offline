@@ -10,7 +10,8 @@
     </ion-pane>
     <ion-side-menu side="left">
         <header class="bar bar-header bar-assertive">
-            <h1 class="title">Categories</h1>
+            <h1 class="title" ng-if="setslide()">Categories</h1>
+            <h1 class="title" ng-if="!setslide()">Sync</h1>
         </header>
         <ion-content class="has-header" ng-controller="menuCtrl">
             <ion-list class="menu-item" ng-show="setslide();">
@@ -25,11 +26,11 @@
                 </div>
 
             </ion-list>
-            <ion-list>
+            <ion-list ng-show="!setslide();">
                 <ion-item menu-close href="#/app/sync">Orders Sync <span class="badge badge-assertive">{{getorsersynccount()}}</span>
                 </ion-item>
                 <ion-item>
-                    <button menu-close class="button button-assertive button-block" ng-click="gotosyncpage();" ng-hide="setslide();">Sync</button>
+                    <button menu-close class="button button-assertive button-block" ng-click="gotosyncpage();">Sync</button>
                 </ion-item>
             </ion-list>
 
