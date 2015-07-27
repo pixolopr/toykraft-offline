@@ -279,7 +279,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         };
 
         var type = false;
-        //var type = $cordovaNetwork.isOffline();
+        var type = $cordovaNetwork.isOffline();
         //alert("The type of network is" + type);
         if (type == true) {
             showpopup('No internet connection !');
@@ -451,12 +451,30 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
 
     })*/
-    .controller('LoginCtrl', function ($scope, $stateParams, MyServices, $location, MyDatabase) {
+    .controller('LoginCtrl', function ($scope, $stateParams, MyServices, $location, MyDatabase, $cordovaNetwork) {
         $scope.login = {};
         console.log($scope.login)
 
         $scope.loginFunction = function (login) {
-            db.transaction(function (tx) {
+
+            var loginsuccess = function (data, status) {
+                console.log(data);
+                if (data != "false") {
+                    MyServices.setuser(data);
+                    $location.path("#/app/home");
+                }else{
+                    $scope.alert = "Username or password incorrect";
+                };
+            };
+            
+            if($cordovaNetwork.isOffline() == false)
+            {
+            MyServices.loginFunc(login).success(loginsuccess);
+            }else{
+                $scope.alert = "You need an internet connection to login";
+            };
+
+            /*db.transaction(function (tx) {
                 console.log(login.password);
                 var sqls = 'SELECT * FROM USERS WHERE name = "' + login.username + '"';
                 tx.executeSql(sqls, [], function (tx, results) {
@@ -468,7 +486,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
                 }, function (tx, results) {
                     $scope.alert = "Username or password incorrect";
                 });
-            });
+            });*/
         };
 
 
@@ -527,60 +545,60 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         $location.path(pathtolast);
     };
 
-    
-    db.transaction(function(tx){
-        tx.executeSql('SELECT count(`id`) as `calls`,sum(`amount`) as `amount`,sum(`quantity`) as `quantity`,strftime("%m", `timestamp`) as `month` FROM `orders`  WHERE `salesid`='+user.id+' GROUP BY `month`  HAVING `month`=strftime("%m", date("now"))',[],function(tx, results){
+
+    db.transaction(function (tx) {
+        tx.executeSql('SELECT count(`id`) as `calls`,sum(`amount`) as `amount`,sum(`quantity`) as `quantity`,strftime("%m", `timestamp`) as `month` FROM `orders`  WHERE `salesid`=' + user.id + ' GROUP BY `month`  HAVING `month`=strftime("%m", date("now"))', [], function (tx, results) {
             console.log(results.rows.item(0));
             $scope.monthtallydata = {};
             $scope.monthtallydata.calls = results.rows.item(0).calls;
             $scope.monthtallydata.amount = results.rows.item(0).amount;
             $scope.monthtallydata.quantity = results.rows.item(0).quantity;
-            
+
             $scope.$apply();
-            
-        }, function(tx, results){
-            console.log(results);
-        });
-    });
-    
-    
-    db.transaction(function(tx){
-        tx.executeSql("SELECT count(`id`) as `orders`, strftime('%m', `timestamp`) as `month` FROM `orders` WHERE  `orders`.`quantity`> 0 AND  `salesid`="+user.id+"  GROUP BY `month` HAVING `month`=strftime('%m', date('now'))",[],function(tx, results){
-            console.log(results.rows.item(0));
-            $scope.monthtallydata.orders = results.rows.item(0).orders;
-            
-            $scope.$apply();
-            
-        }, function(tx, results){
+
+        }, function (tx, results) {
             console.log(results);
         });
     });
 
-    
-    
-    db.transaction(function(tx){
-        tx.executeSql("SELECT count(`id`) as `calls`,sum(`amount`) as `amount`,sum(`quantity`) as `quantity`,date(`timestamp`) as `date` FROM `orders`  WHERE `salesid`="+user.id+"   GROUP BY `date`  HAVING `date`=date('now')",[],function(tx, results){
+
+    db.transaction(function (tx) {
+        tx.executeSql("SELECT count(`id`) as `orders`, strftime('%m', `timestamp`) as `month` FROM `orders` WHERE  `orders`.`quantity`> 0 AND  `salesid`=" + user.id + "  GROUP BY `month` HAVING `month`=strftime('%m', date('now'))", [], function (tx, results) {
+            console.log(results.rows.item(0));
+            $scope.monthtallydata.orders = results.rows.item(0).orders;
+
+            $scope.$apply();
+
+        }, function (tx, results) {
+            console.log(results);
+        });
+    });
+
+
+
+    db.transaction(function (tx) {
+        tx.executeSql("SELECT count(`id`) as `calls`,sum(`amount`) as `amount`,sum(`quantity`) as `quantity`,date(`timestamp`) as `date` FROM `orders`  WHERE `salesid`=" + user.id + "   GROUP BY `date`  HAVING `date`=date('now')", [], function (tx, results) {
             console.log(results.rows.item(0));
             $scope.todtallydata = {};
             $scope.todtallydata.calls = results.rows.item(0).calls;
             $scope.todtallydata.amount = results.rows.item(0).amount;
             $scope.todtallydata.quantity = results.rows.item(0).quantity;
-            
+
             $scope.$apply();
-            
-        }, function(tx, results){
+
+        }, function (tx, results) {
             console.log(results);
         });
     });
-    
-    db.transaction(function(tx){
-        tx.executeSql("SELECT count(`id`) as `orders`, date(`timestamp`) as `date` FROM `orders` WHERE  `orders`.`quantity`> 0 AND  `salesid`="+user.id+"  GROUP BY `date` HAVING `date`=date('now')",[],function(tx, results){
+
+    db.transaction(function (tx) {
+        tx.executeSql("SELECT count(`id`) as `orders`, date(`timestamp`) as `date` FROM `orders` WHERE  `orders`.`quantity`> 0 AND  `salesid`=" + user.id + "  GROUP BY `date` HAVING `date`=date('now')", [], function (tx, results) {
             console.log(results.rows.item(0));
             $scope.todtallydata.orders = results.rows.item(0).orders;
-            
+
             $scope.$apply();
-            
-        }, function(tx, results){
+
+        }, function (tx, results) {
             console.log(results);
         });
     });
