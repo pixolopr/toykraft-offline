@@ -279,7 +279,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         };
 
         var type = false;
-        //var type = $cordovaNetwork.isOffline();
+        var type = $cordovaNetwork.isOffline();
         //alert("The type of network is" + type);
         if (type == true) {
             showpopup('No internet connection !');
