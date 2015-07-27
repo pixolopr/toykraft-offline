@@ -909,16 +909,15 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         }
     };
 
-    console.log('SELECT * FROM `ORDERS` WHERE `retail` = "' +$scope.retailerid+ '" LIMIT 3');
     ////////RECENT RETAILER DATA//////////
-   db.transaction(function(tx){ 
-       tx.executeSql('SELECT * FROM `ORDERS` WHERE `retail` = "'+$scope.retailerid+'" ORDER BY `id` DESC LIMIT 3',[], function(tx, results){ 
-           $scope.retailerrecentdata = [];
-           for(var rrd=0; rrd<results.rows.length; rrd++)
-           {
+    db.transaction(function (tx) {
+        tx.executeSql('SELECT * FROM `ORDERS` WHERE `retail` = "' + $scope.retailerid + '" ORDER BY `id` DESC LIMIT 3', [], function (tx, results) {
+            $scope.retailerrecentdata = [];
+            for (var rrd = 0; rrd < results.rows.length; rrd++) {
                 $scope.retailerrecentdata[rrd] = results.rows.item(rrd);
-           }; },null) 
-   });
+            };
+        }, null)
+    });
     /////////////////////////////////////
 
     //GET TOTAL FUNCTION
