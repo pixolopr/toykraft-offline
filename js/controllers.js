@@ -527,22 +527,66 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         $location.path(pathtolast);
     };
 
-    todaytallydatasuccess = function (data, status) {
-        if (data == "false") {
-            $scope.todtallydata = data;
-        } else {
-            $scope.todtallydata = data;
-        }
+    
+    db.transaction(function(tx){
+        tx.executeSql('SELECT count(`id`) as `calls`,sum(`amount`) as `amount`,sum(`quantity`) as `quantity`,strftime("%m", `timestamp`) as `month` FROM `orders`  WHERE `salesid`='+user.id+' GROUP BY `month`  HAVING `month`=strftime("%m", date("now"))',[],function(tx, results){
+            console.log(results.rows.item(0));
+            $scope.monthtallydata = {};
+            $scope.monthtallydata.calls = results.rows.item(0).calls;
+            $scope.monthtallydata.amount = results.rows.item(0).amount;
+            $scope.monthtallydata.quantity = results.rows.item(0).quantity;
+            $scope.monthtallydata.orders = results.rows.item(0).calls;
+            
+            $scope.$apply();
+            
+        }, function(tx, results){
+            console.log(results);
+        });
+    });
+    
+    
+    db.transaction(function(tx){
+        tx.executeSql("SELECT count(`id`) as `orders`, strftime('%m', `timestamp`) as `month` FROM `orders` WHERE  `orders`.`quantity`> 0 AND  `salesid`="+user.id+"  GROUP BY `month` HAVING `month`=strftime('%m', date('now'))",[],function(tx, results){
+            console.log(results.rows.item(0));
+            $scope.monthtallydata.orders = results.rows.item(0).orders;
+            
+            $scope.$apply();
+            
+        }, function(tx, results){
+            console.log(results);
+        });
+    });
 
-    };
+    
+    
+    db.transaction(function(tx){
+        tx.executeSql("SELECT count(`id`) as `calls`,sum(`amount`) as `amount`,sum(`quantity`) as `quantity`,date(`timestamp`) as `date` FROM `orders`  WHERE `salesid`="+user.id+"   GROUP BY `date`  HAVING `date`=date('now')",[],function(tx, results){
+            console.log(results.rows.item(0));
+            $scope.todtallydata = {};
+            $scope.todtallydata.calls = results.rows.item(0).calls;
+            $scope.todtallydata.amount = results.rows.item(0).amount;
+            $scope.todtallydata.quantity = results.rows.item(0).quantity;
+            $scope.todtallydata.orders = results.rows.item(0).calls;
+            
+            $scope.$apply();
+            
+        }, function(tx, results){
+            console.log(results);
+        });
+    });
+    
+    db.transaction(function(tx){
+        tx.executeSql("SELECT count(`id`) as `orders`, date(`timestamp`) as `date` FROM `orders` WHERE  `orders`.`quantity`> 0 AND  `salesid`="+user.id+"  GROUP BY `date` HAVING `date`=date('now')",[],function(tx, results){
+            console.log(results.rows.item(0));
+            $scope.todtallydata.orders = results.rows.item(0).orders;
+            
+            $scope.$apply();
+            
+        }, function(tx, results){
+            console.log(results);
+        });
+    });
 
-    monthtallydatasuccess = function (data, status) {
-        $scope.monthtallydata = data;
-    };
-
-    console.log("user id is" + user.id)
-    MyServices.gettodaytally(user.id).success(todaytallydatasuccess);
-    MyServices.getmonthtally(user.id).success(monthtallydatasuccess)
 })
 
 .controller('loaderCtrl', function ($scope, $stateParams, $ionicLoading) {
