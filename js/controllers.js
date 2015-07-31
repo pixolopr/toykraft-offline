@@ -85,6 +85,8 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         $scope.rt = false;
         $scope.os = false;
 
+        $scope.user = $.jStorage.get("user");
+
         ///////////////////////TOP TEN SYNC//////////////////////////////////////////////////////////////////
 
         //CHECK IF TOP TEN IS UPDATED
@@ -131,30 +133,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
         //////////////////////////////////////////////////////////////////////////////////
 
-        $scope.uploadretailer = function () {
-            db.transaction(function (tx) {
-                console.log("update retailer");
-                tx.executeSql('SELECT COUNT(*) as `count` FROM `RETAILER` WHERE `issync`=0', [], function (tx, results) {
-                    console.log(results.rows.item(0).count)
-                    if (results.rows.item(0).count > 0) {
-                        $scope.uploadretailersynccount = results.rows.item(0).count;
-                        $scope.rt = true;
-                        console.log($scope.it);
-                        $scope.$apply();
-
-                    } else {
-
-                        $scope.os = true;
-                        console.log("function called");
-                        MyServices.ordersync($scope);
-                        // $scope.getretailersynccount();
-                    };
-
-                }, null)
-            });
-
-
-        };
+        
         //this function is for hiding button when all tables have filled 
         var hideimporttablebutton = function () {
             db.transaction(function (tx) {
@@ -163,7 +142,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
                     if (results.rows.length > 0) {
                         console.log("hide");
                         $scope.it = false;
-                        $scope.uploadretailer();
+                        $scope.os = true;
                     };
                 }, null);
             });
@@ -174,13 +153,11 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
 
             $scope.importtablecount = $scope.importtablecount + 1;
-            console.log($scope.importtablecount);
-            if ($scope.importtablecount == 6) {
+            if ($scope.importtablecount == 7) {
                 $scope.it = false;
                 $scope.uploadretailer();
             }
         };
-        $scope.importtable();
 
 
 
@@ -279,7 +256,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         };
 
         var type = false;
-        var type = $cordovaNetwork.isOffline();
+        //var type = $cordovaNetwork.isOffline();
         //alert("The type of network is" + type);
         if (type == true) {
             showpopup('No internet connection !');
@@ -316,8 +293,30 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         var successfunc = function (data, status) {
             console.log(data);
         };
-        $scope.sendofflineorders = function () {
+
+        $scope.syncordersfunction = function () {
             MyDatabase.syncorders($scope);
+        };
+
+        $scope.sendofflineorders = function () {
+            //CHECK IF UNSYNCYED RETAILERS
+            db.transaction(function (tx) {
+                console.log("update retailer");
+                tx.executeSql('SELECT COUNT(*) as `count` FROM `RETAILER` WHERE `issync`=0', [], function (tx, results) {
+                    console.log(results.rows.item(0).count)
+                    if (results.rows.item(0).count > 0) {
+
+                        $scope.uploadretailersynccount = results.rows.item(0).count;
+                        //SYNC RETAILER with scope AND IN SUCCESS CALL 
+                        MyDatabase.sendnewretailer('SELECT * FROM RETAILER WHERE `issync` = 0', $scope);
+
+                    } else {
+                        $scope.syncordersfunction();
+                    };
+
+                }, null)
+            });
+
         };
         var apply = function () {
             $scope.$apply();
@@ -361,6 +360,36 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
             MyDatabase.insertproductimagedata(data, $scope);
         };
 
+        
+    
+        $scope.ordersynccount = 0;
+        syncordersdatasuccess = function (data, status) {
+            $scope.ordersynccount++;
+            if ($scope.ordersynccount == $scope.usersinzone) {
+                var lastuser = true;
+            };
+            for (var uo = 0; uo < data.length; uo++) {
+                if (lastuser) {
+                    if (uo == (data.length - 1))
+                    {
+                        MyDatabase.insertorders(data[uo], MyDatabase, lastuser, $scope);
+                    }else{
+                        MyDatabase.insertorders(data[uo], MyDatabase);
+                    }
+                } else {
+                    MyDatabase.insertorders(data[uo], MyDatabase);
+                }
+            };
+        };
+        getusersinsamezonesuccess = function (data, status) {
+            console.log(data);
+            $scope.usersinzone = data.length;
+            for (var uz = 0; uz < data.length; uz++) {
+                //ORDERS
+                MyDatabase.syncordersdata(data[uz].id).success(syncordersdatasuccess);
+            };
+        };
+
         //GET DATA FROM ONLINE API
         $scope.getdatatables = function () {
             $scope.importtablecount = 0;
@@ -379,6 +408,10 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
             //PRODUCTIMAGE
             MyDatabase.syncinproductimagedata().success(syncproductimagedatasuccess);
 
+            //USERS
+            MyDatabase.getusersinsamezone($scope.user.zone).success(getusersinsamezonesuccess);
+
+
         };
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -389,12 +422,6 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
 
         $scope.updateretailerdata = function () {
-            /* db.transaction(function (tx) {
-                 tx.executeSql('SELECT * FROM RETAILER WHERE sync = "false" AND id != null', [], function (tx, results) {
-                     console.log(results.rows.item(1));
-                 }, function (tx, results) {});
-             });*/
-            //MyDatabase.sendretailerupdate('SELECT id, contactname, contactnumber, ownername, ownernumber FROM RETAILER WHERE sync = "false" AND id > 0');
             MyDatabase.sendnewretailer('SELECT * FROM RETAILER WHERE `issync` = 0', $scope);
         };
 
@@ -462,15 +489,14 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
                 if (data != "false") {
                     MyServices.setuser(data);
                     $location.path("#/app/home");
-                }else{
+                } else {
                     $scope.alert = "Username or password incorrect";
                 };
             };
-            
-            if($cordovaNetwork.isOffline() == false)
-            {
-            MyServices.loginFunc(login).success(loginsuccess);
-            }else{
+
+            if ($cordovaNetwork.isOffline() == false) {
+                MyServices.loginFunc(login).success(loginsuccess);
+            } else {
                 $scope.alert = "You need an internet connection to login";
             };
 
