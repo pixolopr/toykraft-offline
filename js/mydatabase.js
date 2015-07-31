@@ -896,6 +896,7 @@ var mydatabase = angular.module('mydatabase', [])
                 });
             },
             getusersinsamezone: function (userzone) {
+                console.log("user zone orders");
                 return $http.get(adminurl + "user/getuserbyzone", {
                     params: {
                         zone: userzone
