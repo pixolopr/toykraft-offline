@@ -133,7 +133,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
         //////////////////////////////////////////////////////////////////////////////////
 
-        
+
         //this function is for hiding button when all tables have filled 
         var hideimporttablebutton = function () {
             db.transaction(function (tx) {
@@ -149,15 +149,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         };
         hideimporttablebutton();
 
-        $scope.importtable = function () {
 
-
-            $scope.importtablecount = $scope.importtablecount + 1;
-            if ($scope.importtablecount == 7) {
-                $scope.it = false;
-                $scope.uploadretailer();
-            }
-        };
 
 
 
@@ -286,13 +278,8 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         };
 
 
-        $scope.callbacksuccess = function () {
-            console.log("abhay");
-            appleinterval = $interval(apply, 1000, 5);
-        };
-        var successfunc = function (data, status) {
-            console.log(data);
-        };
+        
+        
 
         $scope.syncordersfunction = function () {
             MyDatabase.syncorders($scope);
@@ -321,47 +308,58 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         var apply = function () {
             $scope.$apply();
         };
-        /*
-            var apple = function() {
-                $interval.cancel(applyinterval);
-                $scope.$apply()
-                appleinterval = $interval(apple, 1000, 1);
-            };
-            */
+
+    
+        //IMPORT DATA TABLES BUTTON//  
+
+        //FUNCTION TO CHECK WHAT SUCCESS IS LAST
+        $scope.importtable = function (whichsuccess) {
+            console.log(whichsuccess);
+            //$cordovaToast.show(whichsuccess+' Data Imported', 'long', 'bottom');
+            $scope.importtablecount = $scope.importtablecount + 1;
+            if ($scope.importtablecount == 7) {
+                $scope.it = false;
+                $scope.os = true;
+                $scope.$apply();
+                //$scope.uploadretailer();
+            }
+        };
 
         //RETRIEVING DATA INTO TABLES (FIRST TIME)
+        //STATE SUCCESS
         syncretailerstatedatasuccess = function (data, status) {
-            console.log(data);
             MyDatabase.insertretailerstatedata(data, $scope);
         };
+        //CITY SUCCESS
         syncretailercitydatasuccess = function (data, status) {
-            console.log(data);
             MyDatabase.insertretailercitydata(data, $scope);
         };
+        //AREA SUCCESS
         syncretailerareadatasuccess = function (data, status) {
-            console.log(data);
             MyDatabase.insertretailerareadata(data, $scope);
         };
+        //RETAILER SUCCESS
         syncretailerdatasuccess = function (data, status) {
-            console.log(data);
-            $scope.retailerdatao = data;
             MyDatabase.insertretailerdata(data, $scope);
         };
+        //PRODUCT SUCCESS
         syncproductdatasuccess = function (data, status) {
-            console.log(data);
             MyDatabase.insertproductdata(data, $scope);
         };
+        //CATEGORY SUCCESS
         synccategorydatasuccess = function (data, status) {
             //INSERTING DATA IN JSTORAGE
             $.jStorage.set("categories", data);
             $scope.categorynamedata = $.jStorage.get("categories");
+            $scope.importtable("Category Names");
         };
+        //PRODUCT IMAGE SUCCESS
         syncproductimagedatasuccess = function (data, status) {
             MyDatabase.insertproductimagedata(data, $scope);
         };
 
-        
-    
+
+
         $scope.ordersynccount = 0;
         syncordersdatasuccess = function (data, status) {
             $scope.ordersynccount++;
@@ -370,10 +368,9 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
             };
             for (var uo = 0; uo < data.length; uo++) {
                 if (lastuser) {
-                    if (uo == (data.length - 1))
-                    {
+                    if (uo == (data.length - 1)) {
                         MyDatabase.insertorders(data[uo], MyDatabase, lastuser, $scope);
-                    }else{
+                    } else {
                         MyDatabase.insertorders(data[uo], MyDatabase);
                     }
                 } else {
@@ -381,6 +378,8 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
                 }
             };
         };
+    
+        //USERS IN SAME ZONE SUCCESS
         getusersinsamezonesuccess = function (data, status) {
             console.log(data);
             $scope.usersinzone = data.length;
@@ -408,7 +407,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
             //PRODUCTIMAGE
             MyDatabase.syncinproductimagedata().success(syncproductimagedatasuccess);
 
-            //USERS
+            //USERS OF ZONE
             MyDatabase.getusersinsamezone($scope.user.zone).success(getusersinsamezonesuccess);
 
 
@@ -494,11 +493,11 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
                 };
             };
 
-            if ($cordovaNetwork.isOffline() == false) {
-                MyServices.loginFunc(login).success(loginsuccess);
-            } else {
-                $scope.alert = "You need an internet connection to login";
-            };
+            //if ($cordovaNetwork.isOffline() == false) {
+            MyServices.loginFunc(login).success(loginsuccess);
+            //} else {
+            //    $scope.alert = "You need an internet connection to login";
+            //};
 
             /*db.transaction(function (tx) {
                 console.log(login.password);
