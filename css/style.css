@@ -362,6 +362,7 @@ p.info {
 input {
     text-transform: none !important;
 }
+
 .notification {
     position: absolute !important;
     background-color: white !important;
@@ -369,3 +370,16 @@ input {
     margin-top: 12px;
 }
 
+.syncbox {
+    display: inline-block;
+    width: 150px;
+    height: 150px;
+    margin: 10px;
+    border-radius: 100%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding-top: 62px;
+    text-align: center;
+    font-size: 65px;
+}

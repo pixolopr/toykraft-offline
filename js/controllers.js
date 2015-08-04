@@ -87,6 +87,47 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
         $scope.user = $.jStorage.get("user");
 
+        //POP-UP FUNCTION WHEN NO INTERNET/////////////////////////////////////////////////
+        var showpopup = function (message) {
+            var myPopup = $ionicPopup.show({
+                template: '',
+                title: message,
+                subTitle: '',
+                buttons: [
+
+                    {
+                        text: '<b>Refresh</b>',
+                        type: 'button button-block button-assertive',
+                        onTap: function (e) {
+                            $state.transitionTo($state.current, $stateParams, {
+                                reload: true,
+                                inherit: false,
+                                notify: true
+                            });
+                        }
+      },
+
+
+                    {
+                        text: '<b>Home</b>',
+                        type: 'button button-block button-assertive',
+                        onTap: function (e) {
+                            $location.path("#/app/home");
+                        }
+      }
+    ]
+            });
+
+        };
+
+        var type = false;
+        //var type = $cordovaNetwork.isOffline();
+        //alert("The type of network is" + type);
+        if (type == true) {
+            showpopup('No internet connection !');
+        };
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+
         ///////////////////////TOP TEN SYNC//////////////////////////////////////////////////////////////////
 
         //CHECK IF TOP TEN IS UPDATED
@@ -134,21 +175,21 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         //////////////////////////////////////////////////////////////////////////////////
 
 
-        //this function is for hiding button when all tables have filled 
+        //THIS FUNCTION DECIDES WHICH BUTTON TO SHOW WHEN SYNC PAGE OPENED///////////////
         var hideimporttablebutton = function () {
             db.transaction(function (tx) {
                 tx.executeSql('SELECT * FROM `RETAILER`', [], function (tx, results) {
 
                     if (results.rows.length > 0) {
-                        console.log("hide");
                         $scope.it = false;
                         $scope.os = true;
+                        $scope.preparesync();
                     };
                 }, null);
             });
         };
         hideimporttablebutton();
-
+        //////////////////////////////////////////////////////////////////////////////////
 
 
 
@@ -158,14 +199,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
             //  var onlineid = [];
             var offlineid = [];
             //check id if exists in offline table
-            var checkretailerexist = function (data) {
-                for (var i = 0; i < data.length; i++) {
-                    if (offlineid.indexOf(parseInt(data[i].id)) == -1) {
-                        console.log(data[i]);
-                        MyServices.findoneretailer(data[i].id).success(retailerinfofound);
-                    };
-                };
-            };
+
             var retailerinfofound = function (data, status) {
                 db.transaction(function (tx) {
                     var sqls = 'INSERT INTO RETAILER (id,lat,long,area,dob,type_of_area,sq_feet,store_image,name,number,email,address,ownername,ownernumber,contactname,contactnumber,timestamp, issync) VALUES (' + data.id + ',"' + data.lat + '","' + data.long + '","' + data.area + '","' + data.dob + '","' + data.type_of_area + '","' + data.sq_feet + '","' + data.store_image + '","' + data.name + '","' + data.number + '","' + data.email + '","' + data.address + '","' + data.ownername + '","' + data.ownernumber + '","' + data.contactname + '","' + data.contactnumber + '","' + data.timestamp + '",1)';
@@ -181,78 +215,14 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
             };
 
 
-            //GET id OF retailers online -> array
-            MyServices.getonlineretailerid().success(function (data, status) {
-                console.log(data);
-                /* onlineid=data;
-                 console.log(onlineid);*/
-                checkretailerexist(data);
-            });
-
-            //GET ids of RETAILERS offline -> array (might have to parseInt)
-            db.transaction(function (tx) {
-                tx.executeSql('SELECT `id` FROM `RETAILER`', [], function (tx, results) {
-                    console.log(results);
-                    console.log(tx);
-                    for (var i = 0; i < results.rows.length; i++) {
-                        offlineid.push(results.rows.item(i).id);
-                    };
-                    console.log(offlineid);
-                }, function (tx, results) {
-                    console.log("result not found");
-                });
-            });
-
-            //http://localhost/NetworkBackend/rest/index.php/retailer/getretailerids
 
 
 
-            /* for (var j = 0; j < unsync.length; j++) {
-                 MyServices.findoneretailer(unsync[j]).success(retailerinfofound);
-             };*/
 
 
         };
 
-        console.log($location.path());
-        var showpopup = function (message) {
-            var myPopup = $ionicPopup.show({
-                template: '',
-                title: message,
-                subTitle: '',
-                buttons: [
 
-                    {
-                        text: '<b>Refresh</b>',
-                        type: 'button button-block button-assertive',
-                        onTap: function (e) {
-                            $state.transitionTo($state.current, $stateParams, {
-                                reload: true,
-                                inherit: false,
-                                notify: true
-                            });
-                        }
-      },
-
-
-                    {
-                        text: '<b>Home</b>',
-                        type: 'button button-block button-assertive',
-                        onTap: function (e) {
-                            $location.path("#/app/home");
-                        }
-      }
-    ]
-            });
-
-        };
-
-        var type = false;
-        //var type = $cordovaNetwork.isOffline();
-        //alert("The type of network is" + type);
-        if (type == true) {
-            showpopup('No internet connection !');
-        };
 
 
         //SYNC ORDERS//
@@ -260,17 +230,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         //GIVING VALUE TO NOTIFICATION
         MyDatabase.setordersynccount();
 
-        $scope.getorsersynccount = function () {
-            MyDatabase.setordersynccount();
 
-            return MyDatabase.getordersynccount();
-
-        };
-        /* $scope.uploadretailersynccount=function(){
-         $scope.uploadretailer=MyServices.getuploadretailercount();
-             return $scope.uploadretailer;
-            
-         }*/
         $scope.downloadateretailercount = 0;
         $scope.getretailersynccount = function () {
             $scope.downloadateretailercount = MyServices.getdownloadretailercount();
@@ -278,14 +238,14 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         };
 
 
-        
-        
+
+
 
         $scope.syncordersfunction = function () {
             MyDatabase.syncorders($scope);
         };
 
-        $scope.sendofflineorders = function () {
+        $scope.sync = function () {
             //CHECK IF UNSYNCYED RETAILERS
             db.transaction(function (tx) {
                 console.log("update retailer");
@@ -309,7 +269,137 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
             $scope.$apply();
         };
 
-    
+        //SYNC BUTTON TRUE FUNCTION//TO BE CALLES WHEN SYNC BUTTON IS TO BE SHOWN
+        $scope.preparesync = function () {
+            console.log("PrEPaRiNg");
+            //COUNT VARIABLES
+            $scope.ordersup = 0;
+            $scope.ordersdown = 0;
+            $scope.retailersup = 0;
+            $scope.retailersdown = 0;
+
+            //ID's STORING VARIABLES
+            $scope.retailersdownids = [];
+            $scope.ordersdownids = [];
+
+            //TEMP ARRAY VARS
+            var offlineorderids = [];
+            var offlineretailerids = [];
+
+            //OFFLINE
+            var offlineretailercount, offlineorderscount;
+
+            //GET NUMBER OF ORDERS UP
+            db.transaction(function (tx) {
+                tx.executeSql('SELECT COUNT(*) as `count` FROM `ORDERS` WHERE `issync`=0', [], function (tx, results) {
+                    console.log(results.rows.item(0).count)
+                    if (results.rows.item(0).count > 0) {
+                        $scope.ordersup = results.rows.item(0).count;
+                    };
+                }, null)
+            });
+
+
+
+            //GET NUMBER OF ORDERS DOWn
+            db.transaction(function (tx) {
+                tx.executeSql('SELECT COUNT(*) as `count` FROM `ORDERS` WHERE `issync`=1', [], function (tx, results) {
+                    if (results.rows.item(0).count >= 0) {
+                        offlineorderscount = results.rows.item(0).count;
+                        console.log(offlineorderscount);
+                        MyServices.getordersbyzonecount($scope.user.zone).success(
+                            function (data, status) {
+                                console.log(data);
+                                $scope.ordersdown = data.count - offlineorderscount;
+                            }
+                        );
+                    };
+                }, function (tx, results) {
+                    console.log("result not found");
+                });
+            });
+
+            //GET NUMBER OF RETAILERS UP
+            db.transaction(function (tx) {
+                tx.executeSql('SELECT COUNT(*) as `count` FROM `RETAILER` WHERE `issync`=0', [], function (tx, results) {
+                    console.log(results.rows.item(0).count)
+                    if (results.rows.item(0).count > 0) {
+                        $scope.retailersup = results.rows.item(0).count;
+                    };
+                }, null)
+            });
+
+            //GET NUMBER OF RETAILERS DOWN
+            db.transaction(function (tx) {
+                tx.executeSql('SELECT COUNT(*) as `count` FROM `RETAILER` WHERE `issync`=1', [], function (tx, results) {
+                    if (results.rows.item(0).count > 0) {
+                        offlineretailercount = results.rows.item(0).count;
+                        console.log(offlineretailercount);
+                        MyServices.retailergetcount($scope.user.zone).success(
+                            function (data, status) {
+                                console.log(data);
+                                $scope.retailersdown = data.count - offlineretailercount;
+                            }
+                        );
+                    };
+                }, function (tx, results) {
+                    console.log("result not found");
+                });
+            });
+
+
+        };
+        /*
+        ARRAY FOR RETAILERS
+        var checkretailerexist = function (data) {
+                for (var i = 0; i < data.length; i++) {
+                    if (offlineretailerids.indexOf(parseInt(data[i].id)) == -1) {
+                        $scope.retailersdownids.push(data[i].id);
+                    };
+                };
+                $scope.retailersdown = $scope.retailersdownids.length;
+            };
+        
+        
+        //GET ARRAY OF ORDERS DOWN
+            var checkorders = function (data, status) {
+                for (var i = 0; i < data.length; i++) {
+                    if (offlineorderids.indexOf(parseInt(data[i].id)) == -1) {
+                        $scope.ordersdownids.push(data[i].id);
+                    };
+                };
+                $scope.ordersdown = $scope.ordersdownids.length;
+            };
+        
+        
+        for (var i = 0; i < results.rows.length; i++) {
+    offlineretailerids.push(results.rows.item(i).id);
+};
+//GET id OF retailers online -> array
+MyServices.getonlineretailerid().success(function (data, status) {
+    checkretailerexist(data);
+});*/
+        /*
+        FNCTION TO GET RETAILER
+        MyServices.findoneretailer(data[i].id).success(retailerinfofound);*/
+
+        /*
+        FUNCTION TO GET ORDER UP SYNC NUMBER
+        $scope.getorsersynccount = function () {
+            MyDatabase.setordersynccount();
+
+            return MyDatabase.getordersynccount();
+
+        };*/
+        /*
+        FUNCTION TO SEND RETAILER
+        MyDatabase.sendnewretailer('SELECT * FROM RETAILER WHERE `issync` = 0', $scope);
+
+        } else {
+            $scope.syncordersfunction();
+        };*/
+
+
         //IMPORT DATA TABLES BUTTON//  
 
         //FUNCTION TO CHECK WHAT SUCCESS IS LAST
@@ -378,7 +468,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
                 }
             };
         };
-    
+
         //USERS IN SAME ZONE SUCCESS
         getusersinsamezonesuccess = function (data, status) {
             console.log(data);
@@ -408,7 +498,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
             MyDatabase.syncinproductimagedata().success(syncproductimagedatasuccess);
 
             //USERS OF ZONE
-            MyDatabase.getusersinsamezone($scope.user.zone).success(getusersinsamezonesuccess);
+            //MyDatabase.getusersinsamezone($scope.user.zone).success(getusersinsamezonesuccess);
 
 
         };

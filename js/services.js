@@ -1,5 +1,5 @@
 //var adminurl = "http://localhost/NetworkBackend/rest/index.php/";
-var adminurl="http://toy-kraft.com/NetworkBackend/rest/index.php/";
+var adminurl = "http://toy-kraft.com/NetworkBackend/rest/index.php/";
 var myservices = angular.module('myservices', [])
 
 
@@ -301,7 +301,7 @@ var myservices = angular.module('myservices', [])
             productCatdata = data;
         },
         gettoptenproducts: function () {
-            return $http.get(adminurl+"product/gettoptenproducts");
+            return $http.get(adminurl + "product/gettoptenproducts");
         },
         editretailerdetails: function (data) {
             return $http.get(adminurl + "retailer/updatecontact", {
@@ -361,10 +361,10 @@ var myservices = angular.module('myservices', [])
                     getcountofretailers().success(function (data, status) {
                         console.log(data);
                         console.log(results.rows.item(0).count);
-                        if(data>=results.rows.item(0).count){
-                        data = data - results.rows.item(0).count;
-                        console.log("success" + data);
-                        retailerdownloadcount = data;
+                        if (data >= results.rows.item(0).count) {
+                            data = data - results.rows.item(0).count;
+                            console.log("success" + data);
+                            retailerdownloadcount = data;
                             scope.getretailersynccount();
                         }
                     });
@@ -378,6 +378,25 @@ var myservices = angular.module('myservices', [])
         },
         getonlineretailerid: function () {
             return $http.get(adminurl + "retailer/getretailerids", {
+                params: {}
+            });
+        },
+        getordersbyzone: function (zone) {
+            return $http.get(adminurl + "orders/ordersmodel", {
+                params: {
+                    zone: zone
+                }
+            });
+        },
+        getordersbyzonecount: function (zone) {
+            return $http.get(adminurl + "orders/getordersbyzonecount", {
+                params: {
+                    zone: zone
+                }
+            });
+        },
+        retailergetcount: function (zone) {
+            return $http.get(adminurl + "retailer/getcount", {
                 params: {}
             });
         },

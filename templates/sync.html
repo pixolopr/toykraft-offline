@@ -12,7 +12,7 @@
                     <button class="button button-assertive button-block" ng-click="getdatatables()">IMPORT DATA TABLES</button>
                 </ion-item>
                 <!--<ion-item ng-if="rt">
-                    <button class="button button-assertive button-block" ng-click="updateretailerdata()">UPDATE RETAILER DATA<span class="badge badge-assertive notification">{{uploadretailersynccount}}</span>
+                    <button class="button button-assertive button-block" ng-click="updateretailerdata()">UPDATE RETAILER DATA<span class="badge badge-assertive notification"></span>
                     </button>
                 </ion-item>-->
                 <ion-item ng-if="tt">
@@ -20,15 +20,32 @@
                 </ion-item>
                 <ion-item ng-if="os">
 
-                    <button class="button button-assertive button-block" ng-click="sendofflineorders()">SEND OFFLINE ORDERS<span class="badge badge-assertive notification">{{getorsersynccount()}}</span>
-                    </button>
-                </ion-item>
-                <ion-item ng-if="os">
-                    <button class="button button-assertive button-block" ng-click="downloadateretailerdata()">UPDATE RETAILERS<span class="badge badge-assertive notification">{{downloadateretailercount}}</span>
-                    </button>
+                    <button class="button button-assertive button-block" ng-click="sync()">SEND OFFLINE ORDERS</button>
                 </ion-item>
 
             </ion-list>
+            <div style="text-align:center">
+                <h4 style=" color: firebrick;font-weight: 700;">SYNC COUNT</h4>
+            </div>
+            <div class="row" ng-show="os">
+
+                <div class="col col-25" style="text-align:center">
+                    <span class="field syncbox">{{ordersup}}</span>
+                    <br>Orders Up
+                </div>
+                <div class="col col-25" style="text-align:center">
+                    <span class="field syncbox">{{ordersdown}}</span>
+                    <br>Orders Down
+                </div>
+                <div class="col col-25" style="text-align:center">
+                    <span class="field syncbox">{{retailersup}}</span>
+                    <br>Retailers Up
+                </div>
+                <div class="col col-25" style="text-align:center">
+                    <span class="field syncbox">{{retailersdown}}</span>
+                    <br>Retailers Down
+                </div>
+            </div>
 
 
 
