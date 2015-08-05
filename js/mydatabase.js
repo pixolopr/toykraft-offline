@@ -791,7 +791,7 @@ var mydatabase = angular.module('mydatabase', [])
                 var insertoffline = function (data, status) {
                     //INSERT RETAINED ORDER INTO OFFLINE DB
                     db.transaction(function (tx) {
-                        tx.executeSql('INSERT INTO ORDERS (id, retail ,sales, amount, signature, salesid, quantity, remark, issync) VALUES (' + data.id + ',' + data.retail + ', "' + data.sales + '",' + data.amount + ' , 1 , ' + data.salesid + ', ' + data.quantity + ' , "' + data.remark + '", 1 )', [], function (tx, results) {
+                        tx.executeSql('INSERT INTO ORDERS (id, retail ,sales, amount, signature, salesid, quantity, remark, issync,timestamp) VALUES (' + data.id + ',' + data.retail + ', "' + data.sales + '",' + data.amount + ' , 1 , ' + data.salesid + ', ' + data.quantity + ' , "' + data.remark + '", 1,"'+data.timestamp+'" )', [], function (tx, results) {
                             console.log("adding order products 2");
                             scope.getorderproductsbyorder(data.id);
                         }, null);
