@@ -382,7 +382,7 @@ var myservices = angular.module('myservices', [])
             });
         },
         getordersbyzone: function (zone) {
-            return $http.get(adminurl + "orders/ordersmodel", {
+            return $http.get(adminurl + "orders/getordersbyzone", {
                 params: {
                     zone: zone
                 }

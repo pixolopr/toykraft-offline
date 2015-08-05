@@ -1,6 +1,6 @@
 //VARIABLES NEEDED
-var adminurl = "http://localhost/NetworkBackend/rest/index.php/";
-//var adminurl="http://toy-kraft.com/NetworkBackend/rest/index.php/";
+//var adminurl = "http://localhost/NetworkBackend/rest/index.php/";
+var adminurl = "http://toy-kraft.com/NetworkBackend/rest/index.php/";
 //var adminurl = "http://169.254.216.140/NetworkBackend/rest/index.php/";
 var zone;
 
@@ -45,33 +45,22 @@ var mydatabase = angular.module('mydatabase', [])
             syncorders: function (scope, oid2) {
                 user = MyServices.getuser();
 
-                console.log("sync orders");
-
-                var apply = function (sc) {
-                    sc.$apply();
-                };
-
                 //SYNC SUCCESS
                 var syncordersuccess = function (id, ordersid) {
-                    console.log(ordersid);
-                    console.log(id);
                     db.transaction(function (tx) {
                         console.log("sync value change");
-                        tx.executeSql('UPDATE `ORDERPRODUCT` SET `orders`=' + id + ' WHERE `orders`=' + ordersid, [], function (tx, results) {
-                            console.log(results.rows);
-                            //angular.element(document.getElementById('syncCtrl')).scope().$apply();
-                            scope.$apply();
-                            apply(scope);
-                            // scope.callbacksuccess();
-                        }, function (tx, results) {
-                            console.log("error");
-                        });
+
                         tx.executeSql('UPDATE `ORDERS` SET `id`=' + id + ',`issync`= 1 WHERE `id`=' + ordersid + ' AND `salesid`=' + user.id, [], function (tx, results) {
-                            console.log(results.rows);
-                            //angular.element(document.getElementById('syncCtrl')).scope().$apply();
-                            scope.$apply();
-                            apply(scope);
-                            scope.callbacksuccess();
+                            tx.executeSql('UPDATE `ORDERPRODUCT` SET `orders`=' + id + ' WHERE `orders`=' + ordersid, [], function (tx, results) {
+
+                                scope.ordersup--;
+                                if (scope.ordersup == 0) {
+                                    scope.downloadordersfunction();
+                                };
+                                scope.$apply();
+                            }, function (tx, results) {
+                                console.log("error");
+                            });
                         }, function (tx, results) {
                             console.log("error");
                         });
@@ -115,10 +104,9 @@ var mydatabase = angular.module('mydatabase', [])
 
                 //RETAINING RETAILER
                 var getretailer = function (orderid, retailerid, remark) {
-                    console.log("retaining retailer");
                     db.transaction(function (tx) {
                         tx.executeSql('SELECT * FROM `RETAILER` WHERE `id` = ' + retailerid, [], function (tx, results) {
-                            console.log(results.rows);
+                            console.log("Retailer Retained");
                             var retailerdata = {};
                             retailerdata = results.rows.item(0);
                             retailerdata.remark = remark;
@@ -131,15 +119,28 @@ var mydatabase = angular.module('mydatabase', [])
 
                 //RETAINING ORDER
                 db.transaction(function (tx) {
-                    console.log("retaining order");
                     tx.executeSql('SELECT * FROM `orders` WHERE `issync` = 0 AND `salesid`=' + user.id, [], function (tx, results) {
-                        console.log(results.rows);
+                        console.log("Orders Retained");
                         for (var os = 0; os < results.rows.length; os++) {
-                            console.log(results.rows.item(os).id + " " + results.rows.item(os).retail + " " + results.rows.item(os).remark)
                             getretailer(results.rows.item(os).id, results.rows.item(os).retail, results.rows.item(os).remark);
                         };
                     }, function (tx, results) {
                         console.log("error");
+                    });
+                });
+            },
+
+            //DOWNLOAD INDIVIDUAL RETAILER
+            downloadretailer: function (data, scope) {
+                db.transaction(function (tx) {
+                    var sqls = "INSERT INTO RETAILER (id,lat,long,area,dob,type_of_area,sq_feet,store_image,name,number,email,address,ownername,ownernumber,contactname,contactnumber,timestamp, issync) VALUES (" + data.id + ",'" + data.lat + "','" + data.long + "','" + data.area + "','" + data.dob + "','" + data.type_of_area + "','" + data.sq_feet + "','" + data.store_image + "','" + data.name + "','" + data.number + "','" + data.email + "','" + data.address + "','" + data.ownername + "','" + data.ownernumber + "','" + data.contactname + "','" + data.contactnumber + "','" + data.timestamp + "',1)";
+                    console.log(sqls);
+                    tx.executeSql(sqls, [], function (tx, results) {
+                        console.log("Retailer Added");
+                        scope.retailersdown--;
+                        scope.$apply();
+                    }, function (tx, results) {
+                        console.log(results);
                     });
                 });
             },
@@ -510,7 +511,7 @@ var mydatabase = angular.module('mydatabase', [])
             addnewretailer: function (data) {
                 db.transaction(function (tx) {
                     db.transaction(function (tx) {
-                        var sqls = 'INSERT INTO RETAILER (lat,long,area,dob,type_of_area,sq_feet,store_image,name,number,email,address,ownername,ownernumber,contactname,contactnumber,timestamp,issync) VALUES ("' + data.lat + '","' + data.long + '","' + data.area + '","' + data.dob + '","' + data.type_of_area + '","' + data.sq_feet + '","' + data.store_image + '","' + data.name + '","' + data.number + '","' + data.email + '","' + data.address + '","' + data.ownername + '","' + data.ownernumber + '","' + data.contactname + '","' + data.contactnumber + '",null, 0)';
+                        var sqls = "INSERT INTO RETAILER (id,lat,long,area,dob,type_of_area,sq_feet,store_image,name,number,email,address,ownername,ownernumber,contactname,contactnumber,timestamp, issync) VALUES (" + data.id + ",'" + data.lat + "','" + data.long + "','" + data.area + "','" + data.dob + "','" + data.type_of_area + "','" + data.sq_feet + "','" + data.store_image + "','" + data.name + "','" + data.number + "','" + data.email + "','" + data.address + "','" + data.ownername + "','" + data.ownernumber + "','" + data.contactname + "','" + data.contactnumber + "','" + data.timestamp + "',1)";
                         tx.executeSql(sqls, [], function (tx, results) {
                             console.log("RAOW INSERTED");
                             window.location.replace(window.location.origin + window.location.pathname + "#/app/retailer/" + data.area);
@@ -559,61 +560,36 @@ var mydatabase = angular.module('mydatabase', [])
                     //$cordovaToast.show('Top Ten Data Imported', 'long', 'bottom');
                 });
             },
+
+            //SYNC BUTTON - FIRST UPLOAD RETAILER IF THERE
             sendnewretailer: function (sqls, scope) {
-
-
-                $cordovaToast.show('Updating Retailer Data', 'long', 'bottom');
-
                 var addRetailerSuccess = function (data) {
-                    console.log(data);
                     db.transaction(function (tx) {
-                        console.log("db trans");
                         tx.executeSql('UPDATE `RETAILER` SET `issync`=1,`id`=' + data[1] + '  WHERE `id` =' + data[0], [], function (tx, results) {
-                            scope.uploadretailersynccount--;
-
-                            if (scope.uploadretailersynccount == 0) {
-                                scope.syncordersfunction();
-                            };
-
-                            scope.$apply();
-                        }, function (tx, results) {
-                            console.log(results.message);
-                        });
-                        tx.executeSql('UPDATE `ORDERS` SET `retail`=' + data[1] + '  WHERE `retail` =' + data[0], [], function (tx, results) {
-                            console.log("hye");
-
-                        }, null);
-
+                            tx.executeSql('UPDATE `ORDERS` SET `retail`=' + data[1] + '  WHERE `retail` =' + data[0], [], function (tx, results) {
+                                scope.retailersup--;
+                                if (scope.retailersup == 0) {
+                                    scope.syncordersfunction();
+                                };
+                                scope.$apply();
+                            }, null);
+                        }, function (tx, results) {});
                     });
                 };
 
+                //SELECT * FROM RETAILER WHERE issync = 0
                 db.transaction(function (tx) {
-                    console.log(sqls);
                     tx.executeSql(sqls, [], function (tx, results) {
-                        console.log(results.rows.length);
-                        if (results.rows.length <= 0) {
-                            scope.rt = false;
-                            scope.os = true;
-                            scope.$apply();
-                        } else {
-                            for (var i = 0; i < results.rows.length; i++) {
-                                console.log(results.rows.item(i));
-                                newretailerdata = results.rows.item(i);
-                                MyServices.addNewRetailer(results.rows.item(i)).success(function (data, status) {
-
-                                    console.log(data);
-                                    addRetailerSuccess(data);
-
-                                });
-
-                            };
+                        for (var i = 0; i < results.rows.length; i++) {
+                            newretailerdata = results.rows.item(i);
+                            MyServices.addNewRetailer(results.rows.item(i)).success(function (data, status) {
+                                addRetailerSuccess(data);
+                            });
                         };
-                    }, function (tx, results) {
-
-                    });
-                    //$cordovaToast.show('Top Ten Data Imported', 'long', 'bottom');
+                    }, function (tx, results) {});
                 });
             },
+
             getcountofretailers: function () {
                 return $http.get(adminurl + "retailer/count", {
                     params: {}
@@ -786,36 +762,56 @@ var mydatabase = angular.module('mydatabase', [])
                     }
                 });
             },
-            insertorders: function (data, mydatabase, lu, scope) {
-                db.transaction(function (tx) {
-                    tx.executeSql('INSERT INTO ORDERS (id, retail ,sales, amount, signature, salesid, quantity, remark, issync) VALUES (' + data.id + ',' + data.retail + ', "' + data.sales + '",' + data.amount + ' , 1 , ' + data.salesid + ', ' + data.quantity + ' , "' + data.remark + '", 1 )', [], function (tx, results) {
-                        mydatabase.getorderproducts(data.id).success(function (data, status) {
-                            var productcount = 0;
-                            if (data.length == 0) {
-                                if (lu) {
-                                    //FINAL SUCCESS
-                                    scope.importtable();
+            insertorders: function (id, scope, mydb) {
+
+                //GET ORDER PRODUCTS OF THE ORDER (3)
+
+
+                //FUNSTION THAT INSERTS ORDER INTO OFFLINE DB(2)
+                var insertoffline = function (data, status) {
+                    //INSERT RETAINED ORDER INTO OFFLINE DB
+                    db.transaction(function (tx) {
+                        tx.executeSql('INSERT INTO ORDERS (id, retail ,sales, amount, signature, salesid, quantity, remark, issync) VALUES (' + data.id + ',' + data.retail + ', "' + data.sales + '",' + data.amount + ' , 1 , ' + data.salesid + ', ' + data.quantity + ' , "' + data.remark + '", 1 )', [], function (tx, results) {
+                            console.log("adding order products");
+                            mydb.getorderproducts(data.id).success(function (data, status) {
+                                console.log("adding order products2");
+                                var productcount = data.length;
+                                var check = 0;
+                                if (data.length == 0) {
+                                    scope.ordersdown--;
                                     scope.$apply();
+                                    console.log("APPLY");
                                 };
-                            };
-                            for (var ops = 0; ops < data.length; ops++) {
-                                db.transaction(function (tx) {
-                                    tx.executeSql('INSERT INTO ORDERPRODUCT (orders, product, quantity, name, amount, scheme_id, status, category, productcode) VALUES (' + data.order + ', ' + data.product + ', ' + data.quantity + ', "' + data.name + '",' + data.amount + ',' + data.scheme_id + ' ,' + data.status + ', "' + data.category + '", "' + data.productcode + '")', [], function (tx, results) {
-                                        //FINAL SUCCESS OF INDIVIDUAL PRODUCT
-                                        productcount++;
-                                        if (lu) {
-                                            if (productcount == data.length) {
-                                                //FINAL SUCCESS
-                                                scope.importtable();
+                                for (var ops = 0; ops < data.length; ops++) {
+                                    console.log("adding order products");
+                                    db.transaction(function (tx) {
+                                        console.log("adding order products");
+                                        tx.executeSql('INSERT INTO ORDERPRODUCT (orders, product, quantity, name, amount, scheme_id, status, category, productcode) VALUES (' + data.order + ', ' + data.product + ', ' + data.quantity + ', "' + data.name + '",' + data.amount + ',' + data.scheme_id + ' ,' + data.status + ', "' + data.category + '", "' + data.productcode + '")', [], function (tx, results) {
+                                            check++;
+                                            if (check == productcount) {
+                                                scope.ordersdown--;
                                                 scope.$apply();
+                                                console.log("APPLY");
                                             };
-                                        };
-                                    }, null);
-                                });
-                            };
-                        });
-                    }, null);
-                });
+                                        }, null);
+                                    });
+                                };
+                            }).error(function(data){console.log(data)});
+                        }, null);
+                    });
+                };
+
+                var getorderinfo = function (id) {
+                    return $http.get(adminurl + "orders/getorderbyid", {
+                        params: {
+                            orderid: id
+                        }
+                    });
+                };
+
+                getorderinfo(id).success(insertoffline);
+
+
 
             },
         }

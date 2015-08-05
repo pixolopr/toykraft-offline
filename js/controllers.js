@@ -195,34 +195,6 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
 
 
-        $scope.downloadateretailerdata = function () {
-            //  var onlineid = [];
-            var offlineid = [];
-            //check id if exists in offline table
-
-            var retailerinfofound = function (data, status) {
-                db.transaction(function (tx) {
-                    var sqls = 'INSERT INTO RETAILER (id,lat,long,area,dob,type_of_area,sq_feet,store_image,name,number,email,address,ownername,ownernumber,contactname,contactnumber,timestamp, issync) VALUES (' + data.id + ',"' + data.lat + '","' + data.long + '","' + data.area + '","' + data.dob + '","' + data.type_of_area + '","' + data.sq_feet + '","' + data.store_image + '","' + data.name + '","' + data.number + '","' + data.email + '","' + data.address + '","' + data.ownername + '","' + data.ownernumber + '","' + data.contactname + '","' + data.contactnumber + '","' + data.timestamp + '",1)';
-                    tx.executeSql(sqls, [], function (tx, results) {
-                        console.log("RAOW INSERTED");
-                        $scope.downloadateretailercount--;
-                        $scope.$apply();
-                    }, function (tx, results) {
-                        console.log("Not inserted");
-                    });
-                    //$cordovaToast.show('Retailer Data Imported', 'long', 'bottom');
-                });
-            };
-
-
-
-
-
-
-
-        };
-
-
 
 
         //SYNC ORDERS//
@@ -239,30 +211,99 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
 
 
+        //DOWNLOAD ORDERS
+        var offlineorderids = [];
+        $scope.downloadordersfunction = function () {
+            console.log("download orders");
+            //GET ARRAY OF ORDERS DOWN
+            var checkorders = function (data, status) {
+                console.log(data);
+                for (var i = 0; i < data.length; i++) {
+                    if (offlineorderids.indexOf(parseInt(data[i].id)) == -1) {
+                        $scope.ordersdownids.push(data[i].id);
+                        MyDatabase.insertorders(data[i].id, $scope, MyDatabase);
+                        
+                    };
+                };
+            };
 
+            if ($scope.ordersdown > 0) {
+                console.log("getiing orders");
+                db.transaction(function (tx) {
+                    tx.executeSql('SELECT `id` FROM `ORDERS` WHERE `issync`=1', [], function (tx, results) {
+                        for (var i = 0; i < results.rows.length; i++) {
+                            offlineorderids.push(results.rows.item(i).id);
+                        };
+                        console.log(offlineorderids);
+                        //GET ONLINE ORDERS ID's
+                        MyServices.getordersbyzone($scope.user.zone).success(checkorders);
+                    }, function (tx, results) {
+                        console.log("result not found");
+                    });
+                });
 
-        $scope.syncordersfunction = function () {
-            MyDatabase.syncorders($scope);
+            };
         };
 
-        $scope.sync = function () {
-            //CHECK IF UNSYNCYED RETAILERS
-            db.transaction(function (tx) {
-                console.log("update retailer");
-                tx.executeSql('SELECT COUNT(*) as `count` FROM `RETAILER` WHERE `issync`=0', [], function (tx, results) {
-                    console.log(results.rows.item(0).count)
-                    if (results.rows.item(0).count > 0) {
+        //UPLOADING ORDERS
+        $scope.syncordersfunction = function () {
+            if ($scope.ordersup > 0) {
+                //SYNC ORDERS, ON FINAL SUCCESS CALL DOWNLOAD ORDERS
+                MyDatabase.syncorders($scope);
+            } else {
+                //CALL DOWNLOAD ORDERS
+                $scope.downloadordersfunction();
+            };
+        };
+        //DOWNLOADING RETAILERS
+        var offlineretailerids = [];
+        $scope.syncretailersdownfunction = function () {
 
-                        $scope.uploadretailersynccount = results.rows.item(0).count;
-                        //SYNC RETAILER with scope AND IN SUCCESS CALL 
-                        MyDatabase.sendnewretailer('SELECT * FROM RETAILER WHERE `issync` = 0', $scope);
+            //INSERT RETAINED ONLINE RETAILER (3)
+            var retailerinfofound = function (data, status) {
+                MyDatabase.downloadretailer(data, $scope);
+            };
 
-                    } else {
-                        $scope.syncordersfunction();
+            //COMPARE ONLINE-OFFLINE ORDERS (2)
+            var checkretailerexist = function (data) {
+                for (var i = 0; i < data.length; i++) {
+                    if (offlineretailerids.indexOf(parseInt(data[i].id)) == -1) {
+                        $scope.retailersdownids.push(data[i].id);
+                        //CALL FUNCTION TO DOWNLOAD RETAILER
+                        MyServices.findoneretailer(data[i].id).success(retailerinfofound);
                     };
+                };
+            };
 
-                }, null)
-            });
+            if ($scope.retailersdown > 0) {
+                db.transaction(function (tx) {
+                    tx.executeSql('SELECT `id` FROM `RETAILER` WHERE `issync`=1', [], function (tx, results) {
+                        for (var i = 0; i < results.rows.length; i++) {
+                            offlineretailerids.push(results.rows.item(i).id);
+                        };
+                        MyServices.getonlineretailerid().success(function (data, status) {
+                            checkretailerexist(data);
+                        });
+                    }, function (tx, results) {
+                        console.log("result not found");
+                    });
+                });
+
+            };
+        };
+
+
+
+        $scope.sync = function () {
+
+            if ($scope.retailersup > 0) {
+                //DO RETaileR SYNC AND ON SUCCESS CALL FUNCTION OF ORDER/RETAILER DOWNLOAD
+                MyDatabase.sendnewretailer('SELECT * FROM RETAILER WHERE `issync` = 0', $scope);
+            } else {
+                //CALL FUNCTION OF ORDER/RETAILER DOWNLOAD
+                $scope.syncordersfunction();
+                $scope.syncretailersdownfunction();
+            };
 
         };
         var apply = function () {
@@ -271,7 +312,6 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
         //SYNC BUTTON TRUE FUNCTION//TO BE CALLES WHEN SYNC BUTTON IS TO BE SHOWN
         $scope.preparesync = function () {
-            console.log("PrEPaRiNg");
             //COUNT VARIABLES
             $scope.ordersup = 0;
             $scope.ordersdown = 0;
@@ -282,16 +322,12 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
             $scope.retailersdownids = [];
             $scope.ordersdownids = [];
 
-            //TEMP ARRAY VARS
-            var offlineorderids = [];
-            var offlineretailerids = [];
-
             //OFFLINE
             var offlineretailercount, offlineorderscount;
 
             //GET NUMBER OF ORDERS UP
             db.transaction(function (tx) {
-                tx.executeSql('SELECT COUNT(*) as `count` FROM `ORDERS` WHERE `issync`=0', [], function (tx, results) {
+                tx.executeSql('SELECT COUNT(*) as `count` FROM `ORDERS` WHERE `issync`=0 AND `salesid`=' + $scope.user.id, [], function (tx, results) {
                     console.log(results.rows.item(0).count)
                     if (results.rows.item(0).count > 0) {
                         $scope.ordersup = results.rows.item(0).count;
@@ -351,37 +387,20 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         };
         /*
         ARRAY FOR RETAILERS
-        var checkretailerexist = function (data) {
-                for (var i = 0; i < data.length; i++) {
-                    if (offlineretailerids.indexOf(parseInt(data[i].id)) == -1) {
-                        $scope.retailersdownids.push(data[i].id);
-                    };
-                };
-                $scope.retailersdown = $scope.retailersdownids.length;
-            };
         
         
-        //GET ARRAY OF ORDERS DOWN
-            var checkorders = function (data, status) {
-                for (var i = 0; i < data.length; i++) {
-                    if (offlineorderids.indexOf(parseInt(data[i].id)) == -1) {
-                        $scope.ordersdownids.push(data[i].id);
-                    };
-                };
-                $scope.ordersdown = $scope.ordersdownids.length;
-            };
+        
+        
         
         
         for (var i = 0; i < results.rows.length; i++) {
     offlineretailerids.push(results.rows.item(i).id);
 };
 //GET id OF retailers online -> array
-MyServices.getonlineretailerid().success(function (data, status) {
-    checkretailerexist(data);
-});*/
+*/
         /*
         FNCTION TO GET RETAILER
-        MyServices.findoneretailer(data[i].id).success(retailerinfofound);*/
+       */
 
         /*
         FUNCTION TO GET ORDER UP SYNC NUMBER
@@ -411,7 +430,7 @@ MyServices.getonlineretailerid().success(function (data, status) {
                 $scope.it = false;
                 $scope.os = true;
                 $scope.$apply();
-                //$scope.uploadretailer();
+                $scope.preparesync();
             }
         };
 
@@ -496,9 +515,6 @@ MyServices.getonlineretailerid().success(function (data, status) {
             MyDatabase.getcategoriesname().success(synccategorydatasuccess);
             //PRODUCTIMAGE
             MyDatabase.syncinproductimagedata().success(syncproductimagedatasuccess);
-
-            //USERS OF ZONE
-            //MyDatabase.getusersinsamezone($scope.user.zone).success(getusersinsamezonesuccess);
 
 
         };
