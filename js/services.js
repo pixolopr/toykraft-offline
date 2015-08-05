@@ -402,6 +402,17 @@ var myservices = angular.module('myservices', [])
         },
 
 
+        getorderproducts: function (oid) {
+            console.log(oid);
+            return $http.get(adminurl + "orders/getproductsbyorder", {
+                params: {
+                    order: oid
+                }
+            });
+            console.log(oid);
+        },
+
+
 
     }
 });

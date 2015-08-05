@@ -213,6 +213,18 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
         //DOWNLOAD ORDERS
         var offlineorderids = [];
+
+        $scope.getorderproductsbyorder = function (oid) {
+            console.log("calling for success");
+            MyServices.getorderproducts(oid).success(function (data, status) {
+                if (data.length == 0) {
+                    $scope.ordersdown--;
+                    $scope.$apply();
+                };
+                MyDatabase.inserorderproductdata(data, $scope);
+            });
+        };
+
         $scope.downloadordersfunction = function () {
             console.log("download orders");
             //GET ARRAY OF ORDERS DOWN
@@ -221,8 +233,8 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
                 for (var i = 0; i < data.length; i++) {
                     if (offlineorderids.indexOf(parseInt(data[i].id)) == -1) {
                         $scope.ordersdownids.push(data[i].id);
-                        MyDatabase.insertorders(data[i].id, $scope, MyDatabase);
-                        
+                        MyDatabase.insertorders(data[i].id, $scope, MyServices);
+
                     };
                 };
             };

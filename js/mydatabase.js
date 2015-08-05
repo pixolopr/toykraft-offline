@@ -755,16 +755,36 @@ var mydatabase = angular.module('mydatabase', [])
                     }
                 });
             },
-            getorderproducts: function (oid) {
-                return $http.get(adminurl + "orders/getproductsbyorder", {
-                    params: {
-                        order: oid
-                    }
-                });
+            inserorderproductdata: function (data, scope) {
+                
+                console.log("SUCCESS");
+                
+                var productcount = data.length;
+                var check = 0;
+
+
+                //GET ORDER PRODUCTS OF THE ORDER (3)
+                var insertorderproduct = function (data) {
+                    db.transaction(function (tx) {
+                        console.log("adding order products");
+                        tx.executeSql('INSERT INTO ORDERPRODUCT (orders, product, quantity, name, amount, scheme_id, status, category, productcode) VALUES (' + data.order + ', ' + data.product + ', ' + data.quantity + ', "' + data.name + '",' + data.amount + ',' + data.scheme_id + ' ,' + data.status + ', "' + data.category + '", "' + data.productcode + '")', [], function (tx, results) {
+                            check++;
+                            if (check == productcount) {
+                                scope.ordersdown--;
+                                scope.$apply();
+                                console.log("APPLY");
+                            };
+                        }, null);
+                    });
+                };
+
+                for (var ops = 0; ops < data.length; ops++) {
+                    console.log("adding order products");
+                    insertorderproduct(data[ops]);
+                };
             },
             insertorders: function (id, scope, mydb) {
 
-                //GET ORDER PRODUCTS OF THE ORDER (3)
 
 
                 //FUNSTION THAT INSERTS ORDER INTO OFFLINE DB(2)
@@ -772,31 +792,8 @@ var mydatabase = angular.module('mydatabase', [])
                     //INSERT RETAINED ORDER INTO OFFLINE DB
                     db.transaction(function (tx) {
                         tx.executeSql('INSERT INTO ORDERS (id, retail ,sales, amount, signature, salesid, quantity, remark, issync) VALUES (' + data.id + ',' + data.retail + ', "' + data.sales + '",' + data.amount + ' , 1 , ' + data.salesid + ', ' + data.quantity + ' , "' + data.remark + '", 1 )', [], function (tx, results) {
-                            console.log("adding order products");
-                            mydb.getorderproducts(data.id).success(function (data, status) {
-                                console.log("adding order products2");
-                                var productcount = data.length;
-                                var check = 0;
-                                if (data.length == 0) {
-                                    scope.ordersdown--;
-                                    scope.$apply();
-                                    console.log("APPLY");
-                                };
-                                for (var ops = 0; ops < data.length; ops++) {
-                                    console.log("adding order products");
-                                    db.transaction(function (tx) {
-                                        console.log("adding order products");
-                                        tx.executeSql('INSERT INTO ORDERPRODUCT (orders, product, quantity, name, amount, scheme_id, status, category, productcode) VALUES (' + data.order + ', ' + data.product + ', ' + data.quantity + ', "' + data.name + '",' + data.amount + ',' + data.scheme_id + ' ,' + data.status + ', "' + data.category + '", "' + data.productcode + '")', [], function (tx, results) {
-                                            check++;
-                                            if (check == productcount) {
-                                                scope.ordersdown--;
-                                                scope.$apply();
-                                                console.log("APPLY");
-                                            };
-                                        }, null);
-                                    });
-                                };
-                            }).error(function(data){console.log(data)});
+                            console.log("adding order products 2");
+                            scope.getorderproductsbyorder(data.id);
                         }, null);
                     });
                 };
