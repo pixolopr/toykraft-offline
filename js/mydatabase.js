@@ -194,7 +194,7 @@ var mydatabase = angular.module('mydatabase', [])
 
                 });
                 db.transaction(function (tx) {
-                    tx.executeSql('CREATE TABLE IF NOT EXISTS ORDERS (id INTEGER PRIMARY KEY, retail Integer,sales Varchar,timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,amount double,signature integer,salesid Integer,quantity Integer,remark text,issync integer)');
+                    tx.executeSql('CREATE TABLE IF NOT EXISTS ORDERS (id INTEGER PRIMARY KEY, retail Integer,sales Varchar,timestamp,amount double,signature integer,salesid Integer,quantity Integer,remark text,issync integer)')
 
                 });
                 db.transaction(function (tx) {
@@ -416,7 +416,7 @@ var mydatabase = angular.module('mydatabase', [])
                     if (retailerdata.remark == undefined) {
                         retailerdata.remark = "No Remark";
                     };
-                    var sqls = 'INSERT INTO ORDERS (retail ,sales, amount, signature, salesid, quantity, remark, issync) VALUES (' + retailerdata.id + ', "' + user.name + '",' + totalamount + ' , 1 , ' + user.id + ', ' + totalquantity + ' , "' + retailerdata.remark + '", 0 )';
+                    var sqls = 'INSERT INTO ORDERS (retail ,sales, amount, signature, salesid, timestamp, quantity, remark, issync) VALUES (' + retailerdata.id + ', "' + user.name + '",' + totalamount + ' , 1 , ' + user.id + ',strftime("%Y-%m-%d %H:%M:%S", "now", "localtime") ,' + totalquantity + ' , "' + retailerdata.remark + '", 0 )';
                     tx.executeSql(sqls, [], function (tx, results) {
                         var insertid = results.insertId;
                         console.log(insertid);
@@ -511,12 +511,12 @@ var mydatabase = angular.module('mydatabase', [])
             addnewretailer: function (data) {
                 db.transaction(function (tx) {
                     db.transaction(function (tx) {
-                        var sqls = "INSERT INTO RETAILER (id,lat,long,area,dob,type_of_area,sq_feet,store_image,name,number,email,address,ownername,ownernumber,contactname,contactnumber,timestamp, issync) VALUES (" + data.id + ",'" + data.lat + "','" + data.long + "','" + data.area + "','" + data.dob + "','" + data.type_of_area + "','" + data.sq_feet + "','" + data.store_image + "','" + data.name + "','" + data.number + "','" + data.email + "','" + data.address + "','" + data.ownername + "','" + data.ownernumber + "','" + data.contactname + "','" + data.contactnumber + "','" + data.timestamp + "',1)";
+                        var sqls = "INSERT INTO RETAILER (lat,long,area,dob,type_of_area,sq_feet,store_image,name,number,email,address,ownername,ownernumber,contactname,contactnumber,timestamp, issync) VALUES ('" + data.lat + "','" + data.long + "','" + data.area + "','" + data.dob + "','" + data.type_of_area + "','" + data.sq_feet + "','" + data.store_image + "','" + data.name + "','" + data.number + "','" + data.email + "','" + data.address + "','" + data.ownername + "','" + data.ownernumber + "','" + data.contactname + "','" + data.contactnumber + "',strftime('%Y-%m-%d %H:%M:%S', 'now', 'localtime'),0)";
                         tx.executeSql(sqls, [], function (tx, results) {
                             console.log("RAOW INSERTED");
                             window.location.replace(window.location.origin + window.location.pathname + "#/app/retailer/" + data.area);
                         }, function (tx, results) {
-                            console.log("RAOW NOT INSERTED");
+                            console.log(results);
                         });
                     });
                 });

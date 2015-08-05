@@ -304,10 +304,12 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
             };
         };
 
-
+        $scope.syncclicked = false;
 
         $scope.sync = function () {
 
+            $scope.syncclicked = true;
+            
             if ($scope.retailersup > 0) {
                 //DO RETaileR SYNC AND ON SUCCESS CALL FUNCTION OF ORDER/RETAILER DOWNLOAD
                 MyDatabase.sendnewretailer('SELECT * FROM RETAILER WHERE `issync` = 0', $scope);

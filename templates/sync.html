@@ -20,7 +20,7 @@
                 </ion-item>
                 <ion-item ng-if="os">
 
-                    <button class="button button-assertive button-block" ng-click="sync()">SYNC</button>
+                    <button class="button button-assertive button-block" ng-click="sync()" ng-disabled="syncclicked">SYNC</button>
                 </ion-item>
 
             </ion-list>
