@@ -609,7 +609,7 @@ var mydatabase = angular.module('mydatabase', [])
                 scope.ordersdata = [];
                 console.log(date);
                 console.log(user);
-                var sqls = 'SELECT * FROM `ORDERS` WHERE `salesid`=' + user.id + ' AND date(`timestamp`)= "' + date + '"';
+                var sqls = 'SELECT * FROM `ORDERS` WHERE date(`timestamp`)= "' + date + '"';
                 console.log(sqls);
                 db.transaction(function (tx) {
                     tx.executeSql(sqls, [], function (tx, results) {
