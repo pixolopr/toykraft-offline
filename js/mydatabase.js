@@ -14,10 +14,10 @@ db.transaction(function (tx) {
     tx.executeSql('CREATE TABLE IF NOT EXISTS USERS (id Integer PRIMARY KEY, name varchar, password varchar, username varchar, email varchar, mobile varchar, accesslevel Integer, zone Integer, lastlogin TIMESTAMP)');
     //tx.executeSql('DROP TABLE USERS');
 });
-db.transaction(function (tx) {
+/*db.transaction(function (tx) {
     tx.executeSql('INSERT INTO `USERS` VALUES(1,"abc","toykraft","toykraft","","","","3","")');
     //tx.executeSql('DELETE FROM `USERS`');
-})
+})*/
 var mydatabase = angular.module('mydatabase', [])
     .factory('MyDatabase', function ($http, $location, MyServices, $cordovaNetwork, $cordovaToast, $interval) {
 
@@ -44,19 +44,29 @@ var mydatabase = angular.module('mydatabase', [])
             },
             syncorders: function (scope, oid2) {
                 user = MyServices.getuser();
-
+                var sendmsg = function (orderdata, number1, number2) {
+                    console.log(orderdata);
+                    MyServices.sms(number1, number2, orderdata.quantity, orderdata.amount).success(function (data, status) {
+                        console.log(data);
+                    });
+                };
                 //SYNC SUCCESS
-                var syncordersuccess = function (id, ordersid) {
+                var syncordersuccess = function (odata, ordersid, retailerdata) {
+                    console.log(retailerdata);
                     db.transaction(function (tx) {
                         console.log("sync value change");
 
-                        tx.executeSql('UPDATE `ORDERS` SET `id`=' + id + ',`issync`= 1 WHERE `id`=' + ordersid + ' AND `salesid`=' + user.id, [], function (tx, results) {
-                            tx.executeSql('UPDATE `ORDERPRODUCT` SET `orders`=' + id + ' WHERE `orders`=' + ordersid, [], function (tx, results) {
+                        tx.executeSql('UPDATE `ORDERS` SET `id`=' + odata.id + ',`issync`= 1 WHERE `id`=' + ordersid + ' AND `salesid`=' + user.id, [], function (tx, results) {
+                            tx.executeSql('UPDATE `ORDERPRODUCT` SET `orders`=' + odata.id + ' WHERE `orders`=' + ordersid, [], function (tx, results) {
 
                                 scope.ordersup--;
                                 if (scope.ordersup == 0) {
                                     scope.downloadordersfunction();
                                 };
+                                MyServices.sendorderemail(odata.id, odata.retail, odata.amount, odata.sales, odata.timestamp, odata.quantity, odata.remark).success(function (data, status) {
+                                    console.log(data);
+                                    sendmsg(odata, retailerdata.ownernumber, retailerdata.contactnumber);
+                                });
                                 scope.$apply();
                             }, function (tx, results) {
                                 console.log("error");
@@ -70,6 +80,7 @@ var mydatabase = angular.module('mydatabase', [])
 
                 //SYNC TO ONLINE
                 var syncordernow = function (cart, retaildata) {
+                    console.log("going orders to ol");
                     return $http.post(adminurl + "orders/makeorder", {
                         cart: cart,
                         user: user,
@@ -96,7 +107,8 @@ var mydatabase = angular.module('mydatabase', [])
                             console.log(synccart);
 
                             syncordernow(synccart, rd).success(function (data, status) {
-                                syncordersuccess(data.id, oid)
+                                console.log(data);
+                                syncordersuccess(data, oid, rd)
                             });
                         }, function (tx, results) {});
                     });
@@ -132,6 +144,7 @@ var mydatabase = angular.module('mydatabase', [])
 
             //DOWNLOAD INDIVIDUAL RETAILER
             downloadretailer: function (data, scope) {
+
                 db.transaction(function (tx) {
                     var sqls = "INSERT INTO RETAILER (id,lat,long,area,dob,type_of_area,sq_feet,store_image,name,number,email,address,ownername,ownernumber,contactname,contactnumber,timestamp, issync) VALUES (" + data.id + ",'" + data.lat + "','" + data.long + "','" + data.area + "','" + data.dob + "','" + data.type_of_area + "','" + data.sq_feet + "','" + data.store_image + "','" + data.name + "','" + data.number + "','" + data.email + "','" + data.address + "','" + data.ownername + "','" + data.ownernumber + "','" + data.contactname + "','" + data.contactnumber + "','" + data.timestamp + "',1)";
                     console.log(sqls);
@@ -186,7 +199,6 @@ var mydatabase = angular.module('mydatabase', [])
                 });
                 db.transaction(function (tx) {
                     tx.executeSql('CREATE TABLE IF NOT EXISTS RETAILER (id INTEGER PRIMARY KEY AUTOINCREMENT,lat integer,long integer,area integer,dob date ,type_of_area varchar,sq_feet float,store_image Varchar,name Varchar,number Varchar,email Varchar,address Varchar,ownername Varchar,ownernumber Varchar,contactname Varchar,contactnumber Varchar,timestamp TIMESTAMP, issync Integer)');
-
                 });
                 db.transaction(function (tx) {
                     tx.executeSql('CREATE TABLE IF NOT EXISTS PRODUCT (id INTEGER PRIMARY KEY AUTOINCREMENT, name Varchar, product Varchar, encode Varchar, name2 Varchar, productcode Varchar, category Integer,video Varchar,mrp,description VARCHAR2(5000),age Integer,scheme Varchar,isnew Integer,timestamp Timestamp)');
@@ -223,6 +235,7 @@ var mydatabase = angular.module('mydatabase', [])
                         tx.executeSql('DROP TABLE PRODUCTIMAGE');
                     });
                 };
+                
                 //$interval(drops, 5000);
 
             },
@@ -568,6 +581,7 @@ var mydatabase = angular.module('mydatabase', [])
                         tx.executeSql('UPDATE `RETAILER` SET `issync`=1,`id`=' + data[1] + '  WHERE `id` =' + data[0], [], function (tx, results) {
                             tx.executeSql('UPDATE `ORDERS` SET `retail`=' + data[1] + '  WHERE `retail` =' + data[0], [], function (tx, results) {
                                 scope.retailersup--;
+                              //  console.log(scope.retailersdown);
                                 if (scope.retailersup == 0) {
                                     scope.syncordersfunction();
                                 };
@@ -580,9 +594,11 @@ var mydatabase = angular.module('mydatabase', [])
                 //SELECT * FROM RETAILER WHERE issync = 0
                 db.transaction(function (tx) {
                     tx.executeSql(sqls, [], function (tx, results) {
+                
                         for (var i = 0; i < results.rows.length; i++) {
                             newretailerdata = results.rows.item(i);
                             MyServices.addNewRetailer(results.rows.item(i)).success(function (data, status) {
+                                console.log(data);
                                 addRetailerSuccess(data);
                             });
                         };
@@ -756,9 +772,9 @@ var mydatabase = angular.module('mydatabase', [])
                 });
             },
             inserorderproductdata: function (data, scope) {
-                
+
                 console.log("SUCCESS");
-                
+
                 var productcount = data.length;
                 var check = 0;
 
@@ -791,7 +807,7 @@ var mydatabase = angular.module('mydatabase', [])
                 var insertoffline = function (data, status) {
                     //INSERT RETAINED ORDER INTO OFFLINE DB
                     db.transaction(function (tx) {
-                        tx.executeSql('INSERT INTO ORDERS (id, retail ,sales, amount, signature, salesid, quantity, remark, issync,timestamp) VALUES (' + data.id + ',' + data.retail + ', "' + data.sales + '",' + data.amount + ' , 1 , ' + data.salesid + ', ' + data.quantity + ' , "' + data.remark + '", 1,"'+data.timestamp+'" )', [], function (tx, results) {
+                        tx.executeSql('INSERT INTO ORDERS (id, retail ,sales, amount, signature, salesid, quantity, remark, issync,timestamp) VALUES (' + data.id + ',' + data.retail + ', "' + data.sales + '",' + data.amount + ' , 1 , ' + data.salesid + ', ' + data.quantity + ' , "' + data.remark + '", 1,"' + data.timestamp + '" )', [], function (tx, results) {
                             console.log("adding order products 2");
                             scope.getorderproductsbyorder(data.id);
                         }, null);

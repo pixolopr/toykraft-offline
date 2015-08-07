@@ -273,6 +273,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
             //INSERT RETAINED ONLINE RETAILER (3)
             var retailerinfofound = function (data, status) {
+                console.log($scope.retailersdownids);
                 MyDatabase.downloadretailer(data, $scope);
             };
 
@@ -307,9 +308,9 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         $scope.syncclicked = false;
 
         $scope.sync = function () {
-            $cordovaToast.show('This might take several minutes, please hold on...', 'long', 'bottom');
+            //  $cordovaToast.show('This might take several minutes, please hold on...', 'long', 'bottom');
             $scope.syncclicked = true;
-            
+
             if ($scope.retailersup > 0) {
                 //DO RETaileR SYNC AND ON SUCCESS CALL FUNCTION OF ORDER/RETAILER DOWNLOAD
                 MyDatabase.sendnewretailer('SELECT * FROM RETAILER WHERE `issync` = 0', $scope);
@@ -402,10 +403,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         /*
         ARRAY FOR RETAILERS
         
-        
-        
-        
-        
+    
         
         for (var i = 0; i < results.rows.length; i++) {
     offlineretailerids.push(results.rows.item(i).id);
@@ -438,7 +436,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         //FUNCTION TO CHECK WHAT SUCCESS IS LAST
         $scope.importtable = function (whichsuccess) {
             console.log(whichsuccess);
-            $cordovaToast.show(whichsuccess+' Data Imported', 'long', 'bottom');
+            // $cordovaToast.show(whichsuccess+' Data Imported', 'long', 'bottom');
             $scope.importtablecount = $scope.importtablecount + 1;
             if ($scope.importtablecount == 7) {
                 $scope.it = false;
@@ -1698,6 +1696,17 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
     $scope.resendemail = function (orderid) {
         $scope.orderID = orderid;
         MyServices.getorderdetail(orderid).success(orderdetails);
+        /*db.transaction(function (tx) {
+            tx.executeSql('SELECT * FROM ORDERS WHERE id=' + orderid, [], function (tx, results) {
+                    console.log(results.rows.length);
+                orderdetails(results.rows.item(0));
+                },
+
+                function (tx, results) {
+                    console.log('error');
+            }
+                );
+        });*/
     };
 
     $scope.recart = [];
