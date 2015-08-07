@@ -308,7 +308,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         $scope.syncclicked = false;
 
         $scope.sync = function () {
-            //  $cordovaToast.show('This might take several minutes, please hold on...', 'long', 'bottom');
+              $cordovaToast.show('This might take several minutes, please hold on...', 'long', 'bottom');
             $scope.syncclicked = true;
 
             if ($scope.retailersup > 0) {
@@ -436,7 +436,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         //FUNCTION TO CHECK WHAT SUCCESS IS LAST
         $scope.importtable = function (whichsuccess) {
             console.log(whichsuccess);
-            // $cordovaToast.show(whichsuccess+' Data Imported', 'long', 'bottom');
+             $cordovaToast.show(whichsuccess+' Data Imported', 'long', 'bottom');
             $scope.importtablecount = $scope.importtablecount + 1;
             if ($scope.importtablecount == 7) {
                 $scope.it = false;
@@ -461,6 +461,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         };
         //RETAILER SUCCESS
         syncretailerdatasuccess = function (data, status) {
+            console.log(data.length);
             MyDatabase.insertretailerdata(data, $scope);
         };
         //PRODUCT SUCCESS
@@ -1356,7 +1357,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
     };
     var orderSuccess = function (data, status) {
         console.log("ordersuccess return data");
-        console.log(data);
+        console.log($scope.mycart.length);
         MyServices.sendorderemail(data.id, data.retail, data.amount, data.sales, data.timestamp, data.quantity, data.remark).success(emailsend);
         $scope.emailtotalquantity = 0;
         $scope.emailtotalvalue = 0;
@@ -1546,6 +1547,13 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
     var emailsend = function (data, status) {
         console.log(data);
+        console.log($scope.number1);
+        console.log($scope.number2);
+         if ($scope.mycart.length > 0) {
+            MyServices.sms($scope.number1, $scope.number2, $scope.emailtotalquantity, $scope.emailtotalvalue).success(function(data,status){console.log(data);});
+            
+        };
+
     };
 
 
@@ -1665,6 +1673,8 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         $scope.retailerdata = data.retailer;
         $scope.distributoremail = data.retailer.distributor;
         $scope.retaileremail = data.retailer.email;
+        $scope.number1=data.retailer.ownernumber;
+        $scope.number2=data.retailer.contactnumber;
 
         $scope.mycart = data.orderproduct;
         $scope.user = data.sales;

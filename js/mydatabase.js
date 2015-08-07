@@ -45,10 +45,13 @@ var mydatabase = angular.module('mydatabase', [])
             syncorders: function (scope, oid2) {
                 user = MyServices.getuser();
                 var sendmsg = function (orderdata, number1, number2) {
-                    console.log(orderdata);
+                    console.log(orderdata.quantity);
+                    if(orderdata.quantity>0){
                     MyServices.sms(number1, number2, orderdata.quantity, orderdata.amount).success(function (data, status) {
                         console.log(data);
+                    
                     });
+                    };
                 };
                 //SYNC SUCCESS
                 var syncordersuccess = function (odata, ordersid, retailerdata) {
@@ -199,6 +202,7 @@ var mydatabase = angular.module('mydatabase', [])
                 });
                 db.transaction(function (tx) {
                     tx.executeSql('CREATE TABLE IF NOT EXISTS RETAILER (id INTEGER PRIMARY KEY AUTOINCREMENT,lat integer,long integer,area integer,dob date ,type_of_area varchar,sq_feet float,store_image Varchar,name Varchar,number Varchar,email Varchar,address Varchar,ownername Varchar,ownernumber Varchar,contactname Varchar,contactnumber Varchar,timestamp TIMESTAMP, issync Integer)');
+                  //  tx.executeSql('drop table retailer');
                 });
                 db.transaction(function (tx) {
                     tx.executeSql('CREATE TABLE IF NOT EXISTS PRODUCT (id INTEGER PRIMARY KEY AUTOINCREMENT, name Varchar, product Varchar, encode Varchar, name2 Varchar, productcode Varchar, category Integer,video Varchar,mrp,description VARCHAR2(5000),age Integer,scheme Varchar,isnew Integer,timestamp Timestamp)');
@@ -597,6 +601,7 @@ var mydatabase = angular.module('mydatabase', [])
                 
                         for (var i = 0; i < results.rows.length; i++) {
                             newretailerdata = results.rows.item(i);
+                            console.log(results.rows.item(i).issync);
                             MyServices.addNewRetailer(results.rows.item(i)).success(function (data, status) {
                                 console.log(data);
                                 addRetailerSuccess(data);
