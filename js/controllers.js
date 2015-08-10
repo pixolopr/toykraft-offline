@@ -67,9 +67,10 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
     console.log("Menu Ctrl");
 
-    if ($.jStorage.get("categories")) {
-        $scope.categorynamedata = $.jStorage.get("categories");
-    };
+
+    $scope.categorynamedata = $.jStorage.get("categories");
+    $scope.$apply();
+
 
     $scope.getorsersynccount = function () {
         MyDatabase.setordersynccount();
@@ -308,7 +309,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         $scope.syncclicked = false;
 
         $scope.sync = function () {
-              //$cordovaToast.show('This might take several minutes, please hold on...', 'long', 'bottom');
+            //$cordovaToast.show('This might take several minutes, please hold on...', 'long', 'bottom');
             $scope.syncclicked = true;
 
             if ($scope.retailersup > 0) {
@@ -436,7 +437,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         //FUNCTION TO CHECK WHAT SUCCESS IS LAST
         $scope.importtable = function (whichsuccess) {
             console.log(whichsuccess);
-             $cordovaToast.show(whichsuccess+' Data Imported', 'long', 'bottom');
+            $cordovaToast.show(whichsuccess + ' Data Imported', 'long', 'bottom');
             $scope.importtablecount = $scope.importtablecount + 1;
             if ($scope.importtablecount == 7) {
                 $scope.it = false;
@@ -975,17 +976,17 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         console.log("CATEGORY PRODUCTSss");
         console.log(data);
         $scope.categoryproductdata = data;
-        
+
         db.transaction(function (tx) {
-            tx.executeSql("SELECT * FROM `PRODUCTIMAGE` WHERE `product` = "+data.id, [], function (tx, results) {
-                $scope.categoryproductdata.images = [];
+            tx.executeSql("SELECT * FROM `PRODUCTIMAGE` WHERE `product` = " + data.id, [], function (tx, results) {
+                    $scope.categoryproductdata.images = [];
                     //PUT ELEMENTS IN TEMPRORY ARRAY
                     for (var i = 0; i < results.rows.length; i++) {
                         console.log(results.rows.item(i));
                         $scope.categoryproductdata.images.push(results.rows.item(i));
                     };
-                $scope.$apply();
-                console.log($scope.categoryproductdata.images);
+                    $scope.$apply();
+                    console.log($scope.categoryproductdata.images);
                 },
                 function (tx, results) {});
         });
@@ -1566,9 +1567,11 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         console.log(data);
         console.log($scope.number1);
         console.log($scope.number2);
-         if ($scope.mycart.length > 0) {
-            MyServices.sms($scope.number1, $scope.number2, $scope.emailtotalquantity, $scope.emailtotalvalue).success(function(data,status){console.log(data);});
-            
+        if ($scope.mycart.length > 0) {
+            MyServices.sms($scope.number1, $scope.number2, $scope.emailtotalquantity, $scope.emailtotalvalue).success(function (data, status) {
+                console.log(data);
+            });
+
         };
 
     };
@@ -1690,8 +1693,8 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         $scope.retailerdata = data.retailer;
         $scope.distributoremail = data.retailer.distributor;
         $scope.retaileremail = data.retailer.email;
-        $scope.number1=data.retailer.ownernumber;
-        $scope.number2=data.retailer.contactnumber;
+        $scope.number1 = data.retailer.ownernumber;
+        $scope.number2 = data.retailer.contactnumber;
 
         $scope.mycart = data.orderproduct;
         $scope.user = data.sales;
