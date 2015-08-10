@@ -38,6 +38,15 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
     $scope.categorynamedata = $.jStorage.get("categories");
     $scope.$apply();
     
+    var synccategorydatasuccess = function(data, status)
+    {
+        $scope.categorynamedata = data;
+        $.jStorage.set("categories", data);
+        $scope.$apply();
+    };
+    //CATEGORIES
+    MyDatabase.getcategoriesname().success(synccategorydatasuccess);
+    
 
 
 
@@ -69,7 +78,17 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
 
     $scope.categorynamedata = $.jStorage.get("categories");
+    console.log($scope.categorynamedata);
     $scope.$apply();
+    
+    var synccategorydatasuccess = function(data, status)
+    {
+        $scope.categorynamedata = data;
+        $.jStorage.set("categories", data);
+        $scope.$apply();
+    };
+    //CATEGORIES
+    MyDatabase.getcategoriesname().success(synccategorydatasuccess);
 
 
     $scope.getorsersynccount = function () {
