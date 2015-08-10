@@ -35,9 +35,9 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
     };
 
     //GET CATEGORY NAMES
-    if ($.jStorage.get("categories")) {
-        $scope.categorynamedata = $.jStorage.get("categories");
-    };
+    $scope.categorynamedata = $.jStorage.get("categories");
+    $scope.$apply();
+    
 
 
 
