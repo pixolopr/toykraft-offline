@@ -15,7 +15,7 @@
         </header>
         <ion-content class="has-header" ng-controller="menuCtrl">
             <ion-list class="menu-item" ng-show="setslide();">
-                <div nav-clear menu-close href="#" ng-repeat="category in categorynamedata">
+                <div nav-clear menu-close href="#" ng-repeat="category in $.jStorage.get('categories')">
                     <h4 style="padding:10px;color:white;background:#b22222;">{{category.name}}</h4>
 
 

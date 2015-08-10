@@ -308,7 +308,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         $scope.syncclicked = false;
 
         $scope.sync = function () {
-              $cordovaToast.show('This might take several minutes, please hold on...', 'long', 'bottom');
+              //$cordovaToast.show('This might take several minutes, please hold on...', 'long', 'bottom');
             $scope.syncclicked = true;
 
             if ($scope.retailersup > 0) {
