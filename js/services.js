@@ -165,7 +165,24 @@ var myservices = angular.module('myservices', [])
         addNewRetailer: function (object1) {
             console.log(object1);
             return $http.get(adminurl + "retailer/create", {
-                params: object1
+                params: {
+                    id: object1.id,
+                    lat: object1.lat,
+                    long: object1.long,
+                    area: object1.area,
+                    dob: object1.dob,
+                    type_of_area: object1.type_of_area,
+                    sq_feet: object1.sq_feet,
+                    name: object1.name,
+                    number: object1.number,
+                    email: object1.email,
+                    address: object1.address,
+                    ownername: object1.ownername,
+                    ownernumber: object1.ownernumber,
+                    contactname: object1.contactname,
+                    contactnumber: object1.contactnumber,
+                    store_image: object1.store_image
+                }
             });
         },
         getCart: function () {

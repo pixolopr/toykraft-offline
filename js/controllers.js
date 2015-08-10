@@ -268,6 +268,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
                 $scope.downloadordersfunction();
             };
         };
+    
         //DOWNLOADING RETAILERS
         var offlineretailerids = [];
         $scope.syncretailersdownfunction = function () {
