@@ -982,6 +982,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
                         console.log(results.rows.item(i));
                         $scope.categoryproductdata.images.push(results.rows.item(i));
                     };
+                $scope.$apply();
                 console.log($scope.categoryproductdata.images);
                 },
                 function (tx, results) {});
