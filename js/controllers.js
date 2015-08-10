@@ -970,8 +970,22 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
     //GIVING VALUES IN VARIABLE - OFFLINE
     var oncategoryproductofflinesuccess = function (data) {
         $ionicLoading.hide();
+        console.log("CATEGORY PRODUCTSss");
         console.log(data);
         $scope.categoryproductdata = data;
+        
+        db.transaction(function (tx) {
+            tx.executeSql("SELECT * FROM `PRODUCTIMAGE` WHERE `product` = "+data.id, [], function (tx, results) {
+                $scope.categoryproductdata.images = [];
+                    //PUT ELEMENTS IN TEMPRORY ARRAY
+                    for (var i = 0; i < results.rows.length; i++) {
+                        console.log(results.rows.item(i));
+                        $scope.categoryproductdata.images.push(results.rows.item(i));
+                    };
+                console.log($scope.categoryproductdata.images);
+                },
+                function (tx, results) {});
+        });
         /*if ($scope.categoryproductdata.scheme2) {
             if ($scope.categoryproductdata.scheme2.name) {
                 $scope.categoryname = "Scheme : " + $scope.categoryproductdata.scheme2.name + " (" + $scope.categoryproductdata.scheme2.discount_percent + "%)";
