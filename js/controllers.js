@@ -1237,11 +1237,12 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
     };
     $scope.editRetailerFunction = function () {
         console.log($scope.editretailer.number);
-        if (offline) {
-            MyDatabase.editaretailer($scope.editretailer, $scope.retailerdata2.name);
-        } else {
-            MyServices.editretailerdetails($scope.editretailer).success(editretailersuccess);
-        };
+        //if (offline) {
+            MyDatabase.editaretailer($scope.editretailer, $scope.retailerdata2.name, $scope);
+        
+        //} else {
+        //    MyServices.editretailerdetails($scope.editretailer).success(editretailersuccess);
+        //};
 
         $scope.oModal2.hide();
     };

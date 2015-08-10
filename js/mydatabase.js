@@ -539,11 +539,14 @@ var mydatabase = angular.module('mydatabase', [])
                 });
             },
 
-            editaretailer: function (data, name) {
+            editaretailer: function (data, name, scope) {
                 db.transaction(function (tx) {
-                    var sqls = 'UPDATE RETAILER SET email = "' + data.email + '", ownername = "' + data.ownername + '", ownernumber = "' + data.ownernumber + '", contactname = "' + data.contactname + '", contactnumber = "' + data.contactnumber + '", sync = "false" WHERE id = ' + data.id + ' AND name ="' + name + '"';
+                    var sqls = 'UPDATE RETAILER SET email = "' + data.email + '", ownername = "' + data.ownername + '", ownernumber = "' + data.ownernumber + '", contactname = "' + data.contactname + '", contactnumber = "' + data.contactnumber + '", issync = 0 WHERE id = ' + data.id + ' AND name ="' + name + '"';
                     tx.executeSql(sqls, [], function (tx, results) {
                         console.log("RAOW UPDATED");
+                        
+                        scope.oModal2.hide();
+                        
                     }, function (tx, results) {
                         console.log("RAOW NOT INSERTED");
                     });
