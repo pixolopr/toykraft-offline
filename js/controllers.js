@@ -471,8 +471,10 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         //CATEGORY SUCCESS
         synccategorydatasuccess = function (data, status) {
             //INSERTING DATA IN JSTORAGE
+            console.log(data);
             $.jStorage.set("categories", data);
             $scope.categorynamedata = $.jStorage.get("categories");
+            console.log($scope.categorynamedata);
             $scope.importtable("Category Names");
         };
         //PRODUCT IMAGE SUCCESS
