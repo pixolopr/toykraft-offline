@@ -46,11 +46,11 @@ var mydatabase = angular.module('mydatabase', [])
                 user = MyServices.getuser();
                 var sendmsg = function (orderdata, number1, number2) {
                     console.log(orderdata.quantity);
-                    if(orderdata.quantity>0){
-                    MyServices.sms(number1, number2, orderdata.quantity, orderdata.amount).success(function (data, status) {
-                        console.log(data);
-                    
-                    });
+                    if (orderdata.quantity > 0) {
+                        MyServices.sms(number1, number2, orderdata.quantity, orderdata.amount).success(function (data, status) {
+                            console.log(data);
+
+                        });
                     };
                 };
                 //SYNC SUCCESS
@@ -202,7 +202,7 @@ var mydatabase = angular.module('mydatabase', [])
                 });
                 db.transaction(function (tx) {
                     tx.executeSql('CREATE TABLE IF NOT EXISTS RETAILER (id INTEGER PRIMARY KEY AUTOINCREMENT,lat integer,long integer,area integer,dob date ,type_of_area varchar,sq_feet float,store_image Varchar,name Varchar,number Varchar,email Varchar,address Varchar,ownername Varchar,ownernumber Varchar,contactname Varchar,contactnumber Varchar,timestamp TIMESTAMP, issync Integer)');
-                  //  tx.executeSql('drop table retailer');
+                    //  tx.executeSql('drop table retailer');
                 });
                 db.transaction(function (tx) {
                     tx.executeSql('CREATE TABLE IF NOT EXISTS PRODUCT (id INTEGER PRIMARY KEY AUTOINCREMENT, name Varchar, product Varchar, encode Varchar, name2 Varchar, productcode Varchar, category Integer,video Varchar,mrp,description VARCHAR2(5000),age Integer,scheme Varchar,isnew Integer,timestamp Timestamp)');
@@ -239,7 +239,7 @@ var mydatabase = angular.module('mydatabase', [])
                         tx.executeSql('DROP TABLE PRODUCTIMAGE');
                     });
                 };
-                
+
                 //$interval(drops, 5000);
 
             },
@@ -378,6 +378,68 @@ var mydatabase = angular.module('mydatabase', [])
 
             },
 
+            //DOWNLOAD ORDERS FULL
+            insertintoorders: function (data, scope) {
+                console.log(data);
+                console.log(data[0].orders[0].orderproducts);
+
+                var insertproductsdb = function (productdata) {
+                    db.transaction(function (tx) {
+                        tx.executeSql("INSERT INTO `orderproduct` (orders, product, quantity, name, amount, scheme_id, status, category, productcode) VALUES (" + productdata.order + ", '" + productdata.product + "', '" + productdata.quantity + "', '" + productdata.name + "', '" + productdata.amount + "', '" + productdata.scheme_id + "', '" + productdata.status + "', '" + productdata.category + "', '" + productdata.productcode + "')", [], function (tx, results) {
+                            console.log("product daala re");
+                        }, function (tx, results) {
+                            console.log("TOP TEN NOT INSERTED");
+                        });
+                    });
+                };
+
+                var insertproducts = function (odata) {
+                    for (var k = 0; k < odata.length; k++) {
+                        insertproductsdb(odata[k]);
+                    };
+                    scope.ordersdown--;
+                };
+
+                var escapefuntion = function (e, r) {
+
+                    console.log("put order number " + data[e].orders[r] + "" + e);
+                    if (data[e].orders[r].quantity > 0) {
+                        console.log(data[e].orders[r].orderproducts);
+                        insertproducts(data[e].orders[r].orderproducts);
+                    } else {
+                        scope.ordersdown--;
+                    };
+                };
+
+                var databasefunction = function (iop, jk) {
+                    db.transaction(function (tx) {
+                        tx.executeSql("INSERT INTO `orders` (`id`, `retail`, `sales`, `timestamp`, `amount`, `signature`, `salesid`, `quantity`, `remark`, `issync`) VALUES (" + data[iop].orders[jk].id + ", '" + data[iop].orders[jk].retail + "', '" + data[iop].orders[jk].sales + "', '" + data[iop].orders[jk].timestamp + "', '" + data[iop].orders[jk].amount + "', '" + data[iop].orders[jk].signature + "', " + data[iop].orders[jk].salesid + ", " + data[iop].orders[jk].quantity + ", '" + data[iop].orders[jk].remark + "', 1) ", [],
+                            function (tx, results) {
+                                escapefuntion(iop, jk);
+
+                            },
+                            function (tx, results) {
+                                console.log("TOP TEN NOT INSERTED");
+                            })
+                    });
+                };
+
+
+                console.log("insert data");
+                for (var io = 0; io < data.length; io++) {
+                    console.log("first for loop");
+                    if (data[io].orders.length > 0) {
+                        for (var j = 0; j < data[io].orders.length; j++) {
+                            console.log("second for loop");
+                            console.log(j + " " + io);
+                            console.log(data[io].orders[j].quantity);
+                            databasefunction(io, j);
+
+                        };
+                    };
+                };
+
+            },
 
             findproductbycategory: function (id) {
                 $http.get(adminurl + "", {
@@ -544,9 +606,9 @@ var mydatabase = angular.module('mydatabase', [])
                     var sqls = 'UPDATE RETAILER SET email = "' + data.email + '", ownername = "' + data.ownername + '", ownernumber = "' + data.ownernumber + '", contactname = "' + data.contactname + '", contactnumber = "' + data.contactnumber + '", issync = 0 WHERE id = ' + data.id + ' AND name ="' + name + '"';
                     tx.executeSql(sqls, [], function (tx, results) {
                         console.log("RAOW UPDATED");
-                        
+
                         scope.oModal2.hide();
-                        
+
                     }, function (tx, results) {
                         console.log("RAOW NOT INSERTED");
                     });
@@ -588,7 +650,7 @@ var mydatabase = angular.module('mydatabase', [])
                         tx.executeSql('UPDATE `RETAILER` SET `issync`=1,`id`=' + data[1] + '  WHERE `id` =' + data[0], [], function (tx, results) {
                             tx.executeSql('UPDATE `ORDERS` SET `retail`=' + data[1] + '  WHERE `retail` =' + data[0], [], function (tx, results) {
                                 scope.retailersup--;
-                              //  console.log(scope.retailersdown);
+                                //  console.log(scope.retailersdown);
                                 if (scope.retailersup == 0) {
                                     scope.syncordersfunction();
                                 };
@@ -601,7 +663,7 @@ var mydatabase = angular.module('mydatabase', [])
                 //SELECT * FROM RETAILER WHERE issync = 0
                 db.transaction(function (tx) {
                     tx.executeSql(sqls, [], function (tx, results) {
-                
+
                         for (var i = 0; i < results.rows.length; i++) {
                             newretailerdata = results.rows.item(i);
                             console.log(results.rows.item(i).issync);

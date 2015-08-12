@@ -428,6 +428,15 @@ var myservices = angular.module('myservices', [])
             });
             console.log(oid);
         },
+        getuserzoneorders: function () {
+            return $http.get("http://localhost/NetworkBackend/rest/index.php/orders/getzoneordersandproducts", {
+                params: {
+                    zone: 4
+                }
+            });
+        },
+
+
 
 
 

@@ -37,16 +37,15 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
     //GET CATEGORY NAMES
     $scope.categorynamedata = $.jStorage.get("categories");
     $scope.$apply();
-    
-    var synccategorydatasuccess = function(data, status)
-    {
+
+    var synccategorydatasuccess = function (data, status) {
         $scope.categorynamedata = data;
         $.jStorage.set("categories", data);
         $scope.$apply();
     };
     //CATEGORIES
     MyDatabase.getcategoriesname().success(synccategorydatasuccess);
-    
+
 
 
 
@@ -80,9 +79,8 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
     $scope.categorynamedata = $.jStorage.get("categories");
     console.log($scope.categorynamedata);
     $scope.$apply();
-    
-    var synccategorydatasuccess = function(data, status)
-    {
+
+    var synccategorydatasuccess = function (data, status) {
         $scope.categorynamedata = data;
         $.jStorage.set("categories", data);
         $scope.$apply();
@@ -287,7 +285,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
                 $scope.downloadordersfunction();
             };
         };
-    
+
         //DOWNLOADING RETAILERS
         var offlineretailerids = [];
         $scope.syncretailersdownfunction = function () {
@@ -457,7 +455,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         //FUNCTION TO CHECK WHAT SUCCESS IS LAST
         $scope.importtable = function (whichsuccess) {
             console.log(whichsuccess);
-            $cordovaToast.show(whichsuccess + ' Data Imported', 'long', 'bottom');
+            //$cordovaToast.show(whichsuccess + ' Data Imported', 'long', 'bottom');
             $scope.importtablecount = $scope.importtablecount + 1;
             if ($scope.importtablecount == 7) {
                 $scope.it = false;
@@ -501,6 +499,11 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         //PRODUCT IMAGE SUCCESS
         syncproductimagedatasuccess = function (data, status) {
             MyDatabase.insertproductimagedata(data, $scope);
+        };
+
+        //ORDERS
+        syncordersuccess = function (data, status) {
+            MyDatabase.insertintoorders(data, $scope);
         };
 
 
@@ -553,6 +556,13 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
             MyDatabase.syncinproductimagedata().success(syncproductimagedatasuccess);
 
 
+            MyServices.getuserzoneorders().success(syncordersuccess);
+
+
+        };
+
+        $scope.ordersget = function () {
+            MyServices.getuserzoneorders().success(syncordersuccess);
         };
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1238,8 +1248,8 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
     $scope.editRetailerFunction = function () {
         console.log($scope.editretailer.number);
         //if (offline) {
-            MyDatabase.editaretailer($scope.editretailer, $scope.retailerdata2.name, $scope);
-        
+        MyDatabase.editaretailer($scope.editretailer, $scope.retailerdata2.name, $scope);
+
         //} else {
         //    MyServices.editretailerdetails($scope.editretailer).success(editretailersuccess);
         //};
