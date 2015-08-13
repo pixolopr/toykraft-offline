@@ -383,21 +383,23 @@ var mydatabase = angular.module('mydatabase', [])
                 console.log(data);
                 console.log(data[0].orders[0].orderproducts);
 
-                var insertproductsdb = function (productdata) {
+                var insertproductsdb = function (productdata, pn, on) {
                     db.transaction(function (tx) {
                         tx.executeSql("INSERT INTO `orderproduct` (orders, product, quantity, name, amount, scheme_id, status, category, productcode) VALUES (" + productdata.order + ", '" + productdata.product + "', '" + productdata.quantity + "', '" + productdata.name + "', '" + productdata.amount + "', '" + productdata.scheme_id + "', '" + productdata.status + "', '" + productdata.category + "', '" + productdata.productcode + "')", [], function (tx, results) {
-                            console.log("product daala re");
+                            $cordovaToast.show("Order Number:"+on+"Product Number:" + pn, 'long', 'bottom');
+                            console.log("Order Number:"+on+"Product Number:" + pn);
                         }, function (tx, results) {
                             console.log("TOP TEN NOT INSERTED");
                         });
                     });
                 };
 
-                var insertproducts = function (odata) {
+                var insertproducts = function (odata, on) {
                     for (var k = 0; k < odata.length; k++) {
-                        insertproductsdb(odata[k]);
+                        insertproductsdb(odata[k], k+1, on);
                     };
                     scope.ordersdown--;
+                    scope.$apply();
                 };
 
                 var escapefuntion = function (e, r) {
@@ -405,9 +407,10 @@ var mydatabase = angular.module('mydatabase', [])
                     console.log("put order number " + data[e].orders[r] + "" + e);
                     if (data[e].orders[r].quantity > 0) {
                         console.log(data[e].orders[r].orderproducts);
-                        insertproducts(data[e].orders[r].orderproducts);
+                        insertproducts(data[e].orders[r].orderproducts, r);
                     } else {
                         scope.ordersdown--;
+                        scope.$apply();
                     };
                 };
 
@@ -431,6 +434,7 @@ var mydatabase = angular.module('mydatabase', [])
                     if (data[io].orders.length > 0) {
                         for (var j = 0; j < data[io].orders.length; j++) {
                             console.log("second for loop");
+                            $cordovaToast.show("Retained Order Number : "+j+" of "+io+" user", 'long', 'bottom');
                             console.log(j + " " + io);
                             console.log(data[io].orders[j].quantity);
                             databasefunction(io, j);

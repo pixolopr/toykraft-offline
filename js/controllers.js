@@ -562,7 +562,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         };
 
         $scope.ordersget = function () {
-            MyServices.getuserzoneorders().success(syncordersuccess);
+            MyServices.getuserzoneorders($scope.user.zone).success(syncordersuccess);
         };
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
