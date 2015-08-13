@@ -556,7 +556,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
             MyDatabase.syncinproductimagedata().success(syncproductimagedatasuccess);
 
 
-            MyServices.getuserzoneorders().success(syncordersuccess);
+            MyServices.getuserzoneorders($scope.user.zone).success(syncordersuccess);
 
 
         };
