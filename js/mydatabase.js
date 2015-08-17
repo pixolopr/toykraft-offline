@@ -378,7 +378,7 @@ var mydatabase = angular.module('mydatabase', [])
 
             },
 
-            //DOWNLOAD ORDERS FULL
+            /*//DOWNLOAD ORDERS FULL
             insertintoorders: function (data, scope) {
                 console.log(data);
                 console.log(data[0].orders[0].orderproducts);
@@ -443,6 +443,125 @@ var mydatabase = angular.module('mydatabase', [])
                     };
                 };
 
+            },*/
+
+
+            insertintoorders: function (data, scope) {
+                console.log(data);
+                console.log(data[0].orders[0].orderproducts);
+
+                var insertproductsdb = function (productdata, on) {
+                    db.transaction(function (tx) {
+                        tx.executeSql("INSERT INTO `orderproduct` (orders, product, quantity, name, amount, scheme_id, status, category, productcode) VALUES " + productdata, [], function (tx, results) {
+                            //$cordovaToast.show("Order Number:"+on+"Products", 'long', 'bottom');
+                            console.log("Order Number: " + on + " Products");
+                        }, function (tx, results) {
+                            console.log("TOP TEN NOT INSERTED");
+                        });
+                    });
+                };
+
+                var insertproducts = function (odata, on) {
+                    var values = "";
+                    for (var k = 0; k < odata.length; k++) {
+                        //insertproductsdb(odata[k], k+1, on);
+                        values += "(" + odata[k].order + ", '" + odata[k].product + "', '" + odata[k].quantity + "', '" + odata[k].name + "', '" + odata[k].amount + "', '" + odata[k].scheme_id + "', '" + odata[k].status + "', '" + odata[k].category + "', '" + odata[k].productcode + "')";
+                        if (k != odata.length - 1) {
+                            values += ",";
+                        };
+                    };
+                    insertproductsdb(values, on);
+                    scope.ordersdown--;
+                    scope.$apply();
+                };
+
+                var escapefuntion = function (e, r) {
+
+                    console.log("put order number " + data[e].orders[r] + "" + e);
+                    if (data[e].orders[r].quantity > 0) {
+                        console.log(data[e].orders[r].orderproducts);
+                        insertproducts(data[e].orders[r].orderproducts, r);
+                    } else {
+                        scope.ordersdown--;
+                        scope.$apply();
+                    };
+                };
+
+                var databasefunction = function (iop, jk) {
+                    db.transaction(function (tx) {
+                        tx.executeSql("INSERT INTO `orders` (`id`, `retail`, `sales`, `timestamp`, `amount`, `signature`, `salesid`, `quantity`, `remark`, `issync`) VALUES (" + data[iop].orders[jk].id + ", '" + data[iop].orders[jk].retail + "', '" + data[iop].orders[jk].sales + "', '" + data[iop].orders[jk].timestamp + "', '" + data[iop].orders[jk].amount + "', '" + data[iop].orders[jk].signature + "', " + data[iop].orders[jk].salesid + ", " + data[iop].orders[jk].quantity + ", '" + data[iop].orders[jk].remark + "', 1) ", [],
+                            function (tx, results) {
+                                escapefuntion(iop, jk);
+
+                            },
+                            function (tx, results) {
+                                console.log("TOP TEN NOT INSERTED");
+                            })
+                    });
+                };
+
+
+                console.log("insert data");
+                for (var io = 0; io < data.length; io++) {
+                    console.log("first for loop");
+                    if (data[io].orders.length > 0) {
+                        for (var j = 0; j < data[io].orders.length; j++) {
+                            console.log("second for loop");
+                            //$cordovaToast.show("Retained Order Number : "+j+" of "+io+" user", 'long', 'bottom');
+                            console.log(j + " " + io);
+                            console.log(data[io].orders[j].quantity);
+                            databasefunction(io, j);
+
+                        };
+                    };
+                };
+
+            },
+
+            insertintoorderswhilesync: function (data, scope) {
+
+                var insertproductsdb = function (productdata) {
+                    db.transaction(function (tx) {
+                        tx.executeSql("INSERT INTO `orderproduct` (orders, product, quantity, name, amount, scheme_id, status, category, productcode) VALUES " + productdata, [], function (tx, results) {
+                            //$cordovaToast.show("Order Number: Products", 'long', 'bottom');
+                            console.log("Order Number:  Products");
+                        }, function (tx, results) {
+                            console.log("TOP TEN NOT INSERTED");
+                        });
+                    });
+                };
+
+                var insertproducts = function (productdata) {
+                    var values = "";
+                    for (var pd = 0; pd < productdata.length; pd++) {
+                        values += "(" + productdata[pd].order + ", '" + productdata[pd].product + "', '" + productdata[pd].quantity + "', '" + productdata[pd].name + "', '" + productdata[pd].amount + "', '" + productdata[pd].scheme_id + "', '" + productdata[pd].status + "', '" + productdata[pd].category + "', '" + productdata[pd].productcode + "')";
+                        if (pd != productdata.length - 1) {
+                            values += ",";
+                        };
+                    };
+                    insertproductsdb(values);
+
+                };
+
+                var insertorder = function (orderdata) {
+                    db.transaction(function (tx) {
+                        tx.executeSql("INSERT INTO `orders` (`id`, `retail`, `sales`, `timestamp`, `amount`, `signature`, `salesid`, `quantity`, `remark`, `issync`) VALUES (" + orderdata.id + ", '" + orderdata.retail + "', '" + orderdata.sales + "', '" + orderdata.timestamp + "', '" + orderdata.amount + "', '" + orderdata.signature + "', " + orderdata.salesid + ", " + orderdata.quantity + ", '" + orderdata.remark + "', 1) ", [],
+                            function (tx, results) {
+                                if (orderdata.quantity > 0) {
+                                    insertproducts(orderdata.orderproducts);
+                                };
+
+                            },
+                            function (tx, results) {
+                                console.log("TOP TEN NOT INSERTED");
+                            })
+                    });
+                };
+
+                for (var insy = 0; insy < data.length; insy++) {
+                    insertorder(data[insy]);
+
+                };
             },
 
             findproductbycategory: function (id) {

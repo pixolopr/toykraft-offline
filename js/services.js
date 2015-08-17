@@ -1,5 +1,5 @@
-//var adminurl = "http://localhost/NetworkBackend/rest/index.php/";
-var adminurl = "http://toy-kraft.com/NetworkBackend/rest/index.php/";
+var adminurl = "http://localhost/NetworkBackend/rest/index.php/";
+//var adminurl = "http://toy-kraft.com/NetworkBackend/rest/index.php/";
 var myservices = angular.module('myservices', [])
 
 
@@ -429,9 +429,17 @@ var myservices = angular.module('myservices', [])
             console.log(oid);
         },
         getuserzoneorders: function (zoneid) {
-            return $http.get(adminurl+"orders/getzoneordersandproducts", {
+            return $http.get(adminurl + "orders/getzoneordersandproducts", {
                 params: {
                     zone: 4
+                }
+            });
+        },
+        sendarray: function (ids, zone ) {
+            return $http.get("http://localhost/NetworkBackend/rest/index.php/orders/getunsyncedorders", {
+                params: {
+                    data: {ids: JSON.stringify(ids)},
+                    zone: zone
                 }
             });
         },

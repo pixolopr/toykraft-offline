@@ -103,6 +103,16 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         $scope.rt = false;
         $scope.os = false;
 
+    
+        var sendarraysuccess = function(data, status)
+        {
+            console.log(data);
+        };
+        $scope.sendarray = function()
+        {
+            MyServices.sendarray().success(sendarraysuccess);
+        };
+    
         $scope.user = $.jStorage.get("user");
 
         //POP-UP FUNCTION WHEN NO INTERNET/////////////////////////////////////////////////
@@ -245,7 +255,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
         $scope.downloadordersfunction = function () {
             console.log("download orders");
-            //GET ARRAY OF ORDERS DOWN
+            /*//GET ARRAY OF ORDERS DOWN
             var checkorders = function (data, status) {
                 console.log(data);
                 for (var i = 0; i < data.length; i++) {
@@ -255,6 +265,12 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
                     };
                 };
+            };*/
+            
+            var unsyncedorderssuccess = function(data, status)
+            {
+                console.log(data);
+                MyDatabase.insertintoorderswhilesync(data, $scope);
             };
 
             if ($scope.ordersdown > 0) {
@@ -265,8 +281,11 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
                             offlineorderids.push(results.rows.item(i).id);
                         };
                         console.log(offlineorderids);
-                        //GET ONLINE ORDERS ID's
-                        MyServices.getordersbyzone($scope.user.zone).success(checkorders);
+                        
+                        MyServices.sendarray(offlineorderids, $scope.user.zone).success(unsyncedorderssuccess);
+                        
+                        /*//GET ONLINE ORDERS ID's
+                        MyServices.getordersbyzone($scope.user.zone).success(checkorders);*/
                     }, function (tx, results) {
                         console.log("result not found");
                     });
