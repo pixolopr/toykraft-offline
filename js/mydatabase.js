@@ -453,7 +453,7 @@ var mydatabase = angular.module('mydatabase', [])
                 var insertproductsdb = function (productdata, on) {
                     db.transaction(function (tx) {
                         tx.executeSql("INSERT INTO `orderproduct` (orders, product, quantity, name, amount, scheme_id, status, category, productcode) VALUES " + productdata, [], function (tx, results) {
-                            $cordovaToast.show("Order Number:" + on + "Products", 'long', 'bottom');
+                            $cordovaToast.show("Order Number:" + on + " -Products", 'long', 'bottom');
                             console.log("Order Number: " + on + " Products");
                         }, function (tx, results) {
                             console.log("TOP TEN NOT INSERTED");
@@ -508,7 +508,7 @@ var mydatabase = angular.module('mydatabase', [])
                     if (data[io].orders.length > 0) {
                         for (var j = 0; j < data[io].orders.length; j++) {
                             console.log("second for loop");
-                            $cordovaToast.show("Retained Order Number : " + j + " of " + io + " user", 'long', 'bottom');
+                            //$cordovaToast.show("Retained Order Number : " + j + " of " + io + " user", 'long', 'bottom');
                             console.log(j + " " + io);
                             console.log(data[io].orders[j].quantity);
                             databasefunction(io, j);
