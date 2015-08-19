@@ -436,7 +436,7 @@ var myservices = angular.module('myservices', [])
             });
         },
         sendarray: function (ids, zone ) {
-            return $http.get("http://localhost/NetworkBackend/rest/index.php/orders/getunsyncedorders", {
+            return $http.get(adminurl+ "orders/getunsyncedorders", {
                 params: {
                     data: {ids: JSON.stringify(ids)},
                     zone: zone

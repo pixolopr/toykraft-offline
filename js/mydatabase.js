@@ -453,7 +453,7 @@ var mydatabase = angular.module('mydatabase', [])
                 var insertproductsdb = function (productdata, on) {
                     db.transaction(function (tx) {
                         tx.executeSql("INSERT INTO `orderproduct` (orders, product, quantity, name, amount, scheme_id, status, category, productcode) VALUES " + productdata, [], function (tx, results) {
-                            //$cordovaToast.show("Order Number:"+on+"Products", 'long', 'bottom');
+                            $cordovaToast.show("Order Number:" + on + "Products", 'long', 'bottom');
                             console.log("Order Number: " + on + " Products");
                         }, function (tx, results) {
                             console.log("TOP TEN NOT INSERTED");
@@ -495,6 +495,7 @@ var mydatabase = angular.module('mydatabase', [])
 
                             },
                             function (tx, results) {
+                                scope.ordersdown--;
                                 console.log("TOP TEN NOT INSERTED");
                             })
                     });
@@ -507,7 +508,7 @@ var mydatabase = angular.module('mydatabase', [])
                     if (data[io].orders.length > 0) {
                         for (var j = 0; j < data[io].orders.length; j++) {
                             console.log("second for loop");
-                            //$cordovaToast.show("Retained Order Number : "+j+" of "+io+" user", 'long', 'bottom');
+                            $cordovaToast.show("Retained Order Number : " + j + " of " + io + " user", 'long', 'bottom');
                             console.log(j + " " + io);
                             console.log(data[io].orders[j].quantity);
                             databasefunction(io, j);
@@ -523,7 +524,7 @@ var mydatabase = angular.module('mydatabase', [])
                 var insertproductsdb = function (productdata) {
                     db.transaction(function (tx) {
                         tx.executeSql("INSERT INTO `orderproduct` (orders, product, quantity, name, amount, scheme_id, status, category, productcode) VALUES " + productdata, [], function (tx, results) {
-                            //$cordovaToast.show("Order Number: Products", 'long', 'bottom');
+                            $cordovaToast.show("Order Products downloading", 'long', 'bottom');
                             console.log("Order Number:  Products");
                         }, function (tx, results) {
                             console.log("TOP TEN NOT INSERTED");
@@ -539,6 +540,7 @@ var mydatabase = angular.module('mydatabase', [])
                             values += ",";
                         };
                     };
+                    scope.ordersdown--;
                     insertproductsdb(values);
 
                 };
@@ -547,12 +549,16 @@ var mydatabase = angular.module('mydatabase', [])
                     db.transaction(function (tx) {
                         tx.executeSql("INSERT INTO `orders` (`id`, `retail`, `sales`, `timestamp`, `amount`, `signature`, `salesid`, `quantity`, `remark`, `issync`) VALUES (" + orderdata.id + ", '" + orderdata.retail + "', '" + orderdata.sales + "', '" + orderdata.timestamp + "', '" + orderdata.amount + "', '" + orderdata.signature + "', " + orderdata.salesid + ", " + orderdata.quantity + ", '" + orderdata.remark + "', 1) ", [],
                             function (tx, results) {
+                                $cordovaToast.show("Orders downloading", 'long', 'bottom');
                                 if (orderdata.quantity > 0) {
                                     insertproducts(orderdata.orderproducts);
+                                } else {
+                                    scope.ordersdown--;
                                 };
 
                             },
                             function (tx, results) {
+                                scope.ordersdown--;
                                 console.log("TOP TEN NOT INSERTED");
                             })
                     });
@@ -602,7 +608,7 @@ var mydatabase = angular.module('mydatabase', [])
                             console.log(results);
                             console.log('did not add no product with no name');
                         });
-                        //$cordovaToast.show('Order Placed Offline', 'long', 'bottom');
+                        $cordovaToast.show('Order Placed Offline', 'long', 'bottom');
                     });
                 };
 
