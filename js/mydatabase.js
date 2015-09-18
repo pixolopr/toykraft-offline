@@ -461,7 +461,7 @@ var mydatabase = angular.module('mydatabase', [])
                     });
                 };
 
-                var insertindividualproduct = function (product, no) {
+                var insertindividualproduct = function (product, on) {
                     db.transaction(function (tx) {
                         tx.executeSql("INSERT INTO `orderproduct` (orders, product, quantity, name, amount, scheme_id, status, category, productcode) VALUES (" + product.order + ", '" + product.product + "', '" + product.quantity + "', '" + product.name + "', '" + product.amount + "', '" + product.scheme_id + "', '" + product.status + "', '" + product.category + "', '" + product.productcode + "')", [], function (tx, results) {
                             $cordovaToast.show("Order Number:" + on + " -Products", 'short', 'bottom');
@@ -526,6 +526,11 @@ var mydatabase = angular.module('mydatabase', [])
                     };
                 };
 
+            },
+            
+            updateschemeproducts: function()
+            {
+                
             },
 
             insertintoorderswhilesync: function (data, scope) {

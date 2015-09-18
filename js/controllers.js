@@ -103,16 +103,14 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         $scope.rt = false;
         $scope.os = false;
 
-    
-        var sendarraysuccess = function(data, status)
-        {
+
+        var sendarraysuccess = function (data, status) {
             console.log(data);
         };
-        $scope.sendarray = function()
-        {
+        $scope.sendarray = function () {
             MyServices.sendarray().success(sendarraysuccess);
         };
-    
+
         $scope.user = $.jStorage.get("user");
 
         //POP-UP FUNCTION WHEN NO INTERNET/////////////////////////////////////////////////
@@ -266,9 +264,8 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
                     };
                 };
             };*/
-            
-            var unsyncedorderssuccess = function(data, status)
-            {
+
+            var unsyncedorderssuccess = function (data, status) {
                 console.log(data);
                 MyDatabase.insertintoorderswhilesync(data, $scope);
             };
@@ -281,9 +278,9 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
                             offlineorderids.push(results.rows.item(i).id);
                         };
                         console.log(offlineorderids);
-                        
+
                         MyServices.sendarray(offlineorderids, $scope.user.zone).success(unsyncedorderssuccess);
-                        
+
                         /*//GET ONLINE ORDERS ID's
                         MyServices.getordersbyzone($scope.user.zone).success(checkorders);*/
                     }, function (tx, results) {
@@ -587,6 +584,14 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+
+        /////UPDATE PRODUCTS
+        var schemeproductssuccess = function (data, status) {
+            MyDatabase.updateschemeproducts(data);
+        };
+        $scope.downloadproducts = function () {
+            MyServices.getschemeproducts().success(schemeproductssuccess);
+        };
 
 
 

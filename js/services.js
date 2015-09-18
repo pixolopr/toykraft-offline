@@ -443,6 +443,12 @@ var myservices = angular.module('myservices', [])
                 }
             });
         },
+        getschemeproducts: function()
+        {
+            return $http.get(adminurl+ "product/getschemeproducts", {
+                params: {}
+            });
+        },
 
 
 
