@@ -314,7 +314,7 @@ var mydatabase = angular.module('mydatabase', [])
 
             //RETAILER SYNC
             syncinretailerdata: function () {
-                return $http.get("http://toy-kraft.com/NetworkBackend/rest/index.php/retailer/find", {
+                return $http.get(adminurl+"retailer/find", {
                     params: {}
                 })
             },
@@ -453,7 +453,7 @@ var mydatabase = angular.module('mydatabase', [])
                 var insertproductsdb = function (productdata, on) {
                     db.transaction(function (tx) {
                         tx.executeSql("INSERT INTO `orderproduct` (orders, product, quantity, name, amount, scheme_id, status, category, productcode) VALUES " + productdata, [], function (tx, results) {
-                            $cordovaToast.show("Order Number:" + on + " -Products", 'long', 'bottom');
+                            //$cordovaToast.show("Order Number:" + on + " -Products", 'long', 'bottom');
                             console.log("Order Number: " + on + " Products");
                         }, function (tx, results) {
                             console.log("TOP TEN NOT INSERTED");
@@ -524,7 +524,7 @@ var mydatabase = angular.module('mydatabase', [])
                 var insertproductsdb = function (productdata) {
                     db.transaction(function (tx) {
                         tx.executeSql("INSERT INTO `orderproduct` (orders, product, quantity, name, amount, scheme_id, status, category, productcode) VALUES " + productdata, [], function (tx, results) {
-                            $cordovaToast.show("Order Products downloading", 'long', 'bottom');
+                            //$cordovaToast.show("Order Products downloading", 'long', 'bottom');
                             console.log("Order Number:  Products");
                         }, function (tx, results) {
                             console.log("TOP TEN NOT INSERTED");
@@ -549,7 +549,7 @@ var mydatabase = angular.module('mydatabase', [])
                     db.transaction(function (tx) {
                         tx.executeSql("INSERT INTO `orders` (`id`, `retail`, `sales`, `timestamp`, `amount`, `signature`, `salesid`, `quantity`, `remark`, `issync`) VALUES (" + orderdata.id + ", '" + orderdata.retail + "', '" + orderdata.sales + "', '" + orderdata.timestamp + "', '" + orderdata.amount + "', '" + orderdata.signature + "', " + orderdata.salesid + ", " + orderdata.quantity + ", '" + orderdata.remark + "', 1) ", [],
                             function (tx, results) {
-                                $cordovaToast.show("Orders downloading", 'long', 'bottom');
+                                //$cordovaToast.show("Orders downloading", 'long', 'bottom');
                                 if (orderdata.quantity > 0) {
                                     insertproducts(orderdata.orderproducts);
                                 } else {
@@ -608,7 +608,7 @@ var mydatabase = angular.module('mydatabase', [])
                             console.log(results);
                             console.log('did not add no product with no name');
                         });
-                        $cordovaToast.show('Order Placed Offline', 'long', 'bottom');
+                        //$cordovaToast.show('Order Placed Offline', 'long', 'bottom');
                     });
                 };
 

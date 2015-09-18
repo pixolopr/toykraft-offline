@@ -431,7 +431,7 @@ var myservices = angular.module('myservices', [])
         getuserzoneorders: function (zoneid) {
             return $http.get(adminurl + "orders/getzoneordersandproducts", {
                 params: {
-                    zone: 4
+                    zone: zoneid
                 }
             });
         },
