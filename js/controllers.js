@@ -346,7 +346,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         $scope.syncclicked = false;
 
         $scope.sync = function () {
-            //$cordovaToast.show('This might take several minutes, please hold on...', 'long', 'bottom');
+            $cordovaToast.show('This might take several minutes, please hold on...', 'long', 'bottom');
             $scope.syncclicked = true;
 
             if ($scope.retailersup > 0) {
@@ -474,7 +474,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         //FUNCTION TO CHECK WHAT SUCCESS IS LAST
         $scope.importtable = function (whichsuccess) {
             console.log(whichsuccess);
-            //$cordovaToast.show(whichsuccess + ' Data Imported', 'long', 'bottom');
+            $cordovaToast.show(whichsuccess + ' Data Imported', 'long', 'bottom');
             $scope.importtablecount = $scope.importtablecount + 1;
             if ($scope.importtablecount == 7) {
                 $scope.it = false;
@@ -574,7 +574,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
             //PRODUCTIMAGE
             MyDatabase.syncinproductimagedata().success(syncproductimagedatasuccess);
 
-
+            //ZONE WISE ORDERS DOWNLOAD
             MyServices.getuserzoneorders($scope.user.zone).success(syncordersuccess);
 
 

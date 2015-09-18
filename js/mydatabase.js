@@ -453,10 +453,10 @@ var mydatabase = angular.module('mydatabase', [])
                 var insertproductsdb = function (productdata, on) {
                     db.transaction(function (tx) {
                         tx.executeSql("INSERT INTO `orderproduct` (orders, product, quantity, name, amount, scheme_id, status, category, productcode) VALUES " + productdata, [], function (tx, results) {
-                            //$cordovaToast.show("Order Number:" + on + " -Products", 'long', 'bottom');
+                            $cordovaToast.show("Order Number:" + on + " -Products", 'short', 'bottom');
                             console.log("Order Number: " + on + " Products");
                         }, function (tx, results) {
-                            console.log("TOP TEN NOT INSERTED");
+                            console.log("PRODUCT INSERT ERROR");
                         });
                     });
                 };
@@ -479,7 +479,6 @@ var mydatabase = angular.module('mydatabase', [])
 
                     console.log("put order number " + data[e].orders[r] + "" + e);
                     if (data[e].orders[r].quantity > 0) {
-                        console.log(data[e].orders[r].orderproducts);
                         insertproducts(data[e].orders[r].orderproducts, r);
                     } else {
                         scope.ordersdown--;
@@ -496,7 +495,6 @@ var mydatabase = angular.module('mydatabase', [])
                             },
                             function (tx, results) {
                                 scope.ordersdown--;
-                                console.log("TOP TEN NOT INSERTED");
                             })
                     });
                 };
@@ -504,12 +502,11 @@ var mydatabase = angular.module('mydatabase', [])
 
                 console.log("insert data");
                 for (var io = 0; io < data.length; io++) {
-                    console.log("first for loop");
+                    console.log("user number "+io);
                     if (data[io].orders.length > 0) {
                         for (var j = 0; j < data[io].orders.length; j++) {
-                            console.log("second for loop");
+                            console.log("user number "+io+" order no. "+j);
                             //$cordovaToast.show("Retained Order Number : " + j + " of " + io + " user", 'long', 'bottom');
-                            console.log(j + " " + io);
                             console.log(data[io].orders[j].quantity);
                             databasefunction(io, j);
 

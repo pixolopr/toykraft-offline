@@ -1,5 +1,5 @@
-var adminurl = "http://localhost/NetworkBackend/rest/index.php/";
-//var adminurl = "http://toy-kraft.com/NetworkBackend/rest/index.php/";
+//var adminurl = "http://localhost/NetworkBackend/rest/index.php/";
+var adminurl = "http://toy-kraft.com/NetworkBackend/rest/index.php/";
 var myservices = angular.module('myservices', [])
 
 
