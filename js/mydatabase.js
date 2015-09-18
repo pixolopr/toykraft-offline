@@ -314,7 +314,7 @@ var mydatabase = angular.module('mydatabase', [])
 
             //RETAILER SYNC
             syncinretailerdata: function () {
-                return $http.get(adminurl+"retailer/find", {
+                return $http.get(adminurl + "retailer/find", {
                     params: {}
                 })
             },
@@ -461,16 +461,28 @@ var mydatabase = angular.module('mydatabase', [])
                     });
                 };
 
+                var insertindividualproduct = function (product, no) {
+                    db.transaction(function (tx) {
+                        tx.executeSql("INSERT INTO `orderproduct` (orders, product, quantity, name, amount, scheme_id, status, category, productcode) VALUES (" + product.order + ", '" + product.product + "', '" + product.quantity + "', '" + product.name + "', '" + product.amount + "', '" + product.scheme_id + "', '" + product.status + "', '" + product.category + "', '" + product.productcode + "')", [], function (tx, results) {
+                            $cordovaToast.show("Order Number:" + on + " -Products", 'short', 'bottom');
+                            console.log("Order Number: " + on + " Products");
+                        }, function (tx, results) {
+                            console.log("PRODUCT INSERT ERROR");
+                        });
+                    });
+                };
+
                 var insertproducts = function (odata, on) {
                     var values = "";
                     for (var k = 0; k < odata.length; k++) {
+                        insertindividualproduct(odata[k], on);
                         //insertproductsdb(odata[k], k+1, on);
-                        values += "(" + odata[k].order + ", '" + odata[k].product + "', '" + odata[k].quantity + "', '" + odata[k].name + "', '" + odata[k].amount + "', '" + odata[k].scheme_id + "', '" + odata[k].status + "', '" + odata[k].category + "', '" + odata[k].productcode + "')";
-                        if (k != odata.length - 1) {
+                        /*values += "(" + odata[k].order + ", '" + odata[k].product + "', '" + odata[k].quantity + "', '" + odata[k].name + "', '" + odata[k].amount + "', '" + odata[k].scheme_id + "', '" + odata[k].status + "', '" + odata[k].category + "', '" + odata[k].productcode + "')";*/
+                        /*if (k != odata.length - 1) {
                             values += ",";
-                        };
+                        };*/
                     };
-                    insertproductsdb(values, on);
+                    //insertproductsdb(values, on);
                     scope.ordersdown--;
                     scope.$apply();
                 };
@@ -502,10 +514,10 @@ var mydatabase = angular.module('mydatabase', [])
 
                 console.log("insert data");
                 for (var io = 0; io < data.length; io++) {
-                    console.log("user number "+io);
+                    console.log("user number " + io);
                     if (data[io].orders.length > 0) {
                         for (var j = 0; j < data[io].orders.length; j++) {
-                            console.log("user number "+io+" order no. "+j);
+                            console.log("user number " + io + " order no. " + j);
                             //$cordovaToast.show("Retained Order Number : " + j + " of " + io + " user", 'long', 'bottom');
                             console.log(data[io].orders[j].quantity);
                             databasefunction(io, j);
