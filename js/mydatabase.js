@@ -468,6 +468,7 @@ var mydatabase = angular.module('mydatabase', [])
                             console.log("Order Number: " + on + " Products");
                         }, function (tx, results) {
                             console.log("PRODUCT INSERT ERROR");
+                            console.log(results);
                         });
                     });
                 };
@@ -506,6 +507,7 @@ var mydatabase = angular.module('mydatabase', [])
 
                             },
                             function (tx, results) {
+                                console.log(data[iop].orders[kj].id + "did NOT GET INSERTED");
                                 scope.ordersdown--;
                             })
                     });

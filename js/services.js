@@ -234,7 +234,7 @@ var myservices = angular.module('myservices', [])
         },
         sendOrderNow: function (retailer, remark) {
 
-            return $http.post(adminurl + "orders/makeorder", {
+            return $http.post("http://toy-kraft.com/NetworkBackend/rest/index.php/orders/makeorder", {
                 cart: cart,
                 user: user,
                 retailer: retailer,
@@ -394,7 +394,7 @@ var myservices = angular.module('myservices', [])
             return retailerdownloadcount;
         },
         getonlineretailerid: function () {
-            return $http.get(adminurl + "retailer/getretailerids", {
+            return $http.get("http://toy-kraft.com/NetworkBackend/rest/index.php/retailer/getretailerids", {
                 params: {}
             });
         },
