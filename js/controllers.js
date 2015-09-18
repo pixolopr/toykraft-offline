@@ -2115,10 +2115,24 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         $scope.addretailer.lat = '';
         $scope.addretailer.long = '';
 
+        $scope.ownererror = '';
+        $scope.contacterror = '';
 
         $scope.addRetailerFunction = function () {
+
             if ($scope.firstclick == 0) {
-                $scope.firstclick = 1;
+
+                if ($scope.addretailer.ownernumber.length == 10) {
+                    if ($scope.addretailer.contactnumber.length == 10) {
+                        $scope.firstclick = 1;
+                        MyDatabase.addnewretailer($scope.addretailer);
+                    } else {
+                        $scope.contacterror = 'Number should be 10 digits';
+                    };
+                } else {
+                    $scope.ownererror = 'Number should be 10 digits';
+                };;
+
 
                 /*function addRetailerSuccess(data, status) {
                     //SUCCESS
@@ -2130,9 +2144,9 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
                 };*/
 
-                MyDatabase.addnewretailer($scope.addretailer);
 
-            }
+
+            };
         };
 
 
