@@ -449,6 +449,14 @@ var myservices = angular.module('myservices', [])
                 params: {}
             });
         },
+        getnewproducts: function(ids)
+        {
+            return $http.get(adminurl+ "product/getnewproducts", {
+                params: {
+                    oldids: {ids: JSON.stringify(ids)}
+                }
+            });
+        },
 
 
 

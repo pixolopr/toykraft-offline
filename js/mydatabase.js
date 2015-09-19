@@ -338,7 +338,7 @@ var mydatabase = angular.module('mydatabase', [])
                     params: {}
                 })
             },
-            insertproductdata: function (data, scope) {
+            insertproductdata: function (data, scope, scheme) {
                 db.transaction(function (tx) {
                     for (var i = 0; i < data.length; i++) {
                         var sqls = 'INSERT INTO PRODUCT (id, name, product, encode, name2, productcode, category,video,mrp,description,age,scheme,isnew,timestamp) VALUES (' + data[i].id + ',"' + data[i].name + '","' + data[i].product + '","' + data[i].encode + '","' + data[i].name2 + '","' + data[i].productcode + '","' + data[i].category + '","' + data[i].video + '","' + data[i].mrp + '","' + data[i].description + '","' + data[i].age + '","' + data[i].scheme + '","' + data[i].isnew + '","' + data[i].timestamp + '")';
@@ -350,6 +350,9 @@ var mydatabase = angular.module('mydatabase', [])
                         });
                     };
                     scope.importtable("Product");
+                    if (scheme == 1) {
+                        scope.getsscheme();
+                    };
                 });
             },
 
@@ -529,10 +532,26 @@ var mydatabase = angular.module('mydatabase', [])
                 };
 
             },
-            
-            updateschemeproducts: function()
-            {
-                
+
+            updateschemeproducts: function (data) {
+                var updatescheme = function () {
+                    db.transaction(function (tx) {
+                        for (var s = 0; s < data.length; s++) {
+                            tx.executeSql("UPDATE `PRODUCT` SET `scheme`= " + data[s].scheme + " WHERE `id` = " + data[s].id, [], function (tx, results) {
+                                $cordovaToast.show("Scheme Products Updated", 'long', 'bottom');
+                            }, function (tx, results) {
+                                console.log("SCHEME NOT UPDATED");
+                            });
+                        };
+                    });
+                };
+                db.transaction(function (tx) {
+                    tx.executeSql("UPDATE `PRODUCT` SET `scheme`= 0 ", [], function (tx, results) {
+                        updatescheme();
+                    }, function (tx, results) {
+                        console.log("SCHEME NOT UPDATED");
+                    });
+                });
             },
 
             insertintoorderswhilesync: function (data, scope) {

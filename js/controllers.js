@@ -97,7 +97,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 })
 
 
-.controller('syncCtrl', function ($scope, $stateParams, MyServices, MyDatabase, $location, $interval, $cordovaNetwork, $cordovaToast, $ionicPopup, $state) {
+.controller('syncCtrl', function ($scope, $stateParams, MyServices, MyDatabase, $location, $interval, $cordovaNetwork, $cordovaToast, $ionicPopup, $state, $ionicLoading) {
         $scope.it = true;
         $scope.tt = false;
         $scope.rt = false;
@@ -587,10 +587,36 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
         /////UPDATE PRODUCTS
         var schemeproductssuccess = function (data, status) {
+            $ionicLoading.hide();
             MyDatabase.updateschemeproducts(data);
         };
-        $scope.downloadproducts = function () {
+
+        $scope.getscheme = function () {
             MyServices.getschemeproducts().success(schemeproductssuccess);
+        };
+
+        var getnewproductssucess = function (data, status) {
+            MyDatabase.insertproductdata(data, $scope, 1);
+        };
+
+        $scope.downloadproducts = function () {
+            $ionicLoading.show({
+                template: 'Updating Products...'
+            });
+            var offlineproductids = [];
+            db.transaction(function (tx) {
+                tx.executeSql('SELECT `id` FROM `PRODUCT`', [], function (tx, results) {
+                    for (var i = 0; i < results.rows.length; i++) {
+                        offlineproductids.push(results.rows.item(i).id);
+                    };
+                    console.log(offlineproductids);
+
+                    MyServices.getnewproducts(offlineproductids).success(getnewproductssucess);
+
+                }, function (tx, results) {
+                    $ionicLoading.hide();
+                });
+            });
         };
 
 
