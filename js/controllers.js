@@ -1093,7 +1093,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
                 sqls2 = 'SELECT * FROM PRODUCT WHERE "isnew" = "1"  ORDER BY `id` ASC';
             } else {
                 if ($scope.categoryid == "scheme") {
-                    sqls2 = 'SELECT * FROM PRODUCT WHERE "scheme" > 3  ORDER BY `id` ASC';
+                    sqls2 = 'SELECT * FROM PRODUCT WHERE "scheme" > 0  ORDER BY `id` ASC';
                 } else {
                     var findindicator = $scope.categoryid.charAt(0);
                     if (findindicator == "f") {
