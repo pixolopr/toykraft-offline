@@ -385,8 +385,6 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
                 }, null)
             });
 
-
-
             //GET NUMBER OF ORDERS DOWn
             db.transaction(function (tx) {
                 tx.executeSql('SELECT COUNT(*) as `count` FROM `ORDERS` WHERE `issync`=1', [], function (tx, results) {
@@ -519,6 +517,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
         //ORDERS
         syncordersuccess = function (data, status) {
+            console.log("ORDERS ARE HERE");
             MyDatabase.insertintoorders(data, $scope);
         };
 

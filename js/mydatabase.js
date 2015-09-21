@@ -351,7 +351,7 @@ var mydatabase = angular.module('mydatabase', [])
                     };
                     scope.importtable("Product");
                     if (scheme == 1) {
-                        scope.getsscheme();
+                        scope.getscheme();
                     };
                 });
             },
@@ -466,7 +466,7 @@ var mydatabase = angular.module('mydatabase', [])
 
                 var insertindividualproduct = function (product, on) {
                     db.transaction(function (tx) {
-                        tx.executeSql("INSERT INTO `orderproduct` (orders, product, quantity, name, amount, scheme_id, status, category, productcode) VALUES (" + product.order + ", '" + product.product + "', '" + product.quantity + "', '" + product.name + "', '" + product.amount + "', '" + product.scheme_id + "', '" + product.status + "', '" + product.category + "', '" + product.productcode + "')", [], function (tx, results) {
+                        tx.executeSql("INSERT INTO `orderproduct` (orders, product, quantity, name, amount, scheme_id, status, category, productcode) VALUES (?,?,?,?,?,?,?,?,?)", [ product.order , product.product , product.quantity , product.name , product.amount , product.scheme_id , product.status , product.category , product.productcode ], function (tx, results) {
                             $cordovaToast.show("Order Number:" + on + " -Products", 'short', 'bottom');
                             console.log("Order Number: " + on + " Products");
                         }, function (tx, results) {
@@ -504,7 +504,7 @@ var mydatabase = angular.module('mydatabase', [])
 
                 var databasefunction = function (iop, jk) {
                     db.transaction(function (tx) {
-                        tx.executeSql("INSERT INTO `orders` (`id`, `retail`, `sales`, `timestamp`, `amount`, `signature`, `salesid`, `quantity`, `remark`, `issync`) VALUES (" + data[iop].orders[jk].id + ", '" + data[iop].orders[jk].retail + "', '" + data[iop].orders[jk].sales + "', '" + data[iop].orders[jk].timestamp + "', '" + data[iop].orders[jk].amount + "', '" + data[iop].orders[jk].signature + "', " + data[iop].orders[jk].salesid + ", " + data[iop].orders[jk].quantity + ", '" + data[iop].orders[jk].remark + "', 1) ", [],
+                        tx.executeSql("INSERT INTO `orders` (`id`, `retail`, `sales`, `timestamp`, `amount`, `signature`, `salesid`, `quantity`, `remark`, `issync`) VALUES (?,?,?,?,?,?,?,?,?,?)", [data[iop].orders[jk].id , data[iop].orders[jk].retail , data[iop].orders[jk].sales , data[iop].orders[jk].timestamp , data[iop].orders[jk].amount , data[iop].orders[jk].signature , data[iop].orders[jk].salesid , data[iop].orders[jk].quantity , data[iop].orders[jk].remark , 1 ],
                             function (tx, results) {
                                 escapefuntion(iop, jk);
 
@@ -523,7 +523,7 @@ var mydatabase = angular.module('mydatabase', [])
                     if (data[io].orders.length > 0) {
                         for (var j = 0; j < data[io].orders.length; j++) {
                             console.log("user number " + io + " order no. " + j);
-                            //$cordovaToast.show("Retained Order Number : " + j + " of " + io + " user", 'long', 'bottom');
+                            $cordovaToast.show("Retained Order Number : " + j + " of " + io + " user", 'long', 'bottom');
                             console.log(data[io].orders[j].quantity);
                             databasefunction(io, j);
 

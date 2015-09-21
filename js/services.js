@@ -451,7 +451,7 @@ var myservices = angular.module('myservices', [])
         },
         getnewproducts: function(ids)
         {
-            return $http.get(adminurl+ "product/getnewproducts", {
+            return $http.post(adminurl+ "product/getnewproducts", {
                 params: {
                     oldids: {ids: JSON.stringify(ids)}
                 }
