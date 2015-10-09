@@ -594,7 +594,14 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 };*/
 
         $scope.getscheme = function () {
-            MyServices.getschemeproducts().success(schemeproductssuccess = function(sdata, status) {
+            MyServices.getschemeproducts().success(schemeproductssuccess = function (sdata, status) {
+                console.log(sdata);
+                MyDatabase.updateschemeproducts(sdata, $scope);
+            });
+        };
+
+        $scope.consolescheme = function () {
+            MyServices.getschemeproducts().success(schemeproductssuccess = function (sdata, status) {
                 console.log(sdata);
                 MyDatabase.updateschemeproducts(sdata, $scope);
             });
