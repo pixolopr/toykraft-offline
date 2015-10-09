@@ -466,7 +466,7 @@ var mydatabase = angular.module('mydatabase', [])
 
                 var insertindividualproduct = function (product, on) {
                     db.transaction(function (tx) {
-                        tx.executeSql("INSERT INTO `orderproduct` (orders, product, quantity, name, amount, scheme_id, status, category, productcode) VALUES (?,?,?,?,?,?,?,?,?)", [ product.order , product.product , product.quantity , product.name , product.amount , product.scheme_id , product.status , product.category , product.productcode ], function (tx, results) {
+                        tx.executeSql("INSERT INTO `orderproduct` (orders, product, quantity, name, amount, scheme_id, status, category, productcode) VALUES (?,?,?,?,?,?,?,?,?)", [product.order, product.product, product.quantity, product.name, product.amount, product.scheme_id, product.status, product.category, product.productcode], function (tx, results) {
                             $cordovaToast.show("Order Number:" + on + " -Products", 'short', 'bottom');
                             console.log("Order Number: " + on + " Products");
                         }, function (tx, results) {
@@ -504,7 +504,7 @@ var mydatabase = angular.module('mydatabase', [])
 
                 var databasefunction = function (iop, jk) {
                     db.transaction(function (tx) {
-                        tx.executeSql("INSERT INTO `orders` (`id`, `retail`, `sales`, `timestamp`, `amount`, `signature`, `salesid`, `quantity`, `remark`, `issync`) VALUES (?,?,?,?,?,?,?,?,?,?)", [data[iop].orders[jk].id , data[iop].orders[jk].retail , data[iop].orders[jk].sales , data[iop].orders[jk].timestamp , data[iop].orders[jk].amount , data[iop].orders[jk].signature , data[iop].orders[jk].salesid , data[iop].orders[jk].quantity , data[iop].orders[jk].remark , 1 ],
+                        tx.executeSql("INSERT INTO `orders` (`id`, `retail`, `sales`, `timestamp`, `amount`, `signature`, `salesid`, `quantity`, `remark`, `issync`) VALUES (?,?,?,?,?,?,?,?,?,?)", [data[iop].orders[jk].id, data[iop].orders[jk].retail, data[iop].orders[jk].sales, data[iop].orders[jk].timestamp, data[iop].orders[jk].amount, data[iop].orders[jk].signature, data[iop].orders[jk].salesid, data[iop].orders[jk].quantity, data[iop].orders[jk].remark, 1],
                             function (tx, results) {
                                 escapefuntion(iop, jk);
 
@@ -533,12 +533,13 @@ var mydatabase = angular.module('mydatabase', [])
 
             },
 
-            updateschemeproducts: function (data) {
+            updateschemeproducts: function (data, scope) {
                 var updatescheme = function () {
                     db.transaction(function (tx) {
                         for (var s = 0; s < data.length; s++) {
                             tx.executeSql("UPDATE `PRODUCT` SET `scheme`= " + data[s].scheme + " WHERE `id` = " + data[s].id, [], function (tx, results) {
-                                $cordovaToast.show("Scheme Products Updated", 'long', 'bottom');
+                                $cordovaToast.show("Scheme Products Updated", 'short', 'bottom');
+                                scope.hideloading();
                             }, function (tx, results) {
                                 console.log("SCHEME NOT UPDATED");
                             });
@@ -546,7 +547,7 @@ var mydatabase = angular.module('mydatabase', [])
                     });
                 };
                 db.transaction(function (tx) {
-                    tx.executeSql("UPDATE `PRODUCT` SET `scheme`= 0 ", [], function (tx, results) {
+                    tx.executeSql("UPDATE `PRODUCT` SET `scheme`= 0 WHERE `scheme` > 0", [], function (tx, results) {
                         updatescheme();
                     }, function (tx, results) {
                         console.log("SCHEME NOT UPDATED");

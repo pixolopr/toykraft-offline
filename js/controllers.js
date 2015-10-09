@@ -585,9 +585,12 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
 
         /////UPDATE PRODUCTS
-        var schemeproductssuccess = function (data, status) {
+        $scope.hideloading = function () {
             $ionicLoading.hide();
-            MyDatabase.updateschemeproducts(data);
+        };
+        var schemeproductssuccess = function (data, status) {
+            //$ionicLoading.hide();
+            MyDatabase.updateschemeproducts(data, $scope);
         };
 
         $scope.getscheme = function () {
