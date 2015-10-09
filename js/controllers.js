@@ -588,14 +588,16 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         $scope.hideloading = function () {
             $ionicLoading.hide();
         };
-        var schemeproductssuccess = function (data, status) {
-            //$ionicLoading.hide();
-            console.log(data);
-            MyDatabase.updateschemeproducts(data, $scope);
-        };
+        /*var schemeproductssuccess = function (sdata, status) {
+    //$ionicLoading.hide();
+
+};*/
 
         $scope.getscheme = function () {
-            MyServices.getschemeproducts().success(schemeproductssuccess);
+            MyServices.getschemeproducts().success(schemeproductssuccess(sdata, status) {
+                console.log(sdata);
+                MyDatabase.updateschemeproducts(sdata, $scope);
+            });
         };
 
         var getnewproductssucess = function (data, status) {
