@@ -535,15 +535,18 @@ var mydatabase = angular.module('mydatabase', [])
 
             updateschemeproducts: function (data, scope) {
                 var updatescheme = function () {
+                    console.log(data);
                     db.transaction(function (tx) {
                         for (var s = 0; s < data.length; s++) {
                             tx.executeSql("UPDATE `PRODUCT` SET `scheme`= " + data[s].scheme + " WHERE `id` = " + data[s].id, [], function (tx, results) {
-                                $cordovaToast.show("Scheme Products Updated", 'short', 'bottom');
-                                scope.hideloading();
+                                //$cordovaToast.show("Scheme Products Updated", 'short', 'bottom');
+
                             }, function (tx, results) {
                                 console.log("SCHEME NOT UPDATED");
                             });
                         };
+                        $cordovaToast.show("Scheme Products Updated", 'short', 'bottom');
+                        scope.hideloading();
                     });
                 };
                 db.transaction(function (tx) {

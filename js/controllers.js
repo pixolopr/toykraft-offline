@@ -590,6 +590,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
         };
         var schemeproductssuccess = function (data, status) {
             //$ionicLoading.hide();
+            console.log(data);
             MyDatabase.updateschemeproducts(data, $scope);
         };
 
