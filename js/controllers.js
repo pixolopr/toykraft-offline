@@ -36,7 +36,7 @@ angular.module('starter.controllers', ['ngCordova', 'myservices', 'mydatabase', 
 
     //GET CATEGORY NAMES
     $scope.categorynamedata = $.jStorage.get("categories");
-    $scope.$apply();
+    //$scope.$apply();
 
     var synccategorydatasuccess = function (data, status) {
         $scope.categorynamedata = data;

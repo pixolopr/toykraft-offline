@@ -33,14 +33,16 @@ var mydatabase = angular.module('mydatabase', [])
             setordersynccount: function () {
                 var user = MyServices.getuser();
                 //console.log('SELECT COUNT(*) as `number` FROM ORDERS WHERE `issync` = 0 AND `salesid`='+user.id);
-                db.transaction(function (tx) {
-                    tx.executeSql('SELECT COUNT(*) as `number` FROM ORDERS WHERE `issync` = 0 AND `salesid`=' + user.id, [], function (tx, results) {
-                        console.log(results.rows.item(0).number)
-                        ordersynccount = results.rows.item(0).number;
-                    }, function (tx, results) {
-                        console.log(results);
-                    })
-                });
+                if (user) {
+                    db.transaction(function (tx) {
+                        tx.executeSql('SELECT COUNT(*) as `number` FROM ORDERS WHERE `issync` = 0 AND `salesid`=' + user.id, [], function (tx, results) {
+                            console.log(results.rows.item(0).number)
+                            ordersynccount = results.rows.item(0).number;
+                        }, function (tx, results) {
+                            console.log(results);
+                        })
+                    });
+                };
             },
             syncorders: function (scope, oid2) {
                 user = MyServices.getuser();
